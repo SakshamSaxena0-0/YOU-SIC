@@ -225,3 +225,28 @@ html.theme-subway .ly-line:hover { color: var(--text-dim); }
 html.theme-subway .ly-line.active { color: var(--text); text-shadow: 0 0 22px color-mix(in srgb, var(--teal) 60%, transparent); }
 html.theme-subway .vis-host { border-radius: var(--r-art); box-shadow: 0 0 0 1px var(--glass-line), 0 30px 60px -20px var(--shade); }
 html.theme-subway .vis-host.full { border-radius: 0; box-shadow: none; }
+
+/* ---------- §1 typography ---------- */
+@font-face { font-family: 'Michroma'; src: url('../fonts/Michroma-Regular.ttf') format('truetype'); font-display: swap; }
+@font-face { font-family: 'Share Tech Mono'; src: url('../fonts/ShareTechMono-Regular.ttf') format('truetype'); font-display: swap; }
+/* titles: the wide techno face, with a teal halo on headings */
+html.theme-subway :is(#plTitle, .lib-title, .ah-title, .sheet-title) {
+  font-family: var(--font-display); font-weight: 400; letter-spacing: 0.04em;
+  text-shadow: 0 0 10px color-mix(in srgb, var(--teal) 50%, transparent);
+}
+html.theme-subway #plTitle { text-transform: uppercase; }
+/* micro labels: mono, small, tracked out */
+html.theme-subway :is(.pl-cat-label, .pl-cat-pos, .ab-kicker, .ab-file, .ab-fmt span, .pl-meta, .tile-count, .r-dur, .t-num, .seek-times,
+  .fchip, .folder-row span, .lib-sub, .ah-meta, .badge, .b-val, .b-freq, .k-label, .knob-hint, .mi-hint, .choice-hint, .rv, #volVal, .about, .seek-bubble) {
+  font-family: var(--font-mono); font-weight: 400; letter-spacing: 0.08em;
+}
+html.theme-subway :is(.pl-cat-label, .ab-kicker, .ab-file, .ab-fmt span, .tile-count, .badge, .k-label, .knob-hint, .about) { font-size: 10px; }
+html.theme-subway :is(.pl-cat-pos, .pl-meta, .r-dur, .t-num, .fchip, .folder-row span, .lib-sub, .ah-meta, .b-val, .b-freq, .mi-hint, .choice-hint, .rv, #volVal, .seek-bubble) { font-size: 11px; }
+/* section headings: mono caps with a hairline */
+html.theme-subway :is(.sec-title, .set-sec) {
+  display: flex; align-items: center; gap: 10px; font-family: var(--font-mono); font-weight: 400; font-size: 11px;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--aqua);
+}
+html.theme-subway :is(.sec-title, .set-sec)::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--glass-line), transparent); }
+html.theme-subway .menu-head { font-family: var(--font-mono); font-weight: 400; letter-spacing: 0.08em; font-size: 10px; }
+.theme-row [data-v='subway'] { font-family: 'Michroma', 'Segoe UI', sans-serif; font-size: 10px; letter-spacing: 0.04em; }

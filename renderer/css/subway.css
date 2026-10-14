@@ -22,6 +22,7 @@ html.theme-subway {
   --lime: #c8ff6a;
   --coral-hi: #ff6b6b;
   --coral-lo: #b82f3d;
+  --mask-solid: linear-gradient(#000 0 0); /* not a colour: the opaque layer for CSS masks */
   /* chrome */
   --chrome-hi: #f4fbff;
   --chrome-mid: #9fb4bd;
@@ -250,3 +251,34 @@ html.theme-subway :is(.sec-title, .set-sec) {
 html.theme-subway :is(.sec-title, .set-sec)::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--glass-line), transparent); }
 html.theme-subway .menu-head { font-family: var(--font-mono); font-weight: 400; letter-spacing: 0.08em; font-size: 10px; }
 .theme-row [data-v='subway'] { font-family: 'Michroma', 'Segoe UI', sans-serif; font-size: 10px; letter-spacing: 0.04em; }
+
+/* ---------- §2 window chrome ---------- */
+/* the drag region, double-click maximise and Windows snap are untouched (.tb-drag / -webkit-app-region) */
+html.theme-subway .titlebar { background: linear-gradient(180deg, color-mix(in srgb, var(--bg-2) 80%, transparent), transparent); }
+html.theme-subway .tb-drag { gap: 8px; padding-left: 16px; }
+/* title: "YouSic :: V.2K" with a teal LED that pulses while playing */
+html.theme-subway .tb-logo { width: 7px; height: 7px; border-radius: var(--r-orb); background: var(--teal); box-shadow: 0 0 6px var(--teal); }
+html.theme-subway .playing .tb-logo { animation: y2k-led 1.6s ease-in-out infinite; }
+@keyframes y2k-led { 50% { opacity: 0.35; } }
+html.theme-subway .tb-title { font-family: var(--font-mono); font-size: 11px; font-weight: 400; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text); }
+html.theme-subway .tb-title::after { content: ' :: V.2K'; color: var(--teal); }
+/* window buttons: three 22px gel circles; the glyph appears on hover */
+html.theme-subway .tb-buttons { align-items: center; gap: 9px; padding: 0 14px 0 8px; }
+html.theme-subway .tb-btn {
+  width: 22px; height: 22px; border-radius: var(--r-orb); color: var(--ink);
+  background: var(--gel); box-shadow: var(--gel-shadow); transition: box-shadow var(--t-fast), transform var(--t-fast);
+}
+html.theme-subway .tb-btn svg { width: 9px; height: 9px; stroke-width: 1.6; opacity: 0; transition: opacity var(--t-fast); }
+html.theme-subway .tb-btn:hover { background: var(--gel); color: var(--ink); box-shadow: var(--gel-shadow-hover); }
+html.theme-subway .tb-btn:hover svg, html.theme-subway .tb-btn:focus-visible svg { opacity: 1; }
+html.theme-subway .tb-btn:active { transform: scale(0.92); box-shadow: var(--gel-shadow-active); }
+html.theme-subway .tb-close { background: var(--gel-gloss), linear-gradient(180deg, var(--coral-hi), var(--coral-lo)); box-shadow: var(--gel-edge), 0 0 12px color-mix(in srgb, var(--coral-hi) 45%, transparent), var(--gel-drop); }
+html.theme-subway .tb-close:hover { background: var(--gel-gloss), linear-gradient(180deg, var(--coral-hi), var(--coral-lo)); box-shadow: var(--gel-edge), 0 0 14px color-mix(in srgb, var(--coral-hi) 75%, transparent), var(--gel-drop); }
+/* a 1px chrome border round the window, rounded at the top (gone when maximised) */
+html.theme-subway .app::after {
+  content: ''; position: fixed; inset: 0; z-index: 700; pointer-events: none; border-radius: 10px 10px 0 0;
+  padding: 1px; background: linear-gradient(180deg, var(--chrome-hi), var(--chrome-lo));
+  -webkit-mask: var(--mask-solid) content-box, var(--mask-solid); -webkit-mask-composite: xor; mask-composite: exclude;
+}
+html.theme-subway .app.maximized::after { display: none; }
+html.theme-subway .app:not(.maximized) { border-radius: 10px 10px 0 0; overflow: hidden; }

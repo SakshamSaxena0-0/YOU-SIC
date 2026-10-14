@@ -258,8 +258,10 @@ html.theme-subway .titlebar { background: linear-gradient(180deg, color-mix(in s
 html.theme-subway .tb-drag { gap: 8px; padding-left: 16px; }
 /* title: "YouSic :: V.2K" with a teal LED that pulses while playing */
 html.theme-subway .tb-logo { width: 7px; height: 7px; border-radius: var(--r-orb); background: var(--teal); box-shadow: 0 0 6px var(--teal); }
-html.theme-subway .playing .tb-logo { animation: y2k-led 1.6s ease-in-out infinite; }
-@keyframes y2k-led { 50% { opacity: 0.35; } }
+/* decorative motion runs in steps on shared half-second beats: a smooth loop would make the GPU redraw
+   every frame (measured: +5-11% CPU), stepped ones cost almost nothing */
+html.theme-subway .playing .tb-logo { animation: y2k-led 1s steps(2, jump-none) infinite; }
+@keyframes y2k-led { to { opacity: 0.35; } }
 html.theme-subway .tb-title { font-family: var(--font-mono); font-size: 11px; font-weight: 400; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text); }
 html.theme-subway .tb-title::after { content: ' :: V.2K'; color: var(--teal); }
 /* window buttons: three 22px gel circles; the glyph appears on hover */
@@ -282,3 +284,32 @@ html.theme-subway .app::after {
 }
 html.theme-subway .app.maximized::after { display: none; }
 html.theme-subway .app:not(.maximized) { border-radius: 10px 10px 0 0; overflow: hidden; }
+
+/* ---------- §3 background ---------- */
+/* one backdrop behind both panes; the panes themselves are clear */
+html.theme-subway .fx { display: block; position: fixed; inset: 0; overflow: hidden; pointer-events: none; background: radial-gradient(120% 90% at 50% 40%, var(--bg-1), var(--bg-0)); }
+html.theme-subway :is(.player, .library, .eq) { background: transparent; }
+html.theme-subway .app:not(.wide) :is(.library, .eq) { background: color-mix(in srgb, var(--bg-0) 90%, transparent); }
+/* the current album art, blurred and saturated (pre-baked in a canvas), crossfading over 600ms */
+html.theme-subway .fx-art i { position: absolute; inset: 0; background: center / cover no-repeat; transform: scale(1.3); opacity: 0; transition: opacity 600ms ease; }
+html.theme-subway .fx-art i.show { opacity: 0.35; }
+/* aurora: three soft blobs drifting on 30-40s loops, moving on the shared half-second beat */
+html.theme-subway .fx-aurora i { position: absolute; width: 60vmax; height: 60vmax; border-radius: var(--r-orb); }
+html.theme-subway .fx-aurora i:nth-child(1) { left: -18vmax; top: -22vmax; background: radial-gradient(closest-side, color-mix(in srgb, var(--teal) 18%, transparent), transparent); animation: y2k-drift-a 34s steps(68) infinite alternate; }
+html.theme-subway .fx-aurora i:nth-child(2) { right: -20vmax; top: 10vh; background: radial-gradient(closest-side, color-mix(in srgb, var(--lilac) 14%, transparent), transparent); animation: y2k-drift-b 38s steps(76) infinite alternate; }
+html.theme-subway .fx-aurora i:nth-child(3) { left: 20vw; bottom: -30vmax; background: radial-gradient(closest-side, color-mix(in srgb, var(--pink) 12%, transparent), transparent); animation: y2k-drift-c 31s steps(62) infinite alternate; }
+@keyframes y2k-drift-a { to { transform: translate(14vmax, 10vmax); } }
+@keyframes y2k-drift-b { to { transform: translate(-12vmax, 14vmax); } }
+@keyframes y2k-drift-c { to { transform: translate(10vmax, -12vmax); } }
+/* grain at 3% */
+html.theme-subway .grain { display: block; opacity: 0.03; }
+/* a faint perspective grid floor under the right pane only */
+html.theme-subway .fx-grid { display: none; }
+html:has(.app.wide).theme-subway .fx-grid {
+  display: block; position: absolute; left: var(--pw); right: 0; bottom: 0; height: 34vh; transform-origin: 50% 100%;
+  transform: perspective(320px) rotateX(58deg) scale(1.6);
+  background:
+    repeating-linear-gradient(90deg, color-mix(in srgb, var(--teal) 8%, transparent) 0 1px, transparent 1px 48px),
+    repeating-linear-gradient(0deg, color-mix(in srgb, var(--teal) 8%, transparent) 0 1px, transparent 1px 48px);
+  -webkit-mask: linear-gradient(0deg, var(--shade), transparent);
+}

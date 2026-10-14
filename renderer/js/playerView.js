@@ -336,7 +336,37 @@ export class PlayerView {
     h.classList.toggle('show', !!text);
   }
 
+  // Y2K theme backdrop: a pre-blurred, saturated copy of the cover (made once per track in a small
+  // canvas, so the window never runs a live 80px blur), crossfaded between two layers.
+  _setFxArt(url) {
+    if (!document.documentElement.classList.contains('theme-subway')) return;
+    const layers = $$('#fx .fx-art i');
+    const swap = (src) => {
+      const next = layers[this.fxFlip ^ 1], cur = layers[this.fxFlip];
+      next.style.backgroundImage = src ? `url("${src}")` : 'none';
+      next.classList.add('show');
+      cur.classList.remove('show');
+      this.fxFlip ^= 1;
+    };
+    this.fxFlip = this.fxFlip || 0;
+    if (!url) return swap(null);
+    const im = new Image();
+    im.onload = () => {
+      const c = document.createElement('canvas');
+      c.width = c.height = 96;
+      const g = c.getContext('2d');
+      g.filter = 'blur(6px) saturate(1.6)';
+      g.drawImage(im, -12, -12, 120, 120);
+      swap(c.toDataURL('image/jpeg', 0.85));
+    };
+    im.onerror = () => swap(null);
+    im.src = url;
+  }
+
+  refreshFx() { this._setFxArt(this.player.track ? coverUrl(this.player.track.cover) : ''); }
+
   _setBackground(url) {
+    this._setFxArt(url);
     const layers = $$('#bg .bg-layer');
     const next = layers[this.bgFlip ^ 1], cur = layers[this.bgFlip];
     const apply = () => {

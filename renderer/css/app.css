@@ -1261,3 +1261,6 @@ html.glass-window, html.glass-window body { background: transparent; }
    progress readouts keep going. */
 .idle .bg-layer, .idle .eqbars i, .idle .marquee span, .idle .aq-pool, .idle .aq-pool i, .idle .aq-bub b,
 .idle .froth b, .idle .ctl-play, .idle .ctl-play > .aq-gloss::after { animation-play-state: paused !important; }
+
+/* app-level effects backdrop (only the Y2K theme shows it; see subway.css §3) */
+.fx { display: none; }

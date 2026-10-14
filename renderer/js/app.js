@@ -320,6 +320,7 @@ class App {
       THEMES.forEach((t) => html0.classList.toggle('theme-' + t, t === theme));
       html0.classList.toggle('theme-solid', solid);
       this.playerView.wave.setTheme(theme);
+      this.playerView.refreshFx();
       refreshLiquid();
     }
     this.root.classList.toggle('no-blur', !s.blurBg);

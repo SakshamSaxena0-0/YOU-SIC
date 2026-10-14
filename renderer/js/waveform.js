@@ -117,7 +117,17 @@ export class Waveform {
   setAccent(rgb) { this.accent = rgb; this.invalidate(); }
   // themes: cyberpunk draws hard-edged cyan bars with a magenta block cursor; y2k subway draws
   // thin sharp pale-teal bars with a mint played side
-  setTheme(name) { this.theme = name; this.cyber = name === 'cyber'; this.invalidate(); }
+  setTheme(name) {
+    this.theme = name;
+    this.cyber = name === 'cyber';
+    // the Y2K theme paints with its design tokens
+    if (name === 'subway') {
+      const cs = getComputedStyle(document.documentElement);
+      const v = (k) => cs.getPropertyValue(k).trim();
+      this.tok = { teal: v('--teal'), lilac: v('--lilac'), pink: v('--pink'), lo: v('--chrome-lo'), mid: v('--chrome-mid'), hi: v('--chrome-hi') };
+    }
+    this.invalidate();
+  }
 
   _bind() {
     const pos = (e) => clamp((e.clientX - this.cv.getBoundingClientRect().left) / this.w, 0, 1);
@@ -132,11 +142,16 @@ export class Waveform {
     this.cv.addEventListener('pointermove', (e) => {
       this.hover = pos(e);
       this.invalidate();
-      if (!this.dragging) return;
+      // hovering shows the time under the pointer; dragging shows the time you will land on
+      if (!this.dragging) { if (this.engine.duration) this._bubble(e, this.hover); return; }
       this.dragX = pos(e);
       this._bubble(e, this.dragX);
     });
-    this.cv.addEventListener('pointerleave', () => { this.hover = -1; this.invalidate(); });
+    this.cv.addEventListener('pointerleave', () => {
+      this.hover = -1;
+      if (!this.dragging) this.bubble.classList.remove('show');
+      this.invalidate();
+    });
     const up = (e) => {
       if (!this.dragging) return;
       this.dragging = false;
@@ -157,6 +172,43 @@ export class Waveform {
     this.bubble.textContent = fmtTime(x * this.engine.duration);
     this.bubble.style.left = `${x * this.w}px`;
     this.bubble.classList.add('show');
+  }
+
+  // Y2K theme: played bars in a teal-lilac-pink gradient with a glow, unplayed bars in dim chrome,
+  // and a small chrome orb with a teal ring for the playhead.
+  _drawY2k(g, w, h, prog) {
+    const c = this.tok;
+    const step = w / BARS, bw = Math.max(1.4, step * 0.55), mid = h * 0.64;
+    const pT = new Path2D(), pB = new Path2D(), uT = new Path2D(), uB = new Path2D();
+    for (let i = 0; i < BARS; i++) {
+      const x = i * step + (step - bw) / 2;
+      const v = this.cur[i];
+      const top = Math.max(1.5, v * (mid - 4)), bot = Math.max(1, v * (h - mid - 3) * 0.6);
+      const played = (i + 0.5) / BARS <= prog;
+      (played ? pT : uT).roundRect(x, mid - top, bw, top, bw / 2);
+      (played ? pB : uB).roundRect(x, mid + 2, bw, bot, bw / 2);
+    }
+    g.fillStyle = c.lo;
+    g.globalAlpha = 0.45; g.fill(uT);
+    g.globalAlpha = 0.18; g.fill(uB);
+    g.globalAlpha = 1;
+    const pg = g.createLinearGradient(0, 4, 0, mid);
+    pg.addColorStop(0, c.teal); pg.addColorStop(0.5, c.lilac); pg.addColorStop(1, c.pink);
+    g.save();
+    g.shadowColor = c.teal; g.shadowBlur = 6;
+    g.fillStyle = pg; g.fill(pT);
+    g.restore();
+    g.globalAlpha = 0.3; g.fillStyle = c.pink; g.fill(pB); g.globalAlpha = 1;
+    if (this.hover >= 0 && !this.dragging) { g.fillStyle = c.mid; g.globalAlpha = 0.6; g.fillRect(this.hover * w - 0.5, 4, 1, h - 8); g.globalAlpha = 1; }
+    // playhead: a 10px chrome orb in a teal ring
+    const px = prog * w, r = this.dragging ? 6 : 5;
+    g.save();
+    g.shadowColor = c.teal; g.shadowBlur = 8;
+    g.beginPath(); g.arc(px, mid, r + 1.5, 0, Math.PI * 2); g.strokeStyle = c.teal; g.lineWidth = 1.5; g.stroke();
+    g.restore();
+    const og = g.createRadialGradient(px - r * 0.35, mid - r * 0.4, 0.5, px, mid, r);
+    og.addColorStop(0, c.hi); og.addColorStop(0.55, c.mid); og.addColorStop(1, c.lo);
+    g.beginPath(); g.arc(px, mid, r, 0, Math.PI * 2); g.fillStyle = og; g.fill();
   }
 
   // Pixel theme: the waveform as a grid of square cells, like an old LED/pixel equalizer.
@@ -202,10 +254,11 @@ export class Waveform {
     g.setTransform(dpr, 0, 0, dpr, 0, 0);
     g.clearRect(0, 0, w, h);
     if (this.theme === 'pixel') { this._drawPixel(g, w, h, prog); return moving; }
+    if (this.theme === 'subway' && this.tok) { this._drawY2k(g, w, h, prog); return moving; }
     const step = w / BARS;
-    const cy = this.cyber, y2k = this.theme === 'subway';
-    const bw = Math.max(1.2, step * (cy ? 0.62 : y2k ? 0.42 : 0.56));
-    const rad = cy || y2k ? 0 : bw / 2;
+    const cy = this.cyber;
+    const bw = Math.max(1.2, step * (cy ? 0.62 : 0.56));
+    const rad = cy ? 0 : bw / 2;
     const mid = h * 0.64;
     const [r, gg, b] = this.accent;
     const light = (k) => `rgb(${Math.round(r + (255 - r) * k)},${Math.round(gg + (255 - gg) * k)},${Math.round(b + (255 - b) * k)})`;
@@ -223,7 +276,7 @@ export class Waveform {
     }
     const px = prog * w;
     // unplayed
-    const base = cy ? '0,240,255' : this.theme === 'subway' ? '160,222,210' : '255,255,255';
+    const base = cy ? '0,240,255' : '255,255,255';
     const ug = g.createLinearGradient(0, 0, 0, mid);
     ug.addColorStop(0, `rgba(${base},${cy ? 0.55 : 0.4})`);
     ug.addColorStop(1, `rgba(${base},${cy ? 0.22 : 0.18})`);

@@ -456,3 +456,7 @@ html.theme-subway .star.on::before {
   filter: drop-shadow(0 0 4px color-mix(in srgb, var(--pink) 70%, transparent));
 }
 html.theme-subway .star:hover { transform: scale(1.15); }
+
+/* ---------- §7 waveform seekbar (drawn in waveform.js from these tokens) ---------- */
+html.theme-subway .seek-times { font-size: 11px; color: var(--text); }
+html.theme-subway .seek-bubble { background: var(--glass), color-mix(in srgb, var(--bg-1) 92%, transparent); color: var(--text); border: 1px solid var(--glass-line); box-shadow: var(--glass-shadow), var(--gel-glow); padding: 3px 10px; }

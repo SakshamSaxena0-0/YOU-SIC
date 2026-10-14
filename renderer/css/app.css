@@ -1275,3 +1275,8 @@ html.glass-window, html.glass-window body { background: transparent; }
 .cd, .sticker { display: none; }
 .spark { display: none; }
 .splash { display: none; }
+
+/* Reduce effects (every theme): no backdrop blur and no looping decoration */
+html.fx-lite *, html.fx-lite *::before, html.fx-lite *::after { backdrop-filter: none !important; }
+html.fx-lite .bg-layer, html.fx-lite .marquee span, html.fx-lite .aq-pool, html.fx-lite .aq-pool i, html.fx-lite .aq-bub b, html.fx-lite .froth b { animation: none !important; }
+html.fx-lite .grain { display: none !important; }

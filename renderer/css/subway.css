@@ -678,3 +678,19 @@ html.boot-y2k .splash-bar i:nth-child(7) { animation-delay: 300ms; } html.boot-y
 html.boot-y2k .splash-bar i:nth-child(9) { animation-delay: 400ms; } html.boot-y2k .splash-bar i:nth-child(10) { animation-delay: 450ms; }
 @keyframes y2k-seg { from { background: color-mix(in srgb, var(--chrome-hi) 10%, transparent); } to { background: var(--teal); box-shadow: 0 0 6px var(--teal); } }
 html.boot-y2k .splash-text { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; color: var(--text-dim); }
+
+/* ---------- §15 performance and accessibility ---------- */
+/* Reduce effects: the glass tokens turn solid (§0); the decoration goes */
+html.theme-subway.fx-lite :is(.fx-aurora, .fx-bubbles, .spark, .grain) { display: none; }
+html.theme-subway.fx-lite .nav-ink::after { display: none; }
+html.theme-subway.fx-lite :is(.cd-disc, .tb-logo) { animation: none !important; }
+html.theme-subway.fx-lite .tile::after { animation: none !important; }
+html.theme-subway.fx-lite .play-wrap::before { animation: none !important; opacity: 0.5; }
+/* every decorative loop stops while the window is unfocused or minimised (html.idle); playback carries on */
+html.theme-subway.idle :is(.fx-aurora i, .fx-bubbles i, .cd-disc, .spark, .tb-logo, .eqbars i) { animation-play-state: paused !important; }
+html.theme-subway.idle .nav-ink::after, html.theme-subway.idle .play-wrap::before { animation-play-state: paused !important; }
+/* a visible 2px aqua focus ring for keyboard users */
+html.theme-subway :focus-visible { outline: 2px solid var(--aqua); outline-offset: 2px; }
+/* the aqua outline replaces the generic accent ring where nothing else draws a shadow */
+html.theme-subway .nav-btn:focus-visible { box-shadow: none; }
+html.theme-subway :is(.row, .tile, .set-row, .menu-item):focus-visible { outline-offset: 2px; }

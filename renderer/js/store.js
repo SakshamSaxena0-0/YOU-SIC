@@ -23,6 +23,7 @@ export const DEFAULT_SETTINGS = {
   buttonStyle: 'ios', // ios (clear glass) | bubble | aqua (liquid-filled)
   liquid: 'aqua', // aqua | lime | accent
   reduceMotion: false,
+  reduceEffects: null, // null = follow Windows' "show animations" setting; true/false once the user chooses
   resume: true,
   waveform: true,
   rating: true,

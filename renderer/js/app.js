@@ -24,6 +24,7 @@ class App {
     installRipples();
     this._bindWindow();
     this._bindTooltips();
+    matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', () => this._applyLook());
     this._buildBubbles();
     await this.store.init();
     const s = this.store.settings;
@@ -372,6 +373,12 @@ class App {
   get theme() { return THEMES.includes(this.store.settings.theme) ? this.store.settings.theme : 'glass'; }
   get solidTheme() { return this.theme !== 'glass'; }
 
+  // Reduce effects is on when the user turned it on, or (until they choose) when Windows asks for less motion.
+  get reduceEffects() {
+    const v = this.store.settings.reduceEffects;
+    return v == null ? matchMedia('(prefers-reduced-motion: reduce)').matches : !!v;
+  }
+
   _applyLook() {
     const s = this.store.settings;
     const theme = this.theme, solid = this.solidTheme;
@@ -397,6 +404,8 @@ class App {
       refreshLiquid();
     }
     this.root.classList.toggle('reduce-motion', !!s.reduceMotion);
+    // Reduce effects: no blur, no decorative motion, solid panels (html.fx-lite)
+    document.documentElement.classList.toggle('fx-lite', this.reduceEffects);
     if (!s.dynamicAccent && !solid) {
       const rgb = hexToRgb(s.accent);
       document.documentElement.style.setProperty('--accent', s.accent);
@@ -535,6 +544,8 @@ class App {
       ${tog('waveform', 'Waveform seekbar', 'Decode tracks to draw a real waveform')}
       ${tog('rating', 'Show rating stars')}
       ${tog('reduceMotion', 'Reduce animations')}
+      <label class="set-row"><div><div class="set-label">Reduce effects</div><div class="set-hint">No blur, spinning CD, bubbles, aurora, sparkles or grain; solid panels instead of glass. On automatically when Windows asks for less motion</div></div>
+      <input type="checkbox" class="switch" data-k="reduceEffects" ${this.reduceEffects ? 'checked' : ''}></label>
       <div class="set-sec">Shortcuts</div>
       <div class="shortcuts">
         <span>Space</span><span>Play / Pause</span><span>Ctrl + ← / →</span><span>Previous / Next</span>

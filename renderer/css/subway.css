@@ -257,8 +257,8 @@ html.theme-subway .titlebar { background: linear-gradient(180deg, color-mix(in s
 html.theme-subway .tb-drag { gap: 8px; padding-left: 16px; }
 /* title: "YouSic :: V.2K" with a teal LED that pulses while playing */
 html.theme-subway .tb-logo { width: 7px; height: 7px; border-radius: var(--r-orb); background: var(--teal); box-shadow: 0 0 6px var(--teal); }
-/* decorative motion runs in steps on shared half-second beats: a smooth loop would make the GPU redraw
-   every frame (measured: +5-11% CPU), stepped ones cost almost nothing */
+/* decorative motion runs in steps whose length is a multiple of 1/12s (the CD's step) so they all land on
+   the same frames: a smooth loop makes the GPU redraw every frame (measured +5-11% CPU) */
 html.theme-subway .playing .tb-logo { animation: y2k-led 1s steps(2, jump-none) infinite; }
 @keyframes y2k-led { to { opacity: 0.35; } }
 html.theme-subway .tb-title { font-family: var(--font-mono); font-size: 11px; font-weight: 400; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text); }
@@ -480,7 +480,8 @@ html.theme-subway .play-wrap::before {
   content: ''; position: absolute; inset: 6px; border-radius: var(--r-orb); pointer-events: none; opacity: 0;
   box-shadow: 0 0 34px 6px color-mix(in srgb, var(--teal) 55%, transparent);
 }
-html.theme-subway .playing .play-wrap::before { animation: y2k-breathe 2.4s steps(12) infinite alternate; }
+/* 2.5s (not 2.4) so its steps land on the CD's 1/12s frames */
+html.theme-subway .playing .play-wrap::before { animation: y2k-breathe 2.5s steps(15) infinite alternate; }
 @keyframes y2k-breathe { from { opacity: 0.25; } to { opacity: 1; } }
 /* shuffle, previous, next, repeat: 44px gel orbs at 80% saturation */
 html.theme-subway :is(.ctl-sm.lg, .ctl-md.lg) { width: 44px; height: 44px; filter: saturate(0.8); overflow: visible; }
@@ -615,9 +616,41 @@ html.theme-subway .row.track.playing .r-title { color: var(--aqua); }
 html.theme-subway .eqbars { border-radius: 10px; padding: 12px 0; }
 html.theme-subway .eqbars i { width: 3px; border-radius: 2px; background: linear-gradient(180deg, var(--aqua), var(--teal)); }
 /* (stepped like the other decorations; still only animates while audio plays) */
-html.theme-subway .eqbars i { animation-timing-function: steps(4); }
+html.theme-subway .eqbars i { animation-duration: 1s; animation-timing-function: steps(4); }
 /* scrollbar: 8px, chrome thumb, clear track, glow on hover */
 html.theme-subway ::-webkit-scrollbar { width: 8px; height: 8px; }
 html.theme-subway ::-webkit-scrollbar-track { background: transparent; }
 html.theme-subway ::-webkit-scrollbar-thumb { background: linear-gradient(90deg, var(--chrome-hi), var(--chrome-lo)); border: 0; border-radius: var(--r-orb); }
 html.theme-subway ::-webkit-scrollbar-thumb:hover { background: linear-gradient(90deg, var(--chrome-hi), var(--chrome-mid)); box-shadow: 0 0 8px var(--teal); }
+
+/* ---------- §13 bubbles and sparkles ---------- */
+/* bubbles live in the #fx backdrop, behind every glass layer; kept fully inside the window */
+html.theme-subway .fx-bubbles i {
+  position: absolute; width: var(--d); height: var(--d); border-radius: var(--r-orb);
+  left: clamp(24px, var(--x), calc(100vw - var(--d) - 24px)); top: clamp(24px, var(--y), calc(100vh - var(--d) - 24px));
+  background:
+    radial-gradient(circle at 32% 26%, color-mix(in srgb, var(--chrome-hi) 85%, transparent) 0 7%, transparent 18%),
+    radial-gradient(circle, transparent 0 62%, color-mix(in srgb, var(--aqua) 10%, transparent) 74%, color-mix(in srgb, var(--pink) 16%, transparent) 86%, color-mix(in srgb, var(--gold) 14%, transparent) 94%, transparent 100%),
+    radial-gradient(circle at 40% 35%, color-mix(in srgb, var(--chrome-hi) 6%, transparent), transparent 70%);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--chrome-hi) 50%, transparent), inset -4px -6px 12px color-mix(in srgb, var(--lilac) 14%, transparent);
+  translate: calc(var(--mx, 0) * var(--depth) * -1px) calc(var(--my, 0) * var(--depth) * -1px);
+  transition: translate 600ms ease-out;
+  /* a +-20px drift on a 12-20s loop from a randomised phase, on the shared half-second beat */
+  animation: y2k-bob 16s steps(32) infinite alternate; /* duration, phase and steps are set per bubble */
+}
+@keyframes y2k-bob { from { transform: translate(calc(var(--dir) * -20px), 14px); } to { transform: translate(calc(var(--dir) * 20px), -14px); } }
+
+/* four-point sparkles that twinkle near the play button, the art corners and the active tab */
+html.theme-subway .spark, html.theme-subway .nav-ink::after {
+  display: block; position: absolute; width: 18px; height: 18px; pointer-events: none; z-index: 3;
+  background: var(--y2k-spark) center / contain no-repeat;
+  animation: y2k-twinkle 3s steps(6) infinite; /* every duration below keeps 2 steps a second */
+}
+@keyframes y2k-twinkle { 0%, 100% { opacity: 0.25; transform: scale(0.55); } 50% { opacity: 1; transform: scale(1); } }
+html.theme-subway .sp-play1 { left: 6px; top: 8px; width: 16px; height: 16px; animation-duration: 2s; animation-timing-function: steps(4); }
+html.theme-subway .sp-play2 { right: 2px; bottom: 14px; width: 12px; height: 12px; animation-duration: 3.5s; animation-timing-function: steps(7); animation-delay: -1s; }
+html.theme-subway .sp-art1, html.theme-subway .sp-art2 { --aa: min(80cqw, calc(100cqh - 30px)); }
+html.theme-subway .sp-art1 { left: calc(50% + var(--aa) / 2 - 4px); top: calc(50% - var(--aa) / 2 - 12px); width: 22px; height: 22px; animation-duration: 4s; animation-timing-function: steps(8); }
+html.theme-subway .sp-art2 { left: calc(50% - var(--aa) / 2 - 14px); top: calc(50% + var(--aa) / 2 - 8px); width: 14px; height: 14px; animation-duration: 2.5s; animation-timing-function: steps(5); animation-delay: -1.5s; }
+html.theme-subway .aa-wrap:is(.lyrics-open, .vis-on) .spark { display: none; }
+html.theme-subway .nav-ink::after { content: ''; right: -5px; top: -6px; width: 14px; height: 14px; animation-duration: 3s; animation-delay: -0.5s; }

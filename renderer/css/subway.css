@@ -494,3 +494,20 @@ html.theme-subway .controls { gap: clamp(8px, 2.6vw, 18px); }
   html.theme-subway .play-wrap { width: 92px; height: 92px; }
   html.theme-subway .ctl-play.lg { width: 74px; height: 74px; }
 }
+
+/* ---------- §9 bottom nav: a glass dock ---------- */
+html.theme-subway .pl-nav { border-radius: var(--r-card); padding: 6px; margin-bottom: 22px; overflow: visible; }
+/* a faint reflection under the dock */
+html.theme-subway .pl-nav::after {
+  content: ''; position: absolute; left: 8px; right: 8px; top: calc(100% + 2px); height: 12px; border-radius: 0 0 var(--r-card) var(--r-card); pointer-events: none;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--chrome-hi) 15%, transparent), transparent);
+}
+html.theme-subway .nav-btn { height: 52px; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: var(--chrome-mid); }
+html.theme-subway .nav-btn .ico { width: 28px; height: 28px; transition: scale 140ms var(--spring); }
+html.theme-subway .nav-btn::after { content: attr(data-label); font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.08em; line-height: 1; }
+html.theme-subway .nav-btn.on { color: var(--ink); }
+html.theme-subway .nav-ink { top: 6px; bottom: 6px; border-radius: 10px; box-shadow: var(--gel-shadow-hover); }
+/* hover magnifies the icon and, a little, its neighbours */
+html.theme-subway .pl-nav .nav-btn:hover .ico { scale: 1.18; }
+html.theme-subway .pl-nav .nav-btn:hover + .nav-btn .ico, html.theme-subway .pl-nav .nav-btn:has(+ .nav-btn:hover) .ico { scale: 1.08; }
+html.theme-subway .nav-btn:active { transform: none; }

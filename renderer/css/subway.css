@@ -519,3 +519,66 @@ html.theme-subway .app:not(.wide) #libBack.dim { opacity: 1; }
 html.theme-subway .lib-title { font-size: 22px; }
 html.theme-subway .lib-sub { color: var(--teal); }
 html.theme-subway .lib-header { gap: 6px; }
+
+/* ---------- §11 library grid ---------- */
+html.theme-subway .root-grid { counter-reset: ch; gap: 14px; }
+/* tiles: glass with the diagonal sheen at 10% */
+html.theme-subway .tile {
+  counter-increment: ch; height: 120px;
+  background: linear-gradient(118deg, transparent 52%, color-mix(in srgb, var(--chrome-hi) 10%, transparent) 52.3%, color-mix(in srgb, var(--chrome-hi) 3%, transparent) 70%, transparent 70.3%), var(--glass);
+  transition: translate var(--t-fast), box-shadow var(--t-fast);
+}
+/* a 1px holographic hairline that appears on hover and keyboard focus */
+html.theme-subway .tile::before {
+  display: block; content: ''; position: absolute; inset: -1px; border-radius: inherit; padding: 1px; pointer-events: none;
+  background: var(--holo); opacity: 0; transition: opacity var(--t-fast);
+  -webkit-mask: var(--mask-solid) content-box, var(--mask-solid); -webkit-mask-composite: xor; mask-composite: exclude;
+}
+html.theme-subway .tile:is(:hover, :focus-visible)::before { opacity: 1; }
+/* hover: lifts, glows, and a sheen sweeps across once */
+html.theme-subway .tile:hover { transform: none; translate: 0 -3px; box-shadow: var(--glass-shadow), var(--gel-glow-hi); }
+html.theme-subway .tile::after {
+  inset: 0; z-index: 0; opacity: 1; background: linear-gradient(105deg, transparent 35%, color-mix(in srgb, var(--chrome-hi) 22%, transparent) 50%, transparent 65%);
+  transform: translateX(-120%);
+}
+html.theme-subway .tile:hover::after { animation: y2k-sweep 600ms ease-out; }
+@keyframes y2k-sweep { to { transform: translateX(120%); } }
+/* the icon is a 44px gel orb */
+html.theme-subway .tile-ico { width: 44px; height: 44px; top: 13px; left: 13px; }
+html.theme-subway .tile-ico .ico { width: 22px; height: 22px; }
+/* the count is a 20px mono pill */
+html.theme-subway .tile-count {
+  top: 14px; right: 13px; min-width: 20px; height: 20px; padding: 0 7px; border-radius: var(--r-orb); display: grid; place-items: center;
+  background: color-mix(in srgb, var(--teal) 18%, transparent); color: var(--text); font-size: 11px;
+}
+/* each tile is numbered like a channel */
+html.theme-subway .tile-title::before { content: 'CH.' counter(ch, decimal-leading-zero); display: block; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; color: var(--text-dim); margin-bottom: 3px; font-weight: 400; }
+html.theme-subway .tile-title { position: relative; z-index: 1; }
+
+/* below the grid: library stats and a recently played shelf (this theme only) */
+.lib-stats, .shelf { display: none; }
+html.theme-subway .lib-stats { display: flex; flex-wrap: wrap; gap: 10px; padding: 14px 16px 2px; }
+html.theme-subway .stat {
+  display: inline-flex; align-items: baseline; gap: 8px; padding: 7px 14px; border-radius: var(--r-orb);
+  background: var(--glass); backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-line); box-shadow: var(--glass-shadow);
+  font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.08em; color: var(--text);
+}
+html.theme-subway .stat b { font-weight: 400; font-size: 10px; color: var(--teal); }
+html.theme-subway .shelf { display: block; }
+html.theme-subway .shelf .sec-title { padding: 16px 16px 8px; }
+html.theme-subway .shelf-row { display: flex; gap: 14px; height: 160px; padding: 6px 16px 14px; overflow: hidden; }
+html.theme-subway .shelf-item { flex: none; height: 100%; aspect-ratio: 1; padding: 0; border-radius: var(--r-card); transition: translate var(--t-fast), box-shadow var(--t-fast); }
+html.theme-subway .shelf-item .it-art {
+  display: grid; place-items: center; width: 100%; height: 100%; border-radius: var(--r-card); background-size: cover; background-position: center; position: relative; overflow: hidden;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--chrome-hi) 45%, transparent), 0 10px 24px -10px var(--shade);
+}
+html.theme-subway .shelf-item .it-art::after { content: ''; position: absolute; inset: 0 0 50% 0; background: var(--gel-gloss); opacity: 0.6; pointer-events: none; }
+html.theme-subway .shelf-item .it-art.ph .ico { width: 34%; height: 34%; }
+html.theme-subway .shelf-item:hover { translate: 0 -3px; }
+html.theme-subway .shelf-item:hover .it-art { box-shadow: inset 0 0 0 1px var(--aqua), 0 10px 24px -10px var(--shade), var(--gel-glow-hi); }
+html.theme-subway .shelf-empty { align-self: center; color: var(--text-dim); font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; }
+/* folder paths are glass capsules; Add folder and Rescan are gel capsules (§0) */
+html.theme-subway .folder-strip { padding: 10px 16px 16px; }
+html.theme-subway .fchip:not(.add) { color: var(--text); }
+html.theme-subway .fchip:not(.add) .ico { color: var(--aqua); }
+html.theme-subway .fchip.add { border-radius: var(--r-orb); height: 32px; color: var(--ink); }

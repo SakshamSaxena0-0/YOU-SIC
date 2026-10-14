@@ -4,12 +4,18 @@
   <meta charset="utf-8">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self' app:; img-src 'self' app: data: blob:; media-src 'self' app: blob:; style-src 'self' 'unsafe-inline'; script-src 'self' app: 'unsafe-eval'; connect-src 'self' app:">
   <title>YouSic</title>
+  <script src="js/boot.js"></script>
   <link rel="stylesheet" href="css/app.css">
   <link rel="stylesheet" href="css/cyber.css">
   <link rel="stylesheet" href="css/subway.css">
   <link rel="stylesheet" href="css/pixel.css">
 </head>
 <body>
+  <div class="splash" aria-hidden="true">
+    <div class="splash-mark">YouSic <span>:: V.2K</span></div>
+    <div class="splash-bar"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="splash-text">Initializing audio engine...</div>
+  </div>
   <div id="wall" class="wall" aria-hidden="true"></div>
   <!-- Y2K theme backdrop behind both panes: album-art glow, aurora, perspective floor, bubbles -->
   <div id="fx" class="fx" aria-hidden="true">

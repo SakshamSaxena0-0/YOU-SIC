@@ -171,6 +171,13 @@ export class LibraryView {
     const reduce = this.store.settings.reduceMotion || !animate;
     if (reduce) { from.style.display = 'none'; done && done(); return; }
     const ease = 'cubic-bezier(.22,.9,.25,1)';
+    // Y2K theme: a short 24px slide, the new page blurring in
+    if (document.documentElement.classList.contains('theme-subway')) {
+      from.animate([{ transform: 'none', opacity: 1 }, { transform: `translateX(${-dir * 24}px)`, opacity: 0 }], { duration: 220, easing: 'ease-out' })
+        .finished.then(() => { if (dir > 0) from.style.display = 'none'; done && done(); });
+      to.animate([{ transform: `translateX(${dir * 24}px)`, opacity: 0, filter: 'blur(6px)' }, { transform: 'none', opacity: 1, filter: 'blur(0)' }], { duration: 220, easing: 'ease-out' });
+      return;
+    }
     from.animate([{ transform: 'translateX(0)', opacity: 1 }, { transform: `translateX(${-dir * 28}%)`, opacity: 0 }], { duration: 340, easing: ease })
       .finished.then(() => { if (dir > 0) from.style.display = 'none'; done && done(); });
     to.animate([{ transform: `translateX(${dir * 40}%)`, opacity: 0 }, { transform: 'translateX(0)', opacity: 1 }], { duration: 380, easing: ease });

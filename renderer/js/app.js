@@ -58,7 +58,7 @@ class App {
     if (!this.player.track) this.playerView.refreshColors();
     // refresh the library in the background (incremental: only changed files are re-read)
     if (this.store.folders.length) this.rescan(false, !this.store.tracks.length);
-    requestAnimationFrame(() => this.root.classList.add('ready'));
+    requestAnimationFrame(() => { this.root.classList.add('ready'); document.documentElement.classList.remove('boot-y2k'); });
     // background window: pause looping decorations (see .idle in app.css)
     const idle = () => document.documentElement.classList.toggle('idle', !document.hasFocus());
     addEventListener('blur', idle);
@@ -376,6 +376,7 @@ class App {
     const s = this.store.settings;
     const theme = this.theme, solid = this.solidTheme;
     const html0 = document.documentElement;
+    try { localStorage.setItem('pr-theme', theme); } catch {} // read by boot.js for the splash
     if (!html0.classList.contains('theme-' + theme)) {
       THEMES.forEach((t) => html0.classList.toggle('theme-' + t, t === theme));
       html0.classList.toggle('theme-solid', solid);

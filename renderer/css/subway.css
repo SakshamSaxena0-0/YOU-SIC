@@ -8,7 +8,8 @@
    ========================================================================== */
 
 /* ---------- §0 design tokens ---------- */
-html.theme-subway {
+/* (the boot splash, html.boot-y2k, shows before the theme class is set, so it shares the tokens) */
+html.theme-subway, html.boot-y2k {
   /* surfaces */
   --bg-0: #050b0c;
   --bg-1: #0a1a1b;
@@ -654,3 +655,26 @@ html.theme-subway .sp-art1 { left: calc(50% + var(--aa) / 2 - 4px); top: calc(50
 html.theme-subway .sp-art2 { left: calc(50% - var(--aa) / 2 - 14px); top: calc(50% + var(--aa) / 2 - 8px); width: 14px; height: 14px; animation-duration: 2.5s; animation-timing-function: steps(5); animation-delay: -1.5s; }
 html.theme-subway .aa-wrap:is(.lyrics-open, .vis-on) .spark { display: none; }
 html.theme-subway .nav-ink::after { content: ''; right: -5px; top: -6px; width: 14px; height: 14px; animation-duration: 3s; animation-delay: -0.5s; }
+
+/* ---------- §14 motion ---------- */
+html.theme-subway :is(button, .tile, .row, .chip, .fchip, .set-row, .menu-item) { transition-timing-function: ease-out; }
+/* track change: the title block rises 8px as it fades in (the cover crossfades in playerView.js) */
+html.theme-subway .pl-info.enter > *, html.theme-subway .pl-info.enter-r > *, html.theme-subway .pl-info.enter-l > * { animation: y2k-rise 320ms ease-out both; }
+@keyframes y2k-rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+/* boot splash: the wordmark and a segmented bar, for at most 600ms (js/boot.js) */
+html.boot-y2k .splash {
+  display: flex; position: fixed; inset: 0; z-index: 1000; flex-direction: column; align-items: center; justify-content: center; gap: 18px;
+  background: radial-gradient(90% 70% at 50% 45%, var(--bg-2), var(--bg-0)); color: var(--text);
+}
+html.boot-y2k .splash-mark { font-family: var(--font-display); font-size: 22px; letter-spacing: 0.12em; text-shadow: 0 0 14px color-mix(in srgb, var(--teal) 60%, transparent); }
+html.boot-y2k .splash-mark span { font-family: var(--font-mono); font-size: 14px; color: var(--teal); letter-spacing: 0.1em; }
+html.boot-y2k .splash-bar { display: flex; gap: 4px; padding: 4px; border-radius: var(--r-orb); border: 1px solid var(--glass-line); }
+html.boot-y2k .splash-bar i { width: 16px; height: 8px; border-radius: 2px; background: color-mix(in srgb, var(--chrome-hi) 10%, transparent); }
+html.boot-y2k .splash-bar i { animation: y2k-seg 500ms steps(1) both; }
+html.boot-y2k .splash-bar i:nth-child(1) { animation-delay: 0ms; } html.boot-y2k .splash-bar i:nth-child(2) { animation-delay: 50ms; }
+html.boot-y2k .splash-bar i:nth-child(3) { animation-delay: 100ms; } html.boot-y2k .splash-bar i:nth-child(4) { animation-delay: 150ms; }
+html.boot-y2k .splash-bar i:nth-child(5) { animation-delay: 200ms; } html.boot-y2k .splash-bar i:nth-child(6) { animation-delay: 250ms; }
+html.boot-y2k .splash-bar i:nth-child(7) { animation-delay: 300ms; } html.boot-y2k .splash-bar i:nth-child(8) { animation-delay: 350ms; }
+html.boot-y2k .splash-bar i:nth-child(9) { animation-delay: 400ms; } html.boot-y2k .splash-bar i:nth-child(10) { animation-delay: 450ms; }
+@keyframes y2k-seg { from { background: color-mix(in srgb, var(--chrome-hi) 10%, transparent); } to { background: var(--teal); box-shadow: 0 0 6px var(--teal); } }
+html.boot-y2k .splash-text { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; color: var(--text-dim); }

@@ -105,6 +105,19 @@ export class PlayerView {
 
   _animateArt(dir, url, done) {
     const w = $('#aaWrap').clientWidth;
+    // Y2K theme: the cover crossfades (400ms) instead of sliding
+    if (document.documentElement.classList.contains('theme-subway') && !this.store.settings.reduceMotion) {
+      const img = this.cards.cur.querySelector('.aa-img');
+      const tok = (this._artTok = (this._artTok || 0) + 1);
+      this._setX(0);
+      img.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 160, easing: 'ease-in' }).finished.then(() => {
+        if (tok !== this._artTok) return;
+        this._setImg(this.cards.cur, url);
+        img.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 240, easing: 'ease-out' });
+        done();
+      }, () => {});
+      return;
+    }
     if (dir !== 0 && !this.store.settings.reduceMotion && w > 0) {
       // slide the carousel one card over, then snap back with swapped images
       const target = dir > 0 ? this.cards.next : this.cards.prev;

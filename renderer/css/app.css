@@ -1274,3 +1274,4 @@ html.glass-window, html.glass-window body { background: transparent; }
 .tip.show { opacity: 1; transform: none; }
 .cd, .sticker { display: none; }
 .spark { display: none; }
+.splash { display: none; }

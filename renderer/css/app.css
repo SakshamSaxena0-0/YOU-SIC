@@ -1272,3 +1272,4 @@ html.glass-window, html.glass-window body { background: transparent; }
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0; transform: translateY(-3px); transition: opacity 0.12s ease-out, transform 0.12s ease-out;
 }
 .tip.show { opacity: 1; transform: none; }
+.cd, .sticker { display: none; }

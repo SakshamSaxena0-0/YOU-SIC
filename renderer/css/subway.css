@@ -20,6 +20,7 @@ html.theme-subway {
   --lilac: #b79cff;
   --pink: #ff7ad9;
   --lime: #c8ff6a;
+  --gold: #ffe58a;
   --coral-hi: #ff6b6b;
   --coral-lo: #b82f3d;
   --mask-solid: linear-gradient(#000 0 0); /* not a colour: the opaque layer for CSS masks */
@@ -134,7 +135,6 @@ html.theme-subway .aa-img { border-radius: var(--r-art); background-color: var(-
 html.theme-subway .aa-img.ph { background: var(--bg-2); }
 html.theme-subway .aa-img.ph .ico { fill: var(--text-dim); filter: none; }
 html.theme-subway .aa-img::before { background: none; }
-html.theme-subway .aa-img::after { background: linear-gradient(100deg, transparent 38%, color-mix(in srgb, var(--chrome-hi) 35%, transparent) 47%, color-mix(in srgb, var(--chrome-hi) 6%, transparent) 52%, transparent 60%); }
 html.theme-subway .badge { border-radius: var(--r-orb); }
 html.theme-subway .badge.hires { background: var(--holo); color: var(--ink); box-shadow: none; }
 html.theme-subway .badge.lossless { background: var(--teal); color: var(--ink); box-shadow: 0 0 12px color-mix(in srgb, var(--teal) 50%, transparent); }
@@ -327,3 +327,109 @@ html.theme-subway .tip {
   color: var(--text); font-family: var(--font-mono); font-weight: 400; font-size: 11px; letter-spacing: 0.08em; padding: 4px 11px;
   box-shadow: var(--glass-shadow), var(--gel-glow);
 }
+
+/* ---------- §5 left panel: art card ---------- */
+/* the card only hints transform (not opacity), so the glass frame's blur can see what is behind the card */
+html.theme-subway .aa-card { will-change: transform; }
+/* glass frame: 6px of glass round the art with a 1px holographic edge */
+html.theme-subway .aa-img {
+  padding: 6px; background-origin: content-box; background-clip: content-box; overflow: hidden;
+  box-shadow: 0 30px 60px -20px var(--shade);
+}
+/* ::before is the 6px glass ring, ::after the 1px holographic hairline round it */
+html.theme-subway .aa-img::before, html.theme-subway .aa-img::after {
+  content: ''; position: absolute; inset: 0; border-radius: inherit; transform: none;
+  -webkit-mask: var(--mask-solid) content-box, var(--mask-solid); -webkit-mask-composite: xor; mask-composite: exclude;
+}
+html.theme-subway .aa-img::before { z-index: 1; padding: 6px; background: var(--glass); backdrop-filter: var(--glass-blur); }
+html.theme-subway .aa-img::after { z-index: 2; padding: 1px; background: var(--holo); }
+html.theme-subway .aa-img.sheen::after, html.theme-subway .aa-img.flip-glint::after { animation: none; }
+html.theme-subway .aa-img.ph { padding: 0; }
+html.theme-subway .aa-img.ph::before { display: none; }
+/* corner crosshair marks */
+html.theme-subway .aa-wrap::before {
+  --aa: min(80cqw, calc(100cqh - 30px));
+  content: ''; position: absolute; left: 50%; top: 50%; pointer-events: none; z-index: 0;
+  width: calc(var(--aa) + 34px); height: calc(var(--aa) + 34px);
+  margin-left: calc((var(--aa) + 34px) / -2); margin-top: calc((var(--aa) + 34px) / -2);
+  --m: color-mix(in srgb, var(--aqua) 70%, transparent);
+  background:
+    linear-gradient(var(--m), var(--m)) 0 9px / 18px 1px no-repeat, linear-gradient(var(--m), var(--m)) 9px 0 / 1px 18px no-repeat,
+    linear-gradient(var(--m), var(--m)) 100% 9px / 18px 1px no-repeat, linear-gradient(var(--m), var(--m)) calc(100% - 9px) 0 / 1px 18px no-repeat,
+    linear-gradient(var(--m), var(--m)) 0 calc(100% - 9px) / 18px 1px no-repeat, linear-gradient(var(--m), var(--m)) 9px 100% / 1px 18px no-repeat,
+    linear-gradient(var(--m), var(--m)) 100% calc(100% - 9px) / 18px 1px no-repeat, linear-gradient(var(--m), var(--m)) calc(100% - 9px) 100% / 1px 18px no-repeat;
+  transition: opacity 0.3s;
+}
+html.theme-subway .aa-wrap.lyrics-open::before, html.theme-subway .aa-wrap.vis-on::before { opacity: 0.15; }
+
+/* the CD: behind the card, offset right ~22%, clipped by the panel; spins while playing, slides out on hover */
+html.theme-subway .cd {
+  --aa: min(80cqw, calc(100cqh - 30px));
+  display: block; position: absolute; left: 50%; top: 50%; width: calc(var(--aa) * 0.94); height: calc(var(--aa) * 0.94);
+  margin-left: calc(var(--aa) * -0.47); margin-top: calc(var(--aa) * -0.47); border-radius: var(--r-orb); pointer-events: none;
+  transform: translateX(22%); transition: transform 0.45s var(--spring), opacity 0.3s;
+}
+html.theme-subway .aa-wrap:hover .cd { transform: translateX(36%); }
+html.theme-subway .aa-wrap:is(.lyrics-open, .vis-on) .cd { opacity: 0; }
+html.theme-subway .cd-disc {
+  position: absolute; inset: 0; border-radius: inherit;
+  background:
+    radial-gradient(circle, var(--bg-0) 0 12.5%, var(--chrome-mid) 13% 14.5%, color-mix(in srgb, var(--chrome-hi) 55%, transparent) 15% 16%, transparent 16.5%),
+    radial-gradient(circle, color-mix(in srgb, var(--chrome-hi) 40%, transparent) 0 25%, transparent 62%),
+    var(--holo-conic);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--chrome-hi) 60%, transparent);
+  -webkit-mask: radial-gradient(circle, transparent 0 5.5%, var(--shade) 6%);
+  animation: y2k-spin 6s steps(72) infinite paused;
+}
+/* the rainbow band round the rim */
+html.theme-subway .cd-disc::before {
+  content: ''; position: absolute; inset: 0; border-radius: inherit;
+  background: conic-gradient(from 90deg, var(--aqua), var(--lime), var(--gold), var(--pink), var(--lilac), var(--aqua));
+  -webkit-mask: radial-gradient(circle, transparent 0 90%, var(--shade) 91% 98.5%, transparent 99%);
+  opacity: 0.85;
+}
+/* a fixed specular streak (it does not turn with the disc) */
+html.theme-subway .cd::after {
+  content: ''; position: absolute; inset: 0; border-radius: inherit;
+  background: linear-gradient(115deg, transparent 38%, color-mix(in srgb, var(--chrome-hi) 55%, transparent) 47%, transparent 56%);
+  -webkit-mask: radial-gradient(circle, transparent 0 16%, var(--shade) 17%);
+}
+html.theme-subway .playing .cd-disc { animation-play-state: running; }
+@keyframes y2k-spin { to { transform: rotate(360deg); } }
+
+/* song info: frosted glass panel, metadata and chips close together */
+html.theme-subway .aa-back { border-radius: var(--r-art); border: 1px solid transparent; background: linear-gradient(160deg, var(--bg-2), var(--bg-1)) padding-box, var(--holo) border-box; box-shadow: var(--glass-shadow), 0 30px 60px -20px var(--shade); }
+html.theme-subway .aa-back.aa-info { background: var(--glass) padding-box, color-mix(in srgb, var(--bg-1) 74%, transparent) padding-box, var(--holo) border-box; backdrop-filter: blur(20px) saturate(1.4); }
+html.theme-subway.fx-lite .aa-back.aa-info { backdrop-filter: none; }
+html.theme-subway .ab-art { display: none; }
+html.theme-subway .aa-back::before { background: linear-gradient(180deg, color-mix(in srgb, var(--chrome-hi) 8%, transparent), transparent 30%); }
+html.theme-subway .aa-back::after { background: linear-gradient(100deg, transparent 40%, color-mix(in srgb, var(--chrome-hi) 25%, transparent) 48%, transparent 58%); }
+html.theme-subway .ab-body { color: var(--text); text-shadow: none; }
+html.theme-subway .ab-kicker { color: var(--teal); }
+html.theme-subway .ab-title { font-family: var(--font-display); font-weight: 400; letter-spacing: 0.04em; font-size: clamp(14px, 5.6cqw, 22px); }
+html.theme-subway .ab-stars { color: var(--lime); }
+html.theme-subway .ab-grid dt { color: var(--text-dim); font-family: var(--font-mono); letter-spacing: 0.08em; font-size: 0.85em; text-transform: uppercase; }
+html.theme-subway :is(.ab-foot, .ab-file) { color: var(--text-dim); }
+/* tighter: the chips sit right under the details, the buttons go to the bottom */
+html.theme-subway .ab-fmt { margin-top: 8px; padding-top: 0; flex-wrap: wrap; gap: 5px; }
+html.theme-subway .ab-actions { margin-top: auto; flex-wrap: wrap; }
+/* tech chips: LED capsules, never truncated, wrapping onto a second row */
+html.theme-subway .ab-fmt span, html.theme-subway .ab-fmt span:nth-child(n) {
+  display: inline-block; white-space: nowrap; border-radius: var(--r-orb); padding: 2px 8px;
+  background: color-mix(in srgb, var(--aqua) 8%, transparent); color: var(--aqua); box-shadow: none; border: 1px solid var(--aqua);
+  text-shadow: 0 0 6px color-mix(in srgb, var(--aqua) 60%, transparent);
+}
+/* Album / Artist / Show file: 28px gel capsules, labels always shown */
+html.theme-subway .ab-btn, html.theme-subway .ab-btn:nth-child(n) { height: 28px; width: auto; padding: 0 12px; border-radius: var(--r-orb); font-size: 11.5px; font-weight: 700; justify-content: center; }
+html.theme-subway .ab-btn span { display: inline; }
+/* corner stickers over the art while playing */
+html.theme-subway .playing .sticker { display: block; }
+html.theme-subway .sticker {
+  --aa: min(80cqw, calc(100cqh - 30px));
+  position: absolute; z-index: 4; pointer-events: none; padding: 3px 9px; border-radius: var(--r-orb);
+  background: var(--lime); color: var(--ink); font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
+  box-shadow: 0 3px 8px color-mix(in srgb, var(--shade) 45%, transparent); transform: rotate(-4deg);
+}
+html.theme-subway .st-hifi { left: calc(50% - var(--aa) / 2 - 8px); top: calc(50% - var(--aa) / 2 - 6px); }
+html.theme-subway .st-np { right: calc(50% - var(--aa) / 2 - 10px); bottom: calc(50% - var(--aa) / 2 - 6px); }
+html.theme-subway .aa-wrap:is(.lyrics-open, .vis-on) .sticker { display: none; }

@@ -1,0 +1,56 @@
+{
+  "name": "yousic",
+  "productName": "YouSic",
+  "version": "1.0.0",
+  "description": "A music player for Windows",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win dir",
+    "installer": "electron-builder --win nsis"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@fontsource-variable/jetbrains-mono": "^5.3.0",
+    "@fontsource-variable/manrope": "^5.3.0",
+    "butterchurn": "^2.6.7",
+    "butterchurn-presets": "^2.4.7",
+    "music-metadata": "^12.2.0"
+  },
+  "devDependencies": {
+    "electron": "^44.7.0",
+    "electron-builder": "^26.15.3"
+  },
+  "author": "YouSic",
+  "build": {
+    "appId": "local.yousic.player",
+    "productName": "YouSic",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer/**",
+      "build/icon.png",
+      "package.json"
+    ],
+    "win": {
+      "icon": "build/icon.png",
+      "target": [
+        "dir"
+      ],
+      "signAndEditExecutable": true
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "shortcutName": "YouSic"
+    },
+    "fileAssociations": [],
+    "electronLanguages": [
+      "en-US"
+    ]
+  }
+}

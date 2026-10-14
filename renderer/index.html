@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' app:; img-src 'self' app: data: blob:; media-src 'self' app: blob:; style-src 'self' 'unsafe-inline'; script-src 'self' app: 'unsafe-eval'; connect-src 'self' app:">
+  <title>YouSic</title>
+  <link rel="stylesheet" href="css/app.css">
+  <link rel="stylesheet" href="css/cyber.css">
+  <link rel="stylesheet" href="css/subway.css">
+  <link rel="stylesheet" href="css/pixel.css">
+</head>
+<body>
+  <div id="wall" class="wall" aria-hidden="true"></div>
+  <div id="app" class="app">
+    <!-- custom title bar -->
+    <header class="titlebar">
+      <div class="tb-drag">
+        <span class="tb-logo"></span>
+        <span class="tb-title">YouSic</span>
+      </div>
+      <div class="tb-buttons">
+        <button class="tb-btn" data-win="min" title="Minimize"><svg viewBox="0 0 12 12"><path d="M1 6h10" /></svg></button>
+        <button class="tb-btn" data-win="max" title="Maximize"><svg viewBox="0 0 12 12"><rect x="1.5" y="1.5" width="9" height="9" rx="1" /></svg></button>
+        <button class="tb-btn tb-close" data-win="close" title="Close"><svg viewBox="0 0 12 12"><path d="M1.5 1.5l9 9M10.5 1.5l-9 9" /></svg></button>
+      </div>
+    </header>
+
+    <div class="stage" id="stage">
+      <!-- ============ PLAYER SCREEN ============ -->
+      <section class="screen player" id="player">
+        <div class="bg" id="bg"><div class="bg-layer"></div><div class="bg-layer"></div><div class="bg-shade"></div></div>
+
+        <div class="pl-header">
+          <button class="icon-btn lg" data-act="library" title="Library (Ctrl+L)" data-icon="queue_music"></button>
+          <div class="pl-cat" id="plCat" title="Track source">
+            <div class="pl-cat-label">Playing from</div>
+            <div class="pl-cat-name" id="plCatName">Library</div>
+            <div class="pl-cat-pos" id="plCatPos"></div>
+          </div>
+          <button class="icon-btn lg" data-act="volume" title="Volume" data-icon="volume_up" id="volBtn"></button>
+          <button class="icon-btn lg" data-act="playerMenu" title="Menu" data-icon="more_vert"></button>
+        </div>
+
+        <div class="aa-wrap" id="aaWrap">
+          <div class="aa-glow" id="aaGlow"></div>
+          <div class="aa-track" id="aaTrack">
+            <div class="aa-card" data-slot="prev"><div class="aa-img"></div></div>
+            <div class="aa-card" data-slot="cur" title="Click to flip for song info (I)">
+              <div class="aa-flip"><div class="aa-img"></div><div class="aa-back" id="aaBack" aria-hidden="true"></div></div>
+            </div>
+            <div class="aa-card" data-slot="next"><div class="aa-img"></div></div>
+          </div>
+          <!-- the card's back at rest: a flat copy that never takes part in 3D, so its text stays sharp -->
+          <div class="aa-back aa-info" id="aaInfo" aria-live="polite"></div>
+          <div class="lyrics-panel" id="lyricsPanel">
+            <div class="lyrics-scroll" id="lyricsScroll"></div>
+          </div>
+          <div class="vis-host" id="visHost"></div>
+          <div class="swipe-hint" id="swipeHint"></div>
+        </div>
+
+        <div class="pl-info">
+          <div class="pl-title-row">
+            <div class="marquee" id="plTitleWrap"><span id="plTitle">YouSic</span></div>
+          </div>
+          <div class="pl-artist" id="plArtist">Add a music folder to start</div>
+          <div class="pl-album" id="plAlbum"></div>
+          <div class="pl-meta-row">
+            <span class="badge" id="plBadge"></span>
+            <div class="pl-meta" id="plMeta" title="Press to cycle meta info"></div>
+            <div class="rating" id="rating"></div>
+          </div>
+        </div>
+
+        <div class="seek">
+          <canvas id="wave" class="wave"></canvas>
+          <div class="seek-bubble" id="seekBubble">0:00</div>
+          <div class="seek-times"><span id="tElapsed">0:00</span><span id="tRemain">0:00</span></div>
+        </div>
+
+        <div class="controls">
+          <button class="ctl ctl-sm lg" id="btnShuffle" title="Shuffle (S)" data-icon="shuffle"></button>
+          <button class="ctl ctl-md lg" id="btnPrev" title="Previous (Ctrl+Left)" data-icon="skip_previous"></button>
+          <div class="play-wrap">
+            <svg class="play-ring" viewBox="0 0 100 100" aria-hidden="true">
+              <circle class="pr-track" cx="50" cy="50" r="47"/>
+              <circle class="pr-fill" id="playRing" cx="50" cy="50" r="47" pathLength="100"/>
+            </svg>
+            <span class="froth" aria-hidden="true"><b></b><b></b><b></b><b></b><b></b><b></b><b></b></span>
+            <button class="ctl ctl-play lg lg-tint" data-lg-scale="40" id="btnPlay" title="Play / Pause (Space)">
+              <svg viewBox="0 0 24 24" class="pp"><path id="ppPath" d="M8 5 L8 19 L13.5 15.5 L13.5 8.5 Z M13.5 8.5 L13.5 15.5 L19 12 L19 12 Z"/></svg>
+            </button>
+          </div>
+          <button class="ctl ctl-md lg" id="btnNext" title="Next (Ctrl+Right)" data-icon="skip_next"></button>
+          <button class="ctl ctl-sm lg" id="btnRepeat" title="Repeat (R)" data-icon="repeat"></button>
+        </div>
+
+        <nav class="pl-nav lg" data-lg-blur="10" id="plNav">
+          <div class="nav-ink" id="navInk"></div>
+          <button class="nav-btn" data-act="library" data-icon="library" title="Library"></button>
+          <button class="nav-btn" data-act="eq" data-icon="equalizer" title="Equalizer (E)"></button>
+          <button class="nav-btn" data-act="vis" data-icon="graphic_eq" title="Visualization (V)"></button>
+          <button class="nav-btn" data-act="lyrics" data-icon="lyrics" title="Lyrics (Y)"></button>
+          <button class="nav-btn" data-act="sleep" data-icon="timer" title="Sleep timer"></button>
+          <button class="nav-btn" data-act="settings" data-icon="settings" title="Settings"></button>
+        </nav>
+      </section>
+
+      <!-- ============ LIBRARY SCREEN ============ -->
+      <section class="screen library" id="library">
+        <div class="lib-header">
+          <button class="icon-btn lg" id="libBack" data-icon="arrow_back" title="Back (Backspace)"></button>
+          <div class="lib-titles">
+            <div class="lib-title" id="libTitle">Library</div>
+            <div class="lib-sub" id="libSub"></div>
+          </div>
+          <button class="icon-btn lg" id="libShuffle" data-icon="shuffle" title="Shuffle all in this list"></button>
+          <button class="icon-btn lg" id="libSearch" data-icon="search" title="Search (Ctrl+F)"></button>
+          <button class="icon-btn lg" id="libMenu" data-icon="more_vert" title="List options"></button>
+        </div>
+        <div class="search-bar lg" id="searchBar">
+          <span class="search-ico" data-icon="search"></span>
+          <input id="searchInput" type="text" placeholder="Search songs, artists, albums, playlists" spellcheck="false">
+          <button class="icon-btn small" id="searchClose" data-icon="close"></button>
+        </div>
+        <div class="lib-pages" id="libPages"></div>
+        <div class="scan-bar" id="scanBar"><div class="scan-fill" id="scanFill"></div><span id="scanText"></span></div>
+
+        <!-- mini player / navbar -->
+        <div class="navbar lg" data-lg-blur="16" id="navbar" title="Press to return to Player. Drag left/right to change tracks.">
+          <div class="nb-progress" id="nbProgress"></div>
+          <div class="nb-inner" id="nbInner">
+            <div class="nb-art" id="nbArt"></div>
+            <div class="nb-text">
+              <div class="nb-title" id="nbTitle">Nothing playing</div>
+              <div class="nb-artist" id="nbArtist"></div>
+            </div>
+          </div>
+          <button class="icon-btn" id="nbPrev" data-icon="skip_previous"></button>
+          <button class="icon-btn nb-play lg lg-tint" id="nbPlay" data-icon="play"></button>
+          <button class="icon-btn" id="nbNext" data-icon="skip_next"></button>
+        </div>
+      </section>
+
+      <!-- ============ EQUALIZER SCREEN ============ -->
+      <section class="screen eq" id="eq">
+        <div class="eq-header">
+          <button class="icon-btn lg" data-act="back" data-icon="arrow_back"></button>
+          <div class="eq-tabs lg">
+            <button class="eq-tab active" data-tab="equ">Equalizer</button>
+            <button class="eq-tab" data-tab="reverb">Reverb</button>
+            <div class="eq-tab-ink"></div>
+          </div>
+          <button class="icon-btn lg" id="eqMenu" data-icon="more_vert"></button>
+        </div>
+
+        <div class="eq-toggles">
+          <button class="chip lg" id="tglEq">Equ</button>
+          <button class="chip lg" id="tglTone">Tone</button>
+          <button class="chip lg" id="tglLimiter">Limiter</button>
+          <button class="chip lg" id="tglReverb">Reverb</button>
+          <div class="flex1"></div>
+          <button class="chip preset-chip lg" id="presetChip"><span id="presetName">Flat</span><i data-icon="expand_more"></i></button>
+        </div>
+
+        <div class="eq-pages" id="eqPages">
+          <div class="eq-page" data-page="equ">
+            <div class="eq-graph" id="eqGraph">
+              <canvas id="eqCanvas"></canvas>
+              <div class="eq-bands" id="eqBands"></div>
+            </div>
+            <div class="knob-hint">❰❰ Drag knobs up/down · double-click resets · wheel fine-tunes ❱❱</div>
+            <div class="knobs" id="eqKnobs"></div>
+          </div>
+          <div class="eq-page" data-page="reverb">
+            <div class="reverb-presets" id="reverbPresets"></div>
+            <div class="knobs" id="reverbKnobs"></div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- overlays -->
+    <div class="scrim" id="scrim"></div>
+    <div class="sheet" id="sheet"></div>
+    <div class="ctxmenu" id="ctx"></div>
+    <div class="toast" id="toast"></div>
+    <div class="grain" aria-hidden="true"></div>
+    <div class="vol-pop" id="volPop">
+      <span data-icon="volume_up" id="volIco"></span>
+      <input type="range" id="volRange" min="0" max="100" value="80">
+      <span id="volVal">80</span>
+    </div>
+  </div>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

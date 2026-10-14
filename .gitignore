@@ -1,0 +1,6 @@
+node_modules/
+dist/
+dist-new/
+dist-next/
+*.log
+swap-build.ps1

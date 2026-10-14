@@ -582,3 +582,42 @@ html.theme-subway .folder-strip { padding: 10px 16px 16px; }
 html.theme-subway .fchip:not(.add) { color: var(--text); }
 html.theme-subway .fchip:not(.add) .ico { color: var(--aqua); }
 html.theme-subway .fchip.add { border-radius: var(--r-orb); height: 32px; color: var(--ink); }
+
+/* ---------- §12 list rows ---------- */
+/* glass strips: 56px high, 8px apart (track lists already lay out on a 64px pitch) */
+html.theme-subway .row.track { height: 56px; }
+html.theme-subway .item-list { display: flex; flex-direction: column; gap: 8px; padding: 6px 12px; }
+html.theme-subway .row.item { height: 56px; }
+html.theme-subway .row { gap: 12px; padding: 0 12px 0 6px; transition: translate var(--t-fast), box-shadow var(--t-fast), background var(--t-fast); }
+/* hover nudges the row right and raises its glow; the others stay fully readable */
+html.theme-subway .row:hover { translate: 4px 0; scale: 1; }
+html.theme-subway .screen :has(> .row:hover) > .row:not(:hover) { opacity: 1; }
+/* thumbnails: 44px, 10px radius, a fine white inner stroke and gloss on the top half */
+html.theme-subway .row .it-art, html.theme-subway .row.item .it-art {
+  width: 44px; height: 44px; border-radius: 10px; overflow: hidden;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--chrome-hi) 55%, transparent), 0 4px 10px -4px var(--shade);
+}
+html.theme-subway .row .it-art::after { content: ''; position: absolute; inset: 0 0 50% 0; background: var(--gel-gloss); opacity: 0.55; pointer-events: none; border-radius: 10px 10px 0 0; }
+html.theme-subway .row:hover .it-art { scale: 1; }
+html.theme-subway .r-title { font-weight: 600; }
+html.theme-subway .r-dur { color: var(--text-dim); }
+/* the chevron sits in a 24px gel circle */
+html.theme-subway .r-chev { width: 24px; height: 24px; flex: none; display: grid; place-items: center; border-radius: var(--r-orb); background: var(--gel); box-shadow: var(--gel-shadow); color: var(--ink); }
+html.theme-subway .r-chev .ico { width: 18px; height: 18px; }
+/* the row menu is a 28px ghost orb that turns gel on hover */
+html.theme-subway .r-more { width: 28px; height: 28px; border-radius: var(--r-orb); color: var(--text-dim); background: transparent; box-shadow: inset 0 0 0 1px var(--glass-line); }
+html.theme-subway .r-more .ico { width: 18px; height: 18px; }
+html.theme-subway .r-more:hover { background: var(--gel); color: var(--ink); box-shadow: var(--gel-shadow); }
+/* the playing row: a holographic bar on the left, an aqua title, a little animated EQ */
+html.theme-subway .row.track.playing { background: var(--glass), color-mix(in srgb, var(--teal) 10%, transparent); }
+html.theme-subway .row.track.playing::before { left: 0; top: 8px; bottom: 8px; width: 3px; border-radius: var(--r-orb); background: var(--holo); box-shadow: 0 0 8px color-mix(in srgb, var(--aqua) 60%, transparent); }
+html.theme-subway .row.track.playing .r-title { color: var(--aqua); }
+html.theme-subway .eqbars { border-radius: 10px; padding: 12px 0; }
+html.theme-subway .eqbars i { width: 3px; border-radius: 2px; background: linear-gradient(180deg, var(--aqua), var(--teal)); }
+/* (stepped like the other decorations; still only animates while audio plays) */
+html.theme-subway .eqbars i { animation-timing-function: steps(4); }
+/* scrollbar: 8px, chrome thumb, clear track, glow on hover */
+html.theme-subway ::-webkit-scrollbar { width: 8px; height: 8px; }
+html.theme-subway ::-webkit-scrollbar-track { background: transparent; }
+html.theme-subway ::-webkit-scrollbar-thumb { background: linear-gradient(90deg, var(--chrome-hi), var(--chrome-lo)); border: 0; border-radius: var(--r-orb); }
+html.theme-subway ::-webkit-scrollbar-thumb:hover { background: linear-gradient(90deg, var(--chrome-hi), var(--chrome-mid)); box-shadow: 0 0 8px var(--teal); }

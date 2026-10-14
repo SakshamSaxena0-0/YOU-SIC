@@ -443,7 +443,7 @@ export class PlayerView {
       const v = +b.dataset.r;
       this.store.setRating(t.id, v === r ? 0 : v);
       const nb = el.querySelector(`[data-r="${v}"]`);
-      nb && nb.animate([{ transform: 'scale(1.5)' }, { transform: 'scale(1)' }], { duration: 300, easing: 'cubic-bezier(.3,1.6,.5,1)' });
+      nb && nb.animate([{ transform: 'scale(1.5)' }, { transform: 'scale(1)' }], { duration: parseFloat(getComputedStyle(el).getPropertyValue('--star-pop')) || 300, easing: 'cubic-bezier(.3,1.6,.5,1)' });
     };
   }
 

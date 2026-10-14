@@ -511,3 +511,10 @@ html.theme-subway .nav-ink { top: 6px; bottom: 6px; border-radius: 10px; box-sha
 html.theme-subway .pl-nav .nav-btn:hover .ico { scale: 1.18; }
 html.theme-subway .pl-nav .nav-btn:hover + .nav-btn .ico, html.theme-subway .pl-nav .nav-btn:has(+ .nav-btn:hover) .ico { scale: 1.08; }
 html.theme-subway .nav-btn:active { transform: none; }
+
+/* ---------- §10 right pane: header ---------- */
+/* back, shuffle, search and menu are 36px gel orbs (§4); back stays visible but dimmed at the root */
+html.theme-subway #libBack.dim { opacity: 0.45; pointer-events: none; }
+html.theme-subway .lib-title { font-size: 22px; }
+html.theme-subway .lib-sub { color: var(--teal); }
+html.theme-subway .lib-header { gap: 6px; }

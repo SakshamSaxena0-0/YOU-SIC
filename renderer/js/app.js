@@ -23,6 +23,7 @@ class App {
     hydrateIcons();
     installRipples();
     this._bindWindow();
+    this._bindTooltips();
     await this.store.init();
     const s = this.store.settings;
     this.engine = new AudioEngine();
@@ -135,6 +136,40 @@ class App {
         back: () => (this.narrow ? this.show('player') : this.show('library')),
       })[act]?.();
     });
+  }
+
+  // Styled tooltips: an element's title moves to data-tip (and aria-label, so it keeps its accessible
+  // name) the first time the pointer reaches it, and a single floating .tip shows it after a short pause.
+  _bindTooltips() {
+    const tip = document.createElement('div');
+    tip.className = 'tip';
+    tip.setAttribute('role', 'tooltip');
+    document.body.appendChild(tip);
+    let timer = 0, cur = null;
+    const hide = () => { clearTimeout(timer); timer = 0; cur = null; tip.classList.remove('show'); };
+    addEventListener('pointerover', (e) => {
+      const el = e.target.closest && e.target.closest('[title], [data-tip]');
+      if (el === cur) return;
+      hide();
+      if (!el) return;
+      if (el.hasAttribute('title')) {
+        el.dataset.tip = el.title;
+        if (!el.hasAttribute('aria-label') && !el.textContent.trim()) el.setAttribute('aria-label', el.title);
+        el.removeAttribute('title');
+      }
+      if (!el.dataset.tip) return;
+      cur = el;
+      timer = setTimeout(() => {
+        if (cur !== el || !el.isConnected) return;
+        tip.textContent = el.dataset.tip;
+        const r = el.getBoundingClientRect(), w = tip.offsetWidth, h = tip.offsetHeight;
+        const below = r.bottom + 8 + h < innerHeight;
+        tip.style.left = `${Math.max(6, Math.min(innerWidth - w - 6, r.left + r.width / 2 - w / 2))}px`;
+        tip.style.top = `${below ? r.bottom + 8 : r.top - h - 8}px`;
+        tip.classList.add('show');
+      }, 450);
+    }, { passive: true });
+    for (const ev of ['pointerdown', 'wheel', 'keydown', 'blur']) addEventListener(ev, hide, { passive: true, capture: true });
   }
 
   _bindWindow() {

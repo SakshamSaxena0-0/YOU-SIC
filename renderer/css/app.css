@@ -1264,3 +1264,11 @@ html.glass-window, html.glass-window body { background: transparent; }
 
 /* app-level effects backdrop (only the Y2K theme shows it; see subway.css §3) */
 .fx { display: none; }
+
+/* styled tooltip (see App._bindTooltips) */
+.tip {
+  position: fixed; left: 0; top: 0; z-index: 800; max-width: min(360px, 80vw); padding: 5px 10px; border-radius: 8px; pointer-events: none;
+  background: rgba(20, 20, 26, 0.94); color: #f5f5f7; font-size: 12px; font-weight: 600; box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.8);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0; transform: translateY(-3px); transition: opacity 0.12s ease-out, transform 0.12s ease-out;
+}
+.tip.show { opacity: 1; transform: none; }

@@ -313,3 +313,17 @@ html:has(.app.wide).theme-subway .fx-grid {
     repeating-linear-gradient(0deg, color-mix(in srgb, var(--teal) 8%, transparent) 0 1px, transparent 1px 48px);
   -webkit-mask: linear-gradient(0deg, var(--shade), transparent);
 }
+
+/* ---------- §4 left panel: header ---------- */
+html.theme-subway .pl-cat-label { color: var(--teal); }
+html.theme-subway .pl-cat-name { font-family: var(--font-display); font-weight: 400; font-size: 13px; letter-spacing: 0.04em; }
+html.theme-subway .pl-cat-pos { color: var(--text-dim); }
+/* queue, volume and menu: 36px gel orbs */
+html.theme-subway .pl-header .icon-btn.lg, html.theme-subway .lib-header .icon-btn.lg { width: 36px; height: 36px; border-radius: var(--r-orb); }
+html.theme-subway .pl-header .icon-btn.lg .ico, html.theme-subway .lib-header .icon-btn.lg .ico { width: 19px; height: 19px; }
+/* tooltips: glass pill in mono */
+html.theme-subway .tip {
+  background: var(--glass), color-mix(in srgb, var(--bg-1) 92%, transparent); border: 1px solid var(--glass-line); border-radius: var(--r-orb);
+  color: var(--text); font-family: var(--font-mono); font-weight: 400; font-size: 11px; letter-spacing: 0.08em; padding: 4px 11px;
+  box-shadow: var(--glass-shadow), var(--gel-glow);
+}

@@ -91,7 +91,6 @@ html.theme-subway :is(.icon-btn.lg, .ctl.lg, .btn, .btn.ghost, .chip, .fchip.add
 html.theme-subway :is(.icon-btn.lg, .ctl.lg, .btn, .btn.ghost, .chip, .fchip.add, .ab-btn, .nb-play):hover { background: var(--gel); box-shadow: var(--gel-shadow-hover); filter: none; transform: none; }
 html.theme-subway :is(.icon-btn.lg, .ctl.lg, .btn, .btn.ghost, .chip, .fchip.add, .ab-btn, .nb-play):active { transform: scale(0.96); box-shadow: var(--gel-shadow-active); }
 html.theme-subway :is(.icon-btn.lg, .ctl.lg, .btn, .chip, .fchip.add, .ab-btn, .nb-play) .ico { filter: drop-shadow(0 1px 0 color-mix(in srgb, var(--chrome-hi) 45%, transparent)); }
-html.theme-subway .icon-btn.lg.dim { opacity: 0.45; }
 html.theme-subway .icon-btn:not(.lg) { color: var(--text-dim); }
 html.theme-subway .icon-btn:not(.lg):hover { background: color-mix(in srgb, var(--chrome-hi) 8%, transparent); color: var(--text); }
 /* glass leftovers from the other looks */
@@ -514,7 +513,9 @@ html.theme-subway .nav-btn:active { transform: none; }
 
 /* ---------- §10 right pane: header ---------- */
 /* back, shuffle, search and menu are 36px gel orbs (§4); back stays visible but dimmed at the root */
-html.theme-subway #libBack.dim { opacity: 0.45; pointer-events: none; }
+/* (in the narrow layout back still returns to the player from the root, so it stays clickable) */
+html.theme-subway .app.wide #libBack.dim { opacity: 0.45; }
+html.theme-subway .app:not(.wide) #libBack.dim { opacity: 1; }
 html.theme-subway .lib-title { font-size: 22px; }
 html.theme-subway .lib-sub { color: var(--teal); }
 html.theme-subway .lib-header { gap: 6px; }

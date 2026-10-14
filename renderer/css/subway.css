@@ -460,3 +460,37 @@ html.theme-subway .star:hover { transform: scale(1.15); }
 /* ---------- §7 waveform seekbar (drawn in waveform.js from these tokens) ---------- */
 html.theme-subway .seek-times { font-size: 11px; color: var(--text); }
 html.theme-subway .seek-bubble { background: var(--glass), color-mix(in srgb, var(--bg-1) 92%, transparent); color: var(--text); border: 1px solid var(--glass-line); box-shadow: var(--glass-shadow), var(--gel-glow); padding: 3px 10px; }
+
+/* ---------- §8 transport controls ---------- */
+html.theme-subway .play-wrap { width: 108px; height: 108px; }
+/* play/pause: an 88px gel orb in a 3px chrome ring with a big specular cap; squashes when pressed */
+html.theme-subway .ctl-play.lg {
+  width: 88px; height: 88px; border: 3px solid transparent;
+  background: var(--gel-gloss) padding-box, var(--gel-body) padding-box, var(--chrome) border-box;
+  transition: transform 180ms var(--spring), box-shadow var(--t-fast);
+}
+html.theme-subway .ctl-play.lg:hover { background: var(--gel-gloss) padding-box, var(--gel-body) padding-box, var(--chrome) border-box; }
+html.theme-subway .ctl-play.lg:active { transform: scale(0.94); transition-duration: 60ms; }
+html.theme-subway .ctl-play.lg::before {
+  display: block; content: ''; position: absolute; left: 14%; right: 14%; top: 4%; height: 46%; border-radius: 50% 50% 45% 45% / 62% 62% 38% 38%;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--chrome-hi) 75%, transparent), color-mix(in srgb, var(--chrome-hi) 8%, transparent)); pointer-events: none;
+}
+html.theme-subway .ctl-play .pp { width: 36px; height: 36px; position: relative; z-index: 1; }
+/* a glow that breathes behind the orb while playing (stepped, 5 updates a second) */
+html.theme-subway .play-wrap::before {
+  content: ''; position: absolute; inset: 6px; border-radius: var(--r-orb); pointer-events: none; opacity: 0;
+  box-shadow: 0 0 34px 6px color-mix(in srgb, var(--teal) 55%, transparent);
+}
+html.theme-subway .playing .play-wrap::before { animation: y2k-breathe 2.4s steps(12) infinite alternate; }
+@keyframes y2k-breathe { from { opacity: 0.25; } to { opacity: 1; } }
+/* shuffle, previous, next, repeat: 44px gel orbs at 80% saturation */
+html.theme-subway :is(.ctl-sm.lg, .ctl-md.lg) { width: 44px; height: 44px; filter: saturate(0.8); overflow: visible; }
+html.theme-subway :is(.ctl-sm.lg, .ctl-md.lg):hover { filter: saturate(0.8); }
+html.theme-subway :is(.ctl-sm.lg, .ctl-md.lg) .ico { width: 22px; height: 22px; }
+/* an active toggle gets a lime LED beneath it */
+html.theme-subway .ctl-sm.on::after { display: block; bottom: -11px; width: 6px; height: 6px; margin-left: -3px; border-radius: var(--r-orb); background: var(--lime); box-shadow: 0 0 6px var(--lime); }
+html.theme-subway .controls { gap: clamp(8px, 2.6vw, 18px); }
+@media (max-height: 720px) {
+  html.theme-subway .play-wrap { width: 92px; height: 92px; }
+  html.theme-subway .ctl-play.lg { width: 74px; height: 74px; }
+}

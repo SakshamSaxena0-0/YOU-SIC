@@ -25,7 +25,6 @@ class App {
     this._bindWindow();
     this._bindTooltips();
     matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', () => this._applyLook());
-    this._buildBubbles();
     await this.store.init();
     const s = this.store.settings;
     this.engine = new AudioEngine();
@@ -172,30 +171,6 @@ class App {
       }, 450);
     }, { passive: true });
     for (const ev of ['pointerdown', 'wheel', 'keydown', 'blur']) addEventListener(ev, hide, { passive: true, capture: true });
-  }
-
-  // Y2K theme: glass bubbles behind every pane. Sizes, spots and drift are fixed per bubble (seeded), and
-  // the pointer moves them a little (bigger bubbles more) for depth. Drawn and animated in subway.css §13.
-  _buildBubbles() {
-    const host = $('#fxBubbles');
-    const spots = [ // [x%, y%, size px]: a few at the left edge, a cluster bottom-right, a couple elsewhere
-      [3, 34, 64], [6, 58, 28], [2, 80, 104], [86, 72, 120], [93, 60, 40], [80, 90, 56], [95, 88, 24], [48, 94, 34], [60, 8, 20],
-    ];
-    host.innerHTML = spots.map(([x, y, d], i) => {
-      const dur = 12 + ((i * 7) % 9);           // 12-20s
-      const phase = -Math.round(((i * 5.3) % dur) * 2) / 2; // randomised start, on a half-second
-      const depth = Math.round(6 + ((d - 20) / 100) * 8); // 6-14px of parallax
-      // two steps a second, on the same beat as the other decorations (see the note in subway.css §3)
-      return `<i style="--d:${d}px;--x:${x}%;--y:${y}%;--depth:${depth};--dir:${i % 2 ? 1 : -1};animation-duration:${dur}s;animation-delay:${phase}s;animation-timing-function:steps(${dur * 2})"></i>`;
-    }).join('');
-    const fx = $('#fx');
-    let raf = 0, mx = 0, my = 0;
-    addEventListener('pointermove', (e) => {
-      if (!document.documentElement.classList.contains('theme-subway')) return;
-      mx = (e.clientX / innerWidth - 0.5) * 2;
-      my = (e.clientY / innerHeight - 0.5) * 2;
-      if (!raf) raf = requestAnimationFrame(() => { raf = 0; fx.style.setProperty('--mx', mx.toFixed(3)); fx.style.setProperty('--my', my.toFixed(3)); });
-    }, { passive: true });
   }
 
   _bindWindow() {
@@ -544,7 +519,7 @@ class App {
       ${tog('waveform', 'Waveform seekbar', 'Decode tracks to draw a real waveform')}
       ${tog('rating', 'Show rating stars')}
       ${tog('reduceMotion', 'Reduce animations')}
-      <label class="set-row"><div><div class="set-label">Reduce effects</div><div class="set-hint">No blur, spinning CD, bubbles, aurora, sparkles or grain; solid panels instead of glass. On automatically when Windows asks for less motion</div></div>
+      <label class="set-row"><div><div class="set-label">Reduce effects</div><div class="set-hint">No blur, spinning CD, aurora, sparkles or grain; solid panels instead of glass. On automatically when Windows asks for less motion</div></div>
       <input type="checkbox" class="switch" data-k="reduceEffects" ${this.reduceEffects ? 'checked' : ''}></label>
       <div class="set-sec">Shortcuts</div>
       <div class="shortcuts">

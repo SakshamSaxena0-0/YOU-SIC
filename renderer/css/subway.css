@@ -399,10 +399,10 @@ html.theme-subway .playing .cd-disc { animation-play-state: running; }
 
 /* song info: frosted glass panel, metadata and chips close together */
 html.theme-subway .aa-back { border-radius: var(--r-art); border: 1px solid transparent; background: linear-gradient(160deg, var(--bg-2), var(--bg-1)) padding-box, var(--holo) border-box; box-shadow: var(--glass-shadow), 0 30px 60px -20px var(--shade); }
-html.theme-subway .aa-back.aa-info { background: var(--glass) padding-box, color-mix(in srgb, var(--bg-1) 74%, transparent) padding-box, var(--holo) border-box; backdrop-filter: blur(20px) saturate(1.4); }
-html.theme-subway.fx-lite .aa-back.aa-info { backdrop-filter: none; }
-html.theme-subway .ab-art { display: none; }
-html.theme-subway .aa-back::before { background: linear-gradient(180deg, color-mix(in srgb, var(--chrome-hi) 8%, transparent), transparent 30%); }
+/* the back is opaque: the cover, mirrored and darkened, behind the details (the flat resting copy matches) */
+html.theme-subway .aa-back.aa-info { background: linear-gradient(160deg, var(--bg-2), var(--bg-1)) padding-box, var(--holo) border-box; backdrop-filter: none; }
+html.theme-subway .ab-art { filter: brightness(0.4) saturate(1.2) blur(2px); }
+html.theme-subway .aa-back::before { background: linear-gradient(180deg, color-mix(in srgb, var(--shade) 10%, transparent), color-mix(in srgb, var(--shade) 45%, transparent)); }
 html.theme-subway .aa-back::after { background: linear-gradient(100deg, transparent 40%, color-mix(in srgb, var(--chrome-hi) 25%, transparent) 48%, transparent 58%); }
 html.theme-subway .ab-body { color: var(--text); text-shadow: none; }
 html.theme-subway .ab-kicker { color: var(--teal); }
@@ -422,6 +422,12 @@ html.theme-subway .ab-fmt span, html.theme-subway .ab-fmt span:nth-child(n) {
 /* Album / Artist / Show file: 28px gel capsules, labels always shown */
 html.theme-subway .ab-btn, html.theme-subway .ab-btn:nth-child(n) { height: 28px; width: auto; padding: 0 12px; border-radius: var(--r-orb); font-size: 11.5px; font-weight: 700; justify-content: center; }
 html.theme-subway .ab-btn span { display: inline; }
+/* on small covers the buttons drop their labels and stay on one row, so the details keep their room */
+@container (max-width: 300px) {
+  html.theme-subway .ab-actions { flex-wrap: nowrap; }
+  html.theme-subway .ab-btn, html.theme-subway .ab-btn:nth-child(n) { width: 28px; padding: 0; }
+  html.theme-subway .ab-btn span { display: none; }
+}
 /* corner stickers over the art while playing */
 html.theme-subway .playing .sticker { display: block; }
 html.theme-subway .sticker {
@@ -624,23 +630,7 @@ html.theme-subway ::-webkit-scrollbar-track { background: transparent; }
 html.theme-subway ::-webkit-scrollbar-thumb { background: linear-gradient(90deg, var(--chrome-hi), var(--chrome-lo)); border: 0; border-radius: var(--r-orb); }
 html.theme-subway ::-webkit-scrollbar-thumb:hover { background: linear-gradient(90deg, var(--chrome-hi), var(--chrome-mid)); box-shadow: 0 0 8px var(--teal); }
 
-/* ---------- §13 bubbles and sparkles ---------- */
-/* bubbles live in the #fx backdrop, behind every glass layer; kept fully inside the window */
-html.theme-subway .fx-bubbles i {
-  position: absolute; width: var(--d); height: var(--d); border-radius: var(--r-orb);
-  left: clamp(24px, var(--x), calc(100vw - var(--d) - 24px)); top: clamp(24px, var(--y), calc(100vh - var(--d) - 24px));
-  background:
-    radial-gradient(circle at 32% 26%, color-mix(in srgb, var(--chrome-hi) 85%, transparent) 0 7%, transparent 18%),
-    radial-gradient(circle, transparent 0 62%, color-mix(in srgb, var(--aqua) 10%, transparent) 74%, color-mix(in srgb, var(--pink) 16%, transparent) 86%, color-mix(in srgb, var(--gold) 14%, transparent) 94%, transparent 100%),
-    radial-gradient(circle at 40% 35%, color-mix(in srgb, var(--chrome-hi) 6%, transparent), transparent 70%);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--chrome-hi) 50%, transparent), inset -4px -6px 12px color-mix(in srgb, var(--lilac) 14%, transparent);
-  translate: calc(var(--mx, 0) * var(--depth) * -1px) calc(var(--my, 0) * var(--depth) * -1px);
-  transition: translate 600ms ease-out;
-  /* a +-20px drift on a 12-20s loop from a randomised phase, on the shared half-second beat */
-  animation: y2k-bob 16s steps(32) infinite alternate; /* duration, phase and steps are set per bubble */
-}
-@keyframes y2k-bob { from { transform: translate(calc(var(--dir) * -20px), 14px); } to { transform: translate(calc(var(--dir) * 20px), -14px); } }
-
+/* ---------- §13 sparkles ---------- */
 /* four-point sparkles that twinkle near the play button, the art corners and the active tab */
 html.theme-subway .spark, html.theme-subway .nav-ink::after {
   display: block; position: absolute; width: 18px; height: 18px; pointer-events: none; z-index: 3;
@@ -681,13 +671,13 @@ html.boot-y2k .splash-text { font-family: var(--font-mono); font-size: 11px; let
 
 /* ---------- §15 performance and accessibility ---------- */
 /* Reduce effects: the glass tokens turn solid (§0); the decoration goes */
-html.theme-subway.fx-lite :is(.fx-aurora, .fx-bubbles, .spark, .grain) { display: none; }
+html.theme-subway.fx-lite :is(.fx-aurora, .spark, .grain) { display: none; }
 html.theme-subway.fx-lite .nav-ink::after { display: none; }
 html.theme-subway.fx-lite :is(.cd-disc, .tb-logo) { animation: none !important; }
 html.theme-subway.fx-lite .tile::after { animation: none !important; }
 html.theme-subway.fx-lite .play-wrap::before { animation: none !important; opacity: 0.5; }
 /* every decorative loop stops while the window is unfocused or minimised (html.idle); playback carries on */
-html.theme-subway.idle :is(.fx-aurora i, .fx-bubbles i, .cd-disc, .spark, .tb-logo, .eqbars i) { animation-play-state: paused !important; }
+html.theme-subway.idle :is(.fx-aurora i, .cd-disc, .spark, .tb-logo, .eqbars i) { animation-play-state: paused !important; }
 html.theme-subway.idle .nav-ink::after, html.theme-subway.idle .play-wrap::before { animation-play-state: paused !important; }
 /* a visible 2px aqua focus ring for keyboard users */
 html.theme-subway :focus-visible { outline: 2px solid var(--aqua); outline-offset: 2px; }

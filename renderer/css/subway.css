@@ -42,17 +42,32 @@ html.theme-subway, html.boot-y2k {
   --r-orb: 999px;
   --r-card: 14px;
   --r-art: 12px;
-  /* gel material (every button) */
-  --gel-gloss: linear-gradient(180deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0) 50%);
+  /* candy gel (lit buttons: primary actions, toggles that are on, the active tab): a crisp white
+     crescent on top, light pooling at the bottom the way it does in real coloured glass */
+  --gel-gloss: radial-gradient(88% 54% at 50% 2%, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.14) 72%, rgba(255, 255, 255, 0) 73%);
+  --gel-caustic: radial-gradient(70% 55% at 50% 104%, rgba(127, 243, 255, 0.95), rgba(127, 243, 255, 0) 72%);
   --gel-body: linear-gradient(180deg, var(--teal), var(--teal-deep));
-  --gel: var(--gel-gloss), var(--gel-body);
-  --gel-edge: inset 0 1px 0 rgba(255, 255, 255, 0.8), inset 0 -6px 10px rgba(0, 60, 60, 0.5);
+  --gel: var(--gel-gloss), var(--gel-caustic), var(--gel-body);
+  --gel-edge: inset 0 1px 0 rgba(255, 255, 255, 0.8), inset 0 -2px 6px rgba(0, 60, 60, 0.45);
   --gel-glow: 0 0 14px rgba(63, 224, 197, 0.45);
-  --gel-glow-hi: 0 0 14px rgba(63, 224, 197, 0.7);
+  --gel-glow-hi: 0 0 22px rgba(63, 224, 197, 0.75);
   --gel-drop: 0 4px 10px rgba(0, 0, 0, 0.5);
   --gel-shadow: var(--gel-edge), var(--gel-glow), var(--gel-drop);
   --gel-shadow-hover: var(--gel-edge), var(--gel-glow-hi), var(--gel-drop);
   --gel-shadow-active: inset 0 3px 8px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.5), var(--gel-glow);
+  /* smoked lens (every other button): dark glass with a faint gloss and a teal glow pooling at the bottom */
+  --lens-gloss: radial-gradient(84% 50% at 50% 0%, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.05) 74%, rgba(255, 255, 255, 0) 75%);
+  --lens-caustic: radial-gradient(76% 52% at 50% 104%, rgba(63, 224, 197, 0.42), rgba(63, 224, 197, 0) 74%);
+  --lens-body: linear-gradient(180deg, #16383a, #06100f);
+  --lens: var(--lens-gloss), var(--lens-caustic), var(--lens-body);
+  --lens-lit: radial-gradient(80% 62% at 50% 104%, rgba(127, 243, 255, 0.62), rgba(127, 243, 255, 0) 76%);
+  --lens-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.75), 0 3px 8px rgba(0, 0, 0, 0.55);
+  --lens-shadow-hover: inset 0 1px 2px rgba(0, 0, 0, 0.75), 0 3px 8px rgba(0, 0, 0, 0.55), 0 0 16px rgba(63, 224, 197, 0.5);
+  /* brushed chrome bezel round lenses and gel (a conic sweep reads as turned metal) */
+  --bezel: conic-gradient(from 210deg, #f4fbff, #4b5d66 14%, #c9d8de 29%, #5f747d 44%, #f4fbff 57%, #4b5d66 73%, #dfeaee 87%, #f4fbff);
+  /* the glyph glow on a lens */
+  --neon: drop-shadow(0 0 4px rgba(127, 243, 255, 0.75));
+  --neon-hi: drop-shadow(0 0 6px rgba(127, 243, 255, 0.95));
   /* glass material (tiles, rows, cards, panels) */
   --glass: linear-gradient(135deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.03));
   --glass-blur: blur(18px) saturate(1.4);
@@ -79,25 +94,61 @@ html.theme-subway, html.boot-y2k {
 }
 /* Reduce effects: solid panels instead of frosted glass */
 html.theme-subway.fx-lite { --glass: rgba(15, 42, 43, 0.85); --glass-blur: none; }
+/* how a material sits inside its bezel: every layer clipped to the padding box, the chrome to the border box */
+html.theme-subway { --in-bezel: padding-box, padding-box, padding-box, border-box; }
 
 html.theme-subway body { font-family: 'Segoe UI', 'Manrope', sans-serif; font-feature-settings: normal; color: var(--text); }
 html.theme-subway ::selection { background: var(--teal); color: var(--ink); }
 
-/* ---------- §0 materials: gel for every button ---------- */
-html.theme-subway :is(.icon-btn.lg, .ctl.lg, .btn, .btn.ghost, .chip, .fchip.add, .ab-btn, .nb-play) {
-  background: var(--gel); color: var(--ink); border: 0; filter: none;
-  box-shadow: var(--gel-shadow); backdrop-filter: none !important;
-  transition: box-shadow var(--t-fast), transform var(--t-fast), filter var(--t-fast);
-}
-html.theme-subway :is(.icon-btn.lg, .ctl.lg, .btn, .btn.ghost, .chip, .fchip.add, .ab-btn, .nb-play):hover { background: var(--gel); box-shadow: var(--gel-shadow-hover); filter: none; transform: none; }
-html.theme-subway :is(.icon-btn.lg, .ctl.lg, .btn, .btn.ghost, .chip, .fchip.add, .ab-btn, .nb-play):active { transform: scale(0.96); box-shadow: var(--gel-shadow-active); }
-html.theme-subway :is(.icon-btn.lg, .ctl.lg, .btn, .chip, .fchip.add, .ab-btn, .nb-play) .ico { filter: drop-shadow(0 1px 0 color-mix(in srgb, var(--chrome-hi) 45%, transparent)); }
-html.theme-subway .icon-btn:not(.lg) { color: var(--text-dim); }
-html.theme-subway .icon-btn:not(.lg):hover { background: color-mix(in srgb, var(--chrome-hi) 8%, transparent); color: var(--text); }
+/* ---------- §0 materials: buttons ---------- */
 /* glass leftovers from the other looks */
 html.theme-subway :is(.lg, .btn, .chip, .ctl-md, .ctl-glass, .sheet, .ctxmenu, .toast, .vol-pop, .pl-nav, .navbar, .eq-graph, .pl-meta, .search-bar, .btn.ghost, .tile)::before { display: none; }
 html.theme-subway :is(.aq, .aq-gloss, .froth), html.theme-subway .ctl-play::before { display: none; }
 html.theme-subway .ripple { display: none; }
+/* Two materials, both set in a brushed chrome bezel:
+   - the smoked lens: dark glass, an aqua neon glyph; it lights up from below on hover;
+   - candy gel: lit teal glass with an ink glyph, for primary actions and anything switched on.
+   The bezel is the border box: border: transparent, background-clip per layer (--in-bezel). */
+html.theme-subway :is(.icon-btn.lg, .ctl.lg, .btn, .chip, .fchip.add, .ab-btn, .nb-play, .tile-ico, .r-chev, .r-more) {
+  border: 1.5px solid transparent; background: var(--lens), var(--bezel); background-clip: var(--in-bezel); background-origin: border-box;
+  color: var(--aqua); filter: none; box-shadow: var(--lens-shadow); backdrop-filter: none !important;
+  transition: box-shadow 160ms ease-out, transform 160ms ease-out, color 160ms ease-out, translate 160ms ease-out;
+  isolation: isolate;
+}
+/* the lens lights up from below (an overlay under the glyph and label, so it fades rather than snapping) */
+html.theme-subway :is(.icon-btn.lg, .ctl.lg:not(.ctl-play), .btn, .chip, .fchip.add, .ab-btn, .tile-ico, .r-more)::before {
+  display: block; content: ''; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none; transform: none;
+  background: var(--lens-lit); opacity: 0; transition: opacity 160ms ease-out;
+}
+html.theme-subway :is(.icon-btn.lg, .ctl.lg, .chip, .ab-btn, .tile-ico, .r-chev, .r-more, .btn.ghost) .ico { filter: var(--neon); }
+html.theme-subway :is(.icon-btn.lg, .ctl.lg, .btn, .chip, .fchip.add, .ab-btn, .nb-play, .r-more):hover {
+  background: var(--lens), var(--holo-conic); background-clip: var(--in-bezel); background-origin: border-box;
+  color: var(--text); box-shadow: var(--lens-shadow-hover); filter: none; transform: none; translate: 0 -1px;
+}
+html.theme-subway :is(.icon-btn.lg, .ctl.lg, .btn, .chip, .fchip.add, .ab-btn, .r-more):is(:hover, :focus-visible)::before, html.theme-subway .tile:is(:hover, :focus-visible) .tile-ico::before { opacity: 1; }
+html.theme-subway :is(.icon-btn.lg, .ctl.lg, .chip, .ab-btn, .r-more):hover .ico { filter: var(--neon-hi); }
+html.theme-subway :is(.icon-btn.lg, .ctl.lg, .btn, .chip, .fchip.add, .ab-btn, .nb-play, .r-more):active { transform: scale(0.94); translate: 0 0; box-shadow: inset 0 3px 8px var(--shade), 0 0 10px color-mix(in srgb, var(--teal) 40%, transparent); transition-duration: 60ms; }
+/* candy gel: primary text buttons, Add folder, the mini play button, and every "on" state */
+html.theme-subway :is(.btn:not(.ghost), .fchip.add, .nb-play, .chip.on, .ctl-sm.on) {
+  background: var(--gel), var(--bezel); background-clip: var(--in-bezel); background-origin: border-box; color: var(--ink);
+}
+html.theme-subway :is(.btn:not(.ghost), .fchip.add, .nb-play, .chip.on, .ctl-sm.on):hover {
+  background: var(--gel), var(--holo-conic); background-clip: var(--in-bezel); background-origin: border-box; color: var(--ink);
+}
+html.theme-subway :is(.btn:not(.ghost), .fchip.add, .nb-play, .chip.on, .ctl-sm.on) { box-shadow: var(--gel-shadow); }
+html.theme-subway :is(.btn:not(.ghost), .fchip.add, .nb-play, .chip.on, .ctl-sm.on):hover { box-shadow: var(--gel-shadow-hover); }
+html.theme-subway :is(.btn:not(.ghost), .fchip.add, .nb-play, .chip.on, .ctl-sm.on)::before { background: var(--gel-caustic); }
+html.theme-subway :is(.btn:not(.ghost), .fchip.add, .nb-play, .chip.on, .ctl-sm.on) .ico { filter: drop-shadow(0 1px 0 color-mix(in srgb, var(--chrome-hi) 55%, transparent)); }
+/* text buttons: capsules with a mono, tracked-out label */
+html.theme-subway :is(.btn, .chip) { border-radius: var(--r-orb); }
+/* (the theme chips in Settings keep their own theme's lettering) */
+html.theme-subway :is(.btn, .chip:not(.theme-row .chip)) { font-family: var(--font-mono); font-weight: 400; text-transform: uppercase; letter-spacing: 0.1em; }
+html.theme-subway .chip:not(.theme-row .chip) { font-size: 11px; }
+html.theme-subway .btn { font-size: 12px; padding-inline: 18px; }
+html.theme-subway .btn.ghost { color: var(--aqua); text-shadow: 0 0 8px color-mix(in srgb, var(--aqua) 55%, transparent); }
+html.theme-subway .btn.ghost:hover { color: var(--text); }
+html.theme-subway .icon-btn:not(.lg) { color: var(--text-dim); }
+html.theme-subway .icon-btn:not(.lg):hover { background: color-mix(in srgb, var(--chrome-hi) 8%, transparent); color: var(--text); }
 
 /* ---------- §0 materials: glass for tiles, rows, cards and panels ---------- */
 html.theme-subway :is(.tile, .row, .pl-nav, .navbar, .sheet, .ctxmenu, .vol-pop, .toast, .eq-graph, .eq-tabs, .search-bar, .scan-bar, .swipe-hint, .pl-meta, .fchip:not(.add), .folder-row, .text-input) {
@@ -138,11 +189,11 @@ html.theme-subway .aa-img::before { background: none; }
 html.theme-subway .badge { border-radius: var(--r-orb); }
 html.theme-subway .badge.hires { background: var(--holo); color: var(--ink); box-shadow: none; }
 html.theme-subway .badge.lossless { background: var(--teal); color: var(--ink); box-shadow: 0 0 12px color-mix(in srgb, var(--teal) 50%, transparent); }
-html.theme-subway .pr-track { stroke: color-mix(in srgb, var(--chrome-hi) 10%, transparent); }
+html.theme-subway .pr-track { stroke: color-mix(in srgb, var(--chrome-hi) 16%, transparent); }
 html.theme-subway .pr-fill { stroke: var(--teal); filter: drop-shadow(0 0 4px var(--teal)); }
 html.theme-subway .seek-times { color: var(--text); }
 html.theme-subway .seek-bubble { background: var(--chrome-hi); color: var(--ink); border-radius: var(--r-orb); box-shadow: var(--gel-glow); }
-html.theme-subway .nav-ink { background: var(--gel); border-radius: var(--r-card); box-shadow: var(--gel-shadow); }
+html.theme-subway .nav-ink { border: 1px solid transparent; background: var(--gel), var(--bezel); background-clip: var(--in-bezel); background-origin: border-box; border-radius: var(--r-card); box-shadow: var(--gel-shadow); }
 html.theme-subway .nav-btn { color: var(--chrome-mid); }
 html.theme-subway .nav-btn:hover { color: var(--text); }
 html.theme-subway .nav-btn.on { color: var(--ink); filter: none; }
@@ -152,8 +203,8 @@ html.theme-subway .ctl-play .pp { fill: var(--ink); filter: drop-shadow(0 1px 0 
 /* ---------- §0 library basics ---------- */
 html.theme-subway .tile:hover { filter: none; }
 html.theme-subway .tile::after { background: radial-gradient(200px circle at var(--mx, 50%) var(--my, 50%), color-mix(in srgb, var(--aqua) 12%, transparent), transparent 65%); }
-html.theme-subway .tile-ico { border-radius: var(--r-orb); background: var(--gel); color: var(--ink); box-shadow: var(--gel-shadow); }
-html.theme-subway .tile-ico .ico { filter: drop-shadow(0 1px 0 color-mix(in srgb, var(--chrome-hi) 45%, transparent)); }
+html.theme-subway .tile-ico { border-radius: var(--r-orb); }
+html.theme-subway .tile:hover .tile-ico { color: var(--text); box-shadow: var(--lens-shadow-hover); background: var(--lens), var(--holo-conic); background-clip: var(--in-bezel); background-origin: border-box; }
 html.theme-subway .tile-count { color: var(--text); }
 html.theme-subway .row:hover { scale: 1; background: var(--glass), color-mix(in srgb, var(--aqua) 6%, transparent); box-shadow: var(--glass-shadow), var(--gel-glow); }
 html.theme-subway .row::after { background: radial-gradient(220px circle at var(--mx, 50%) var(--my, 50%), color-mix(in srgb, var(--aqua) 10%, transparent), transparent 65%); }
@@ -175,13 +226,12 @@ html.theme-subway .search-ico, html.theme-subway .empty-lib .ico { color: var(--
 /* ---------- §0 equalizer ---------- */
 html.theme-subway .eq-tab { color: var(--text-dim); border-radius: var(--r-orb); }
 html.theme-subway .eq-tab.active { color: var(--ink); }
-html.theme-subway .eq-tab-ink { background: var(--gel); border-radius: var(--r-orb); box-shadow: var(--gel-shadow); }
+html.theme-subway .eq-tab-ink { border: 1px solid transparent; background: var(--gel), var(--bezel); background-clip: var(--in-bezel); background-origin: border-box; border-radius: var(--r-orb); box-shadow: var(--gel-shadow); }
 html.theme-subway .chip { border-radius: var(--r-orb); }
-/* toggle chips: off is a quieter gel, on is full gel with a lime LED */
-html.theme-subway .eq-toggles .chip:not(.on):not(.preset-chip), html.theme-subway .reverb-presets .chip:not(.on) { filter: saturate(0.3) brightness(0.75); }
+/* toggle chips: off is a dark lens, on is lit gel; both carry an LED */
 html.theme-subway .eq-toggles .chip:not(.preset-chip)::after, html.theme-subway .reverb-presets .chip::after { background: color-mix(in srgb, var(--shade) 45%, transparent); box-shadow: inset 0 1px 1px var(--shade); }
 html.theme-subway .eq-toggles .chip.on::after, html.theme-subway .reverb-presets .chip.on::after { background: var(--lime); box-shadow: 0 0 8px var(--lime); }
-html.theme-subway .preset-chip i .ico { color: var(--ink); }
+html.theme-subway .preset-chip i .ico { color: inherit; }
 html.theme-subway .eq-graph { background: var(--glass), color-mix(in srgb, var(--bg-0) 60%, transparent); }
 html.theme-subway .b-val { color: var(--text-dim); }
 html.theme-subway .band.nonzero .b-val, html.theme-subway .band.active .b-val { color: var(--aqua); }
@@ -264,18 +314,31 @@ html.theme-subway .playing .tb-logo { animation: y2k-led 1s steps(2, jump-none) 
 @keyframes y2k-led { to { opacity: 0.35; } }
 html.theme-subway .tb-title { font-family: var(--font-mono); font-size: 11px; font-weight: 400; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text); }
 html.theme-subway .tb-title::after { content: ' :: V.2K'; color: var(--teal); }
-/* window buttons: three 22px gel circles; the glyph appears on hover */
-html.theme-subway .tb-buttons { align-items: center; gap: 9px; padding: 0 14px 0 8px; }
-html.theme-subway .tb-btn {
-  width: 22px; height: 22px; border-radius: var(--r-orb); color: var(--ink);
-  background: var(--gel); box-shadow: var(--gel-shadow); transition: box-shadow var(--t-fast), transform var(--t-fast);
+/* window buttons: one smoked-lens capsule in a chrome bezel, split into three segments with
+   always-visible neon glyphs; a segment fills with gel on hover (coral for close) */
+html.theme-subway .tb-buttons {
+  align-self: center; height: 26px; margin-right: 10px; padding: 0; gap: 0; border-radius: var(--r-orb); overflow: hidden;
+  border: 1px solid transparent; background: var(--lens), var(--bezel); background-clip: var(--in-bezel); background-origin: border-box;
+  box-shadow: var(--lens-shadow);
 }
-html.theme-subway .tb-btn svg { width: 9px; height: 9px; stroke-width: 1.6; opacity: 0; transition: opacity var(--t-fast); }
-html.theme-subway .tb-btn:hover { background: var(--gel); color: var(--ink); box-shadow: var(--gel-shadow-hover); }
-html.theme-subway .tb-btn:hover svg, html.theme-subway .tb-btn:focus-visible svg { opacity: 1; }
-html.theme-subway .tb-btn:active { transform: scale(0.92); box-shadow: var(--gel-shadow-active); }
-html.theme-subway .tb-close { background: var(--gel-gloss), linear-gradient(180deg, var(--coral-hi), var(--coral-lo)); box-shadow: var(--gel-edge), 0 0 12px color-mix(in srgb, var(--coral-hi) 45%, transparent), var(--gel-drop); }
-html.theme-subway .tb-close:hover { background: var(--gel-gloss), linear-gradient(180deg, var(--coral-hi), var(--coral-lo)); box-shadow: var(--gel-edge), 0 0 14px color-mix(in srgb, var(--coral-hi) 75%, transparent), var(--gel-drop); }
+html.theme-subway .tb-btn {
+  width: 40px; height: 100%; border-radius: 0; color: var(--aqua); background: transparent; position: relative;
+  transition: color var(--t-fast), box-shadow var(--t-fast);
+}
+/* an etched groove between segments */
+html.theme-subway .tb-btn + .tb-btn { box-shadow: inset 1px 0 0 color-mix(in srgb, var(--shade) 70%, transparent), inset 2px 0 0 color-mix(in srgb, var(--chrome-hi) 14%, transparent); }
+html.theme-subway .tb-btn::before {
+  content: ''; position: absolute; inset: 0; opacity: 0; transition: opacity var(--t-fast); pointer-events: none;
+  background: var(--gel-gloss), var(--gel-caustic), var(--gel-body);
+}
+html.theme-subway .tb-close::before { background: var(--gel-gloss), linear-gradient(180deg, var(--coral-hi), var(--coral-lo)); }
+html.theme-subway .tb-btn svg { position: relative; width: 10px; height: 10px; stroke-width: 1.5; filter: var(--neon); transition: filter var(--t-fast); }
+html.theme-subway .tb-btn:is(:hover, :focus-visible) { background: transparent; color: var(--ink); }
+html.theme-subway .tb-btn:is(:hover, :focus-visible)::before { opacity: 1; }
+html.theme-subway .tb-btn:is(:hover, :focus-visible) svg { filter: none; }
+html.theme-subway .tb-close:is(:hover, :focus-visible) { background: transparent; color: var(--text); }
+html.theme-subway .tb-btn:active::before { filter: brightness(0.82); }
+html.theme-subway .tb-btn:focus-visible { outline-offset: -3px; }
 /* a 1px chrome border round the window, rounded at the top (gone when maximised) */
 html.theme-subway .app::after {
   content: ''; position: fixed; inset: 0; z-index: 700; pointer-events: none; border-radius: 10px 10px 0 0;
@@ -319,7 +382,7 @@ html.theme-subway .pl-cat-label { color: var(--teal); }
 html.theme-subway .pl-cat-name { font-family: var(--font-display); font-weight: 400; font-size: 13px; letter-spacing: 0.04em; }
 html.theme-subway .pl-cat-pos { color: var(--text-dim); }
 /* queue, volume and menu: 36px gel orbs */
-html.theme-subway .pl-header .icon-btn.lg, html.theme-subway .lib-header .icon-btn.lg { width: 36px; height: 36px; border-radius: var(--r-orb); }
+html.theme-subway .pl-header .icon-btn.lg, html.theme-subway .lib-header .icon-btn.lg { width: 36px; height: 36px; border-radius: var(--r-orb); border-width: 2px; }
 html.theme-subway .pl-header .icon-btn.lg .ico, html.theme-subway .lib-header .icon-btn.lg .ico { width: 19px; height: 19px; }
 /* tooltips: glass pill in mono */
 html.theme-subway .tip {
@@ -419,8 +482,8 @@ html.theme-subway .ab-fmt span, html.theme-subway .ab-fmt span:nth-child(n) {
   background: color-mix(in srgb, var(--aqua) 8%, transparent); color: var(--aqua); box-shadow: none; border: 1px solid var(--aqua);
   text-shadow: 0 0 6px color-mix(in srgb, var(--aqua) 60%, transparent);
 }
-/* Album / Artist / Show file: 28px gel capsules, labels always shown */
-html.theme-subway .ab-btn, html.theme-subway .ab-btn:nth-child(n) { height: 28px; width: auto; padding: 0 12px; border-radius: var(--r-orb); font-size: 11.5px; font-weight: 700; justify-content: center; }
+/* Album / Artist / Show file: 28px lens capsules, labels always shown */
+html.theme-subway .ab-btn, html.theme-subway .ab-btn:nth-child(n) { height: 28px; width: auto; padding: 0 12px; border-radius: var(--r-orb); font-family: var(--font-mono); font-size: 11px; font-weight: 400; letter-spacing: 0.08em; text-transform: uppercase; justify-content: center; }
 html.theme-subway .ab-btn span { display: inline; }
 /* on small covers the buttons drop their labels and stay on one row, so the details keep their room */
 @container (max-width: 300px) {
@@ -469,17 +532,17 @@ html.theme-subway .seek-bubble { background: var(--glass), color-mix(in srgb, va
 
 /* ---------- §8 transport controls ---------- */
 html.theme-subway .play-wrap { width: 108px; height: 108px; }
-/* play/pause: an 88px gel orb in a 3px chrome ring with a big specular cap; squashes when pressed */
-html.theme-subway .ctl-play.lg {
-  width: 88px; height: 88px; border: 3px solid transparent;
-  background: var(--gel-gloss) padding-box, var(--gel-body) padding-box, var(--chrome) border-box;
-  transition: transform 180ms var(--spring), box-shadow var(--t-fast);
+/* play/pause: an 88px candy orb in a 4px brushed-chrome bezel with a big specular cap; squashes when pressed */
+html.theme-subway .ctl-play.lg, html.theme-subway .ctl-play.lg:hover {
+  width: 88px; height: 88px; border: 4px solid transparent;
+  background: var(--gel-caustic), var(--gel-body), var(--bezel); background-clip: padding-box, padding-box, border-box; background-origin: border-box;
 }
-html.theme-subway .ctl-play.lg:hover { background: var(--gel-gloss) padding-box, var(--gel-body) padding-box, var(--chrome) border-box; }
+html.theme-subway .ctl-play.lg { box-shadow: var(--gel-edge), 0 0 26px color-mix(in srgb, var(--teal) 50%, transparent), 0 12px 24px -8px var(--shade); transition: transform 180ms var(--spring), box-shadow var(--t-fast); }
+html.theme-subway .ctl-play.lg:hover { background: var(--gel-caustic), var(--gel-body), var(--holo-conic); background-clip: padding-box, padding-box, border-box; background-origin: border-box; translate: 0 0; transform: scale(1.04); box-shadow: var(--gel-edge), 0 0 34px color-mix(in srgb, var(--aqua) 70%, transparent), 0 12px 24px -8px var(--shade); }
 html.theme-subway .ctl-play.lg:active { transform: scale(0.94); transition-duration: 60ms; }
 html.theme-subway .ctl-play.lg::before {
-  display: block; content: ''; position: absolute; left: 14%; right: 14%; top: 4%; height: 46%; border-radius: 50% 50% 45% 45% / 62% 62% 38% 38%;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--chrome-hi) 75%, transparent), color-mix(in srgb, var(--chrome-hi) 8%, transparent)); pointer-events: none;
+  display: block; content: ''; position: absolute; left: 12%; right: 12%; top: 3%; height: 47%; border-radius: 50% 50% 45% 45% / 62% 62% 38% 38%;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--chrome-hi) 85%, transparent), color-mix(in srgb, var(--chrome-hi) 6%, transparent)); pointer-events: none;
 }
 html.theme-subway .ctl-play .pp { width: 36px; height: 36px; position: relative; z-index: 1; }
 /* a glow that breathes behind the orb while playing (stepped, 5 updates a second) */
@@ -490,10 +553,14 @@ html.theme-subway .play-wrap::before {
 /* 2.5s (not 2.4) so its steps land on the CD's 1/12s frames */
 html.theme-subway .playing .play-wrap::before { animation: y2k-breathe 2.5s steps(15) infinite alternate; }
 @keyframes y2k-breathe { from { opacity: 0.25; } to { opacity: 1; } }
-/* shuffle, previous, next, repeat: 44px gel orbs at 80% saturation */
-html.theme-subway :is(.ctl-sm.lg, .ctl-md.lg) { width: 44px; height: 44px; filter: saturate(0.8); overflow: visible; }
-html.theme-subway :is(.ctl-sm.lg, .ctl-md.lg):hover { filter: saturate(0.8); }
-html.theme-subway :is(.ctl-sm.lg, .ctl-md.lg) .ico { width: 22px; height: 22px; }
+/* previous and next: 48px smoked lenses; shuffle and repeat: 40px, lit gel while on (§0 materials) */
+html.theme-subway :is(.ctl-sm.lg, .ctl-md.lg) { overflow: visible; border-width: 2px; }
+html.theme-subway .ctl-md.lg { width: 48px; height: 48px; }
+html.theme-subway .ctl-sm.lg { width: 40px; height: 40px; }
+html.theme-subway .ctl-md.lg .ico { width: 24px; height: 24px; }
+html.theme-subway .ctl-sm.lg .ico { width: 20px; height: 20px; }
+/* the progress ring round play: a segmented LED meter track under the lit arc */
+html.theme-subway .pr-track { stroke-dasharray: 2.4 2.5; stroke-width: 3; }
 /* an active toggle gets a lime LED beneath it */
 html.theme-subway .ctl-sm.on::after { display: block; bottom: -11px; width: 6px; height: 6px; margin-left: -3px; border-radius: var(--r-orb); background: var(--lime); box-shadow: 0 0 6px var(--lime); }
 html.theme-subway .controls { gap: clamp(8px, 2.6vw, 18px); }
@@ -513,6 +580,8 @@ html.theme-subway .nav-btn { height: 52px; border-radius: 10px; display: flex; f
 html.theme-subway .nav-btn .ico { width: 28px; height: 28px; transition: scale 140ms var(--spring); }
 html.theme-subway .nav-btn::after { content: attr(data-label); font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.08em; line-height: 1; }
 html.theme-subway .nav-btn.on { color: var(--ink); }
+html.theme-subway .nav-btn:not(.on):hover { color: var(--aqua); }
+html.theme-subway .nav-btn:not(.on):hover .ico { filter: var(--neon); }
 html.theme-subway .nav-ink { top: 6px; bottom: 6px; border-radius: 10px; box-shadow: var(--gel-shadow-hover); }
 /* hover magnifies the icon and, a little, its neighbours */
 html.theme-subway .pl-nav .nav-btn:hover .ico { scale: 1.18; }
@@ -552,7 +621,7 @@ html.theme-subway .tile::after {
 html.theme-subway .tile:hover::after { animation: y2k-sweep 600ms ease-out; }
 @keyframes y2k-sweep { to { transform: translateX(120%); } }
 /* the icon is a 44px gel orb */
-html.theme-subway .tile-ico { width: 44px; height: 44px; top: 13px; left: 13px; }
+html.theme-subway .tile-ico { width: 44px; height: 44px; top: 13px; left: 13px; border-width: 2px; }
 html.theme-subway .tile-ico .ico { width: 22px; height: 22px; }
 /* the count is a 20px mono pill */
 html.theme-subway .tile-count {
@@ -609,13 +678,13 @@ html.theme-subway .row .it-art::after { content: ''; position: absolute; inset: 
 html.theme-subway .row:hover .it-art { scale: 1; }
 html.theme-subway .r-title { font-weight: 600; }
 html.theme-subway .r-dur { color: var(--text-dim); }
-/* the chevron sits in a 24px gel circle */
-html.theme-subway .r-chev { width: 24px; height: 24px; flex: none; display: grid; place-items: center; border-radius: var(--r-orb); background: var(--gel); box-shadow: var(--gel-shadow); color: var(--ink); }
+/* the chevron sits in a 24px lens */
+html.theme-subway .r-chev { width: 24px; height: 24px; flex: none; display: grid; place-items: center; border-radius: var(--r-orb); border-width: 1px; }
+html.theme-subway .row:hover .r-chev { color: var(--text); box-shadow: var(--lens-shadow-hover); background: var(--lens), var(--holo-conic); background-clip: var(--in-bezel); background-origin: border-box; }
 html.theme-subway .r-chev .ico { width: 18px; height: 18px; }
-/* the row menu is a 28px ghost orb that turns gel on hover */
-html.theme-subway .r-more { width: 28px; height: 28px; border-radius: var(--r-orb); color: var(--text-dim); background: transparent; box-shadow: inset 0 0 0 1px var(--glass-line); }
+/* the row menu is a 28px lens that lights on hover */
+html.theme-subway .r-more { width: 28px; height: 28px; border-radius: var(--r-orb); border-width: 1px; }
 html.theme-subway .r-more .ico { width: 18px; height: 18px; }
-html.theme-subway .r-more:hover { background: var(--gel); color: var(--ink); box-shadow: var(--gel-shadow); }
 /* the playing row: a holographic bar on the left, an aqua title, a little animated EQ */
 html.theme-subway .row.track.playing { background: var(--glass), color-mix(in srgb, var(--teal) 10%, transparent); }
 html.theme-subway .row.track.playing::before { left: 0; top: 8px; bottom: 8px; width: 3px; border-radius: var(--r-orb); background: var(--holo); box-shadow: 0 0 8px color-mix(in srgb, var(--aqua) 60%, transparent); }

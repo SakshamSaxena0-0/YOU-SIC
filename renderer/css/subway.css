@@ -532,19 +532,33 @@ html.theme-subway .seek-bubble { background: var(--glass), color-mix(in srgb, va
 
 /* ---------- §8 transport controls ---------- */
 html.theme-subway .play-wrap { width: 108px; height: 108px; }
-/* play/pause: an 88px candy orb in a 4px brushed-chrome bezel with a big specular cap; squashes when pressed */
+/* play/pause: the hero lens. A thick brushed-chrome bezel, a dark glass core with a ring of teal light
+   just inside it, and a big neon glyph. Hover turns the bezel holographic and floods the core with light. */
 html.theme-subway .ctl-play.lg, html.theme-subway .ctl-play.lg:hover {
-  width: 88px; height: 88px; border: 4px solid transparent;
-  background: var(--gel-caustic), var(--gel-body), var(--bezel); background-clip: padding-box, padding-box, border-box; background-origin: border-box;
+  width: 88px; height: 88px; border: 5px solid transparent;
+  --core: radial-gradient(circle, color-mix(in srgb, var(--teal) 42%, transparent), transparent 58%);
+  background: var(--lens-gloss), var(--core), var(--lens-caustic), var(--lens-body), var(--bezel);
+  background-clip: padding-box, padding-box, padding-box, padding-box, border-box; background-origin: border-box;
 }
-html.theme-subway .ctl-play.lg { box-shadow: var(--gel-edge), 0 0 26px color-mix(in srgb, var(--teal) 50%, transparent), 0 12px 24px -8px var(--shade); transition: transform 180ms var(--spring), box-shadow var(--t-fast); }
-html.theme-subway .ctl-play.lg:hover { background: var(--gel-caustic), var(--gel-body), var(--holo-conic); background-clip: padding-box, padding-box, border-box; background-origin: border-box; translate: 0 0; transform: scale(1.04); box-shadow: var(--gel-edge), 0 0 34px color-mix(in srgb, var(--aqua) 70%, transparent), 0 12px 24px -8px var(--shade); }
+html.theme-subway .ctl-play.lg { box-shadow: inset 0 2px 4px var(--shade), 0 0 24px color-mix(in srgb, var(--teal) 45%, transparent), 0 12px 24px -8px var(--shade); transition: transform 180ms var(--spring), box-shadow var(--t-fast); }
+html.theme-subway .ctl-play.lg:hover {
+  background: var(--lens-gloss), var(--core), var(--lens-lit), var(--lens-body), var(--holo-conic);
+  background-clip: padding-box, padding-box, padding-box, padding-box, border-box; background-origin: border-box;
+  translate: 0 0; transform: scale(1.04); box-shadow: inset 0 2px 4px var(--shade), 0 0 34px color-mix(in srgb, var(--aqua) 65%, transparent), 0 12px 24px -8px var(--shade);
+}
 html.theme-subway .ctl-play.lg:active { transform: scale(0.94); transition-duration: 60ms; }
+/* the light ring inside the bezel */
 html.theme-subway .ctl-play.lg::before {
-  display: block; content: ''; position: absolute; left: 12%; right: 12%; top: 3%; height: 47%; border-radius: 50% 50% 45% 45% / 62% 62% 38% 38%;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--chrome-hi) 85%, transparent), color-mix(in srgb, var(--chrome-hi) 6%, transparent)); pointer-events: none;
+  display: block; content: ''; position: absolute; inset: 5px; border-radius: var(--r-orb); pointer-events: none;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--aqua) 85%, transparent), 0 0 14px color-mix(in srgb, var(--teal) 85%, transparent), inset 0 0 16px color-mix(in srgb, var(--teal) 65%, transparent);
+  transition: box-shadow var(--t-fast);
 }
-html.theme-subway .ctl-play .pp { width: 36px; height: 36px; position: relative; z-index: 1; }
+html.theme-subway .ctl-play.lg:hover::before { box-shadow: 0 0 0 2px var(--aqua), 0 0 18px var(--teal), inset 0 0 22px color-mix(in srgb, var(--aqua) 75%, transparent); }
+/* the glyph: white-hot at the core, aqua neon round it */
+html.theme-subway .ctl-play .pp {
+  width: 38px; height: 38px; position: relative; z-index: 1; fill: color-mix(in srgb, var(--aqua) 35%, var(--chrome-hi));
+  filter: drop-shadow(0 0 4px var(--aqua)) drop-shadow(0 0 12px var(--teal));
+}
 /* a glow that breathes behind the orb while playing (stepped, 5 updates a second) */
 html.theme-subway .play-wrap::before {
   content: ''; position: absolute; inset: 6px; border-radius: var(--r-orb); pointer-events: none; opacity: 0;

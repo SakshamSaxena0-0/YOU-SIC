@@ -60,7 +60,8 @@ export const ICONS = {
 
 export function icon(name, cls = '') {
   const d = ICONS[name] || '';
-  return `<svg class="ico ${cls}" viewBox="0 0 24 24" aria-hidden="true"><path d="${d}"/></svg>`;
+  // data-i names the icon so a theme can redraw it (the Vector Surrealism theme swaps some paths in CSS)
+  return `<svg class="ico ${cls}" viewBox="0 0 24 24" aria-hidden="true" data-i="${name}"><path d="${d}"/></svg>`;
 }
 
 // Replace every [data-icon] placeholder in a subtree with its SVG.

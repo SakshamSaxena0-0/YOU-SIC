@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 280">
+  <!-- Vector Surrealism: a soft clock draped over a ledge, melting (original artwork) -->
+  <!-- the ledge -->
+  <path fill="#3A2C78" d="M0 120h170v26H0Z"/>
+  <path fill="#0F0A2B" opacity="0.5" d="M170 120l40 26h-40Z"/>
+  <!-- long shadow of the clock -->
+  <path fill="#0F0A2B" opacity="0.45" transform="translate(12 10)" d="M24 112C20 60 90 30 160 36C224 42 268 72 262 112C256 150 222 152 218 196C214 236 196 262 182 240C170 222 184 190 164 168C138 140 30 160 24 112Z"/>
+  <!-- the soft face -->
+  <path fill="#FFF1DC" d="M24 112C20 60 90 30 160 36C224 42 268 72 262 112C256 150 222 152 218 196C214 236 196 262 182 240C170 222 184 190 164 168C138 140 30 160 24 112Z"/>
+  <!-- a rim that sags with it -->
+  <path fill="#FF8A5B" d="M24 112C20 60 90 30 160 36C224 42 268 72 262 112C256 150 222 152 218 196C214 236 196 262 182 240C196 250 206 230 208 196C212 150 246 146 250 112C254 80 216 54 160 48C96 42 34 66 36 110Z"/>
+  <!-- hour marks -->
+  <g fill="#1B1340">
+    <circle cx="142" cy="56" r="5"/>
+    <circle cx="226" cy="88" r="5"/>
+    <circle cx="60" cy="96" r="5"/>
+    <circle cx="200" cy="150" r="5"/>
+    <path d="M196 206h9v16a4.5 4.5 0 0 1-9 0Z"/>
+  </g>
+  <!-- hands -->
+  <g fill="#FF5FA2">
+    <rect x="138" y="70" width="10" height="44" rx="5"/>
+    <rect x="140" y="98" width="62" height="9" rx="4.5" transform="rotate(18 144 102)"/>
+  </g>
+  <circle cx="143" cy="104" r="8" fill="#1B1340"/>
+</svg>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 64" preserveAspectRatio="none">
+  <!-- Vector Surrealism: the cloud's eyelid (original artwork). It covers the almond of eye-cloud.svg;
+       CSS scales it from 0 to 1 on Y, from the top, to make the eye blink. -->
+  <path fill="#D9CCFF" d="M-2 32Q60 -18 122 32Q60 82 -2 32Z"/>
+  <!-- lashes as a flat crescent along the closed lid -->
+  <path fill="#1B1340" d="M8 34Q60 66 112 34Q60 58 8 34Z"/>
+</svg>

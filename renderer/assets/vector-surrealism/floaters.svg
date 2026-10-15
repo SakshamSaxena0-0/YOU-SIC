@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400">
+  <!-- Vector Surrealism: small objects floating in the sky at mismatched scales (original artwork):
+       a sphere, a cube, a cone, a ring, a pebble and a few stars -->
+  <!-- sphere with its detached shadow -->
+  <circle cx="90" cy="90" r="26" fill="#FF8A5B"/>
+  <path fill="#E2683C" d="M90 64a26 26 0 0 1 0 52a34 34 0 0 0 0-52Z"/>
+  <ellipse cx="96" cy="140" rx="18" ry="4" fill="#0F0A2B" opacity="0.5"/>
+  <!-- cube -->
+  <path fill="#B8A1FF" d="M300 56l30 16v34l-30-16Z"/>
+  <path fill="#9C85EE" d="M330 72l30-16v34l-30 16Z"/>
+  <path fill="#E3D6FF" d="M300 56l30-16 30 16-30 16Z"/>
+  <ellipse cx="332" cy="140" rx="22" ry="4" fill="#0F0A2B" opacity="0.5"/>
+  <!-- cone -->
+  <path fill="#2EC4B6" d="M560 40l24 60h-48Z"/>
+  <path fill="#1E9D92" d="M560 40l24 60h-24Z"/>
+  <!-- ring -->
+  <path fill="#FFC93C" fill-rule="evenodd" d="M690 150a30 12 0 1 1 0.1 0Z M690 156a18 6 0 1 0 0.1 0Z"/>
+  <!-- pebble -->
+  <path fill="#FF5FA2" d="M210 250c14-12 40-10 46 4s-8 26-26 26-34-18-20-30Z"/>
+  <!-- stars: four-point, flat -->
+  <g fill="#FFF1DC">
+    <path d="M460 200l4 12 12 4-12 4-4 12-4-12-12-4 12-4Z"/>
+    <path d="M150 330l3 8 8 3-8 3-3 8-3-8-8-3 8-3Z"/>
+    <path d="M740 300l3 8 8 3-8 3-3 8-3-8-8-3 8-3Z"/>
+    <circle cx="620" cy="250" r="3"/>
+    <circle cx="40" cy="240" r="2.5"/>
+    <circle cx="390" cy="330" r="2.5"/>
+  </g>
+</svg>

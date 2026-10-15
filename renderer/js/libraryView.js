@@ -375,7 +375,7 @@ export class LibraryView {
         if (pool.has(i)) continue;
         const t = tracks[i];
         const el = document.createElement('div');
-        el.className = 'row track' + (cur && cur.id === t.id ? ' playing' : '');
+        el.className = 'row track' + (i % 2 ? ' alt' : '') + (cur && cur.id === t.id ? ' playing' : ''); // .alt: every other row (DOM order is not list order)
         el.style.transform = `translateY(${i * ROW_H}px)`;
         el.dataset.i = i;
         const right = stat === 'plays' ? `${this.store.stats[t.id]?.plays || 0}×` : stat === 'rating' ? '★'.repeat(this.store.rating(t.id)) : fmtTime(t.duration);

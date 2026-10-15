@@ -126,6 +126,12 @@ export class Waveform {
       const v = (k) => cs.getPropertyValue(k).trim();
       this.tok = { teal: v('--teal'), lilac: v('--lilac'), pink: v('--pink'), lo: v('--chrome-lo'), mid: v('--chrome-mid'), hi: v('--chrome-hi') };
     }
+    // so does the Vector Surrealism theme
+    if (name === 'vector-surrealism') {
+      const cs = getComputedStyle(document.documentElement);
+      const v = (k) => cs.getPropertyValue(k).trim();
+      this.vs = { coral: v('--vs-coral'), blush: v('--vs-blush'), lav: v('--vs-lavender'), cream: v('--vs-cream'), teal: v('--vs-teal'), ink: v('--vs-ink'), shade: v('--vs-shade') };
+    }
     this.invalidate();
   }
 
@@ -211,6 +217,53 @@ export class Waveform {
     g.beginPath(); g.arc(px, mid, r, 0, Math.PI * 2); g.fillStyle = og; g.fill();
   }
 
+  // Vector Surrealism theme: the waveform as a river. A flat ribbon meanders along the bar; its width
+  // follows the loudness. The played stretch is coral-to-blush, the rest lavender; a hard offset
+  // "long shadow" sits under it; the playhead is a small floating eye.
+  _drawVs(g, w, h, prog) {
+    const c = this.vs;
+    // a river has smooth banks: average the bars down to a few dozen points
+    const N = 36, per = BARS / N, step = w / (N - 1), mid = h * 0.5, amp = h * 0.07;
+    const cy = (f) => mid + Math.sin(f * Math.PI * 3) * amp; // f: 0..1 along the bar
+    const top = [], bot = [];
+    for (let i = 0; i < N; i++) {
+      let v = 0;
+      for (let k = Math.floor(i * per); k < Math.min(BARS, Math.floor((i + 1) * per)); k++) v = Math.max(v, this.cur[k]);
+      const t = 2 + v * h * 0.34, y = cy(i / (N - 1));
+      top.push([i * step, y - t]);
+      bot.push([i * step, y + t * 0.6]);
+    }
+    // one smooth closed outline: midpoint quadratics along the top edge, back along the bottom
+    const river = new Path2D();
+    const run = (pts, first) => {
+      if (first) river.moveTo(pts[0][0], pts[0][1]); else river.lineTo(pts[0][0], pts[0][1]);
+      for (let i = 1; i < pts.length - 1; i++) river.quadraticCurveTo(pts[i][0], pts[i][1], (pts[i][0] + pts[i + 1][0]) / 2, (pts[i][1] + pts[i + 1][1]) / 2);
+      const l = pts[pts.length - 1];
+      river.lineTo(l[0], l[1]);
+    };
+    run(top, true);
+    run(bot.reverse(), false);
+    river.closePath();
+    const px = prog * w;
+    g.save(); g.translate(3, 3); g.fillStyle = c.shade; g.fill(river); g.restore();
+    g.fillStyle = c.lav; g.globalAlpha = 0.42; g.fill(river); g.globalAlpha = 1;
+    g.save();
+    g.beginPath(); g.rect(0, 0, px, h); g.clip();
+    const pg = g.createLinearGradient(0, 0, Math.max(px, 1), 0);
+    pg.addColorStop(0, c.coral); pg.addColorStop(1, c.blush);
+    g.fillStyle = pg; g.fill(river);
+    g.restore();
+    if (this.hover >= 0 && !this.dragging) { g.fillStyle = c.cream; g.globalAlpha = 0.55; g.fillRect(this.hover * w - 0.5, 2, 1, h - 4); g.globalAlpha = 1; }
+    // the playhead: an almond eye with a teal iris, floating on the river
+    const ex = Math.min(Math.max(px, 11), w - 11), ey = cy(prog), r = this.dragging ? 12 : 10;
+    const eye = new Path2D();
+    eye.moveTo(ex - r, ey); eye.quadraticCurveTo(ex, ey - r * 1.15, ex + r, ey); eye.quadraticCurveTo(ex, ey + r * 1.15, ex - r, ey); eye.closePath();
+    g.save(); g.translate(2, 2); g.fillStyle = c.shade; g.fill(eye); g.restore();
+    g.fillStyle = c.cream; g.fill(eye);
+    g.beginPath(); g.arc(ex, ey, r * 0.42, 0, Math.PI * 2); g.fillStyle = c.teal; g.fill();
+    g.beginPath(); g.arc(ex, ey, r * 0.18, 0, Math.PI * 2); g.fillStyle = c.ink; g.fill();
+  }
+
   // Pixel theme: the waveform as a grid of square cells, like an old LED/pixel equalizer.
   _drawPixel(g, w, h, prog) {
     const cell = 6, gap = 1, pitch = cell + gap;
@@ -255,6 +308,7 @@ export class Waveform {
     g.clearRect(0, 0, w, h);
     if (this.theme === 'pixel') { this._drawPixel(g, w, h, prog); return moving; }
     if (this.theme === 'subway' && this.tok) { this._drawY2k(g, w, h, prog); return moving; }
+    if (this.theme === 'vector-surrealism' && this.vs) { this._drawVs(g, w, h, prog); return moving; }
     const step = w / BARS;
     const cy = this.cyber;
     const bw = Math.max(1.2, step * (cy ? 0.62 : 0.56));

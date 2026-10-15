@@ -1,11 +1,12 @@
 import { debounce, sortKey } from './util.js';
 
 // Themes (Settings > Theme). Every theme but glass is solid and runs on a fixed palette.
-export const THEMES = ['glass', 'cyber', 'subway', 'pixel'];
+export const THEMES = ['glass', 'cyber', 'subway', 'pixel', 'vector-surrealism'];
 export const THEME_COLORS = {
   cyber: { accent: [252, 238, 10], dark: [7, 7, 13] },
   subway: { accent: [111, 227, 200], dark: [7, 18, 20] },
   pixel: { accent: [255, 43, 214], dark: [42, 10, 84] },
+  'vector-surrealism': { accent: [255, 138, 91], dark: [15, 10, 43] },
 };
 
 export const DEFAULT_SETTINGS = {
@@ -17,7 +18,7 @@ export const DEFAULT_SETTINGS = {
   dynamicAccent: true,
   accent: '#ff9f1c',
   blurBg: true,
-  theme: 'glass', // glass (liquid glass over the wallpaper) | cyber (solid neon cyberpunk) | subway (y2k: dim teal, chrome, glass) | pixel (retro 90s desktop windows, pixel art)
+  theme: 'glass', // glass (liquid glass over the wallpaper) | cyber (solid neon cyberpunk) | subway (y2k: dim teal, chrome, glass) | pixel (retro 90s desktop windows, pixel art) | vector-surrealism (flat dreamlike vector poster)
   refraction: true,
   windowBg: 'wallpaper', // wallpaper | acrylic | solid
   buttonStyle: 'ios', // ios (clear glass) | bubble | aqua (liquid-filled)

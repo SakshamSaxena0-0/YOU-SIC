@@ -138,6 +138,12 @@ export class Waveform {
       const v = (k) => cs.getPropertyValue(k).trim();
       this.lm = { rose: v('--lm-rose'), peach: v('--lm-peach'), gold: v('--lm-gold'), cream: v('--lm-cream'), haze: v('--lm-haze') };
     }
+    // and the Midnight theme
+    if (name === 'midnight') {
+      const cs = getComputedStyle(document.documentElement);
+      const v = (k) => cs.getPropertyValue(k).trim();
+      this.mn = { cyan: v('--mn-cyan'), deep: v('--mn-cyan-deep'), ice: v('--mn-ice'), steel: v('--mn-steel-3'), chrome: v('--mn-chrome'), void: v('--mn-void') };
+    }
     this.invalidate();
   }
 
@@ -320,6 +326,49 @@ export class Waveform {
     g.restore();
   }
 
+  // Midnight theme: the waveform as city lights on a wet street. Thin bars stand on a street line and are
+  // reflected beneath it, faint and broken into streaks; the played stretch is lit cyan, the rest is dull
+  // steel. The playhead is a thin ice-white light with a chrome stud on the street line.
+  _drawMn(g, w, h, prog) {
+    const c = this.mn;
+    const step = w / BARS, bw = Math.max(1, step * 0.42), line = Math.round(h * 0.62) + 0.5;
+    const pT = new Path2D(), pB = new Path2D(), uT = new Path2D(), uB = new Path2D();
+    for (let i = 0; i < BARS; i++) {
+      const x = i * step + (step - bw) / 2, v = this.cur[i];
+      const up = Math.max(1.5, v * (line - 4)), down = Math.max(1, v * (h - line - 2) * 0.8);
+      const played = (i + 0.5) / BARS <= prog;
+      (played ? pT : uT).rect(x, line - up - 1, bw, up);
+      // the reflection breaks into two streaks, like light on wet asphalt
+      (played ? pB : uB).rect(x, line + 2, bw, down * 0.55);
+      (played ? pB : uB).rect(x, line + 3 + down * 0.65, bw, down * 0.25);
+    }
+    g.fillStyle = c.steel;
+    g.globalAlpha = 0.42; g.fill(uT);
+    g.globalAlpha = 0.12; g.fill(uB);
+    g.globalAlpha = 1;
+    const px = prog * w;
+    const pg = g.createLinearGradient(0, line, 0, 0);
+    pg.addColorStop(0, c.deep); pg.addColorStop(0.35, c.cyan); pg.addColorStop(1, c.ice);
+    g.save();
+    g.shadowColor = c.cyan; g.shadowBlur = 8;
+    g.fillStyle = pg; g.fill(pT);
+    g.restore();
+    g.globalAlpha = 0.28; g.fillStyle = c.cyan; g.fill(pB); g.globalAlpha = 1;
+    // the street line
+    g.fillStyle = c.chrome; g.globalAlpha = 0.14; g.fillRect(0, line, w, 1); g.globalAlpha = 1;
+    if (this.hover >= 0 && !this.dragging) { g.fillStyle = c.chrome; g.globalAlpha = 0.4; g.fillRect(this.hover * w - 0.5, 2, 1, h - 4); g.globalAlpha = 1; }
+    // the playhead
+    g.save();
+    g.shadowColor = c.cyan; g.shadowBlur = 10;
+    g.fillStyle = c.ice; g.fillRect(Math.round(px) - 1, 1, 2, h - 2);
+    g.restore();
+    const r = this.dragging ? 6 : 4.5;
+    const sg = g.createLinearGradient(0, line - r, 0, line + r);
+    sg.addColorStop(0, c.chrome); sg.addColorStop(0.5, c.steel); sg.addColorStop(1, c.void);
+    g.beginPath(); g.arc(px, line, r, 0, Math.PI * 2); g.fillStyle = sg; g.fill();
+    g.lineWidth = 1.5; g.strokeStyle = c.cyan; g.stroke();
+  }
+
   // Pixel theme: the waveform as a grid of square cells, like an old LED/pixel equalizer.
   _drawPixel(g, w, h, prog) {
     const cell = 6, gap = 1, pitch = cell + gap;
@@ -366,6 +415,7 @@ export class Waveform {
     if (this.theme === 'subway' && this.tok) { this._drawY2k(g, w, h, prog); return moving; }
     if (this.theme === 'vector-surrealism' && this.vs) { this._drawVs(g, w, h, prog); return moving; }
     if (this.theme === 'liminal' && this.lm) { this._drawLm(g, w, h, prog); return moving; }
+    if (this.theme === 'midnight' && this.mn) { this._drawMn(g, w, h, prog); return moving; }
     const step = w / BARS;
     const cy = this.cyber;
     const bw = Math.max(1.2, step * (cy ? 0.62 : 0.56));

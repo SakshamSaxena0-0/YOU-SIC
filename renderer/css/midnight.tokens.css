@@ -1,0 +1,115 @@
+/* ==========================================================================
+   Midnight theme (html.theme-midnight): design tokens
+   A city at 3 a.m. seen from a dark room: near-black blue air, a far skyline with a few cold cyan
+   windows, and UI made of dark polished gunmetal with glossy highlights and chrome rims. Every
+   colour, light, material, radius, font and asset the theme uses is defined here; css/midnight.css
+   (the component rules) only reads these tokens (`npm run check` fails on a literal colour there).
+   See THEME_MIDNIGHT.md.
+   Fonts: IBM Plex Sans (liminal.tokens.css), Michroma (subway.css) and JetBrains Mono (app.css)
+   are already bundled and declared.
+   ========================================================================== */
+
+html.theme-midnight {
+  /* ---- palette: night air, gunmetal, and the city's cold light ---- */
+  --mn-void: #06080C;      /* the darkest air: page background */
+  --mn-night: #0A0E14;     /* the sky above the city */
+  --mn-steel-9: #0F141B;   /* gunmetal, deepest */
+  --mn-steel-8: #161C24;
+  --mn-steel-7: #1F2630;   /* panels, buttons */
+  --mn-steel-6: #2A333F;
+  --mn-steel-5: #3C4755;   /* brushed highlights */
+  --mn-steel-3: #7E8B99;   /* chrome, mid */
+  --mn-chrome: #D7DFE7;    /* chrome, catching the light */
+  --mn-white: #E4EBF0;     /* primary text, a cold white */
+  --mn-mist: #93A1AE;      /* secondary text */
+  --mn-cyan: #46E3F2;      /* the city's light: accent, selected, playing */
+  --mn-cyan-deep: #0B5F6B; /* lit glass: primary fills */
+  --mn-ice: #C9F8FF;       /* the hot core of a light */
+  --mn-sodium: #E3AE4E;    /* the odd warm window: stars, favourites */
+  --mn-ember: #E2626B;     /* close, danger */
+
+  /* ---- text (contrast measured on steel-6, the lightest panel) ---- */
+  --mn-text: var(--mn-white);          /* 10.6:1 on steel-6 */
+  --mn-text-dim: var(--mn-mist);       /* 4.8:1 on steel-6, 7.6:1 on the void */
+  --mn-text-on-lit: var(--mn-ice);     /* on cyan-deep 6.4:1 */
+  --mn-text-on-cyan: var(--mn-void);   /* on cyan 12.9:1 */
+  --mn-line: color-mix(in srgb, var(--mn-chrome) 11%, transparent);
+
+  /* ---- light ---- */
+  --mn-glow: 0 0 22px -4px color-mix(in srgb, var(--mn-cyan) 60%, transparent);
+  --mn-glow-strong: 0 0 18px -2px color-mix(in srgb, var(--mn-cyan) 75%, transparent), 0 0 50px -8px color-mix(in srgb, var(--mn-cyan) 45%, transparent);
+  --mn-text-glow: 0 0 14px color-mix(in srgb, var(--mn-cyan) 45%, transparent);
+  --mn-glyph-glow: drop-shadow(0 0 5px color-mix(in srgb, var(--mn-cyan) 80%, transparent));
+  --mn-shadow: 0 22px 44px -18px color-mix(in srgb, var(--mn-void) 95%, transparent);
+  --mn-shadow-sm: 0 8px 16px -8px color-mix(in srgb, var(--mn-void) 95%, transparent);
+
+  /* ---- materials ---- */
+  /* gloss: the wet highlight across the top half of anything polished, with a hard horizon */
+  --mn-gloss: linear-gradient(180deg, color-mix(in srgb, var(--mn-chrome) 16%, transparent), color-mix(in srgb, var(--mn-chrome) 5%, transparent) 46%, transparent 50%);
+  --mn-gloss-soft: linear-gradient(180deg, color-mix(in srgb, var(--mn-chrome) 9%, transparent), transparent 48%);
+  /* on wide plates the reflection falls at an angle, like a window reflected in polished metal */
+  --mn-gloss-wide: linear-gradient(162deg, color-mix(in srgb, var(--mn-chrome) 13%, transparent), color-mix(in srgb, var(--mn-chrome) 4%, transparent) 40%, transparent 40.5%);
+  /* the dome highlight on round buttons */
+  --mn-gloss-dome: radial-gradient(90% 55% at 50% 4%, color-mix(in srgb, var(--mn-chrome) 30%, transparent), color-mix(in srgb, var(--mn-chrome) 6%, transparent) 60%, transparent 62%);
+  /* brushed gunmetal: round (spun) and flat (drawn) */
+  --mn-spun: conic-gradient(from 200deg, var(--mn-steel-7), var(--mn-steel-5) 9%, var(--mn-steel-8) 21%, var(--mn-steel-6) 34%, var(--mn-steel-9) 48%, var(--mn-steel-5) 59%, var(--mn-steel-8) 72%, var(--mn-steel-6) 86%, var(--mn-steel-7));
+  --mn-drawn: repeating-linear-gradient(90deg, color-mix(in srgb, var(--mn-chrome) 3%, transparent) 0 1px, transparent 1px 3px), linear-gradient(180deg, var(--mn-steel-6), var(--mn-steel-8) 70%, var(--mn-steel-9));
+  /* a panel: dark gunmetal, a little see-through so the night shows at the edges */
+  --mn-panel: linear-gradient(180deg, color-mix(in srgb, var(--mn-steel-7) 88%, transparent), color-mix(in srgb, var(--mn-steel-9) 94%, transparent));
+  --mn-panel-solid: linear-gradient(180deg, var(--mn-steel-7), var(--mn-steel-9));
+  /* machined rings on the play button's face */
+  --mn-turned: repeating-radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--mn-chrome) 4%, transparent) 0 1px, transparent 1px 3px);
+  /* a chrome bezel (used as a border-box background behind a padding-box face) */
+  --mn-bezel: conic-gradient(from 160deg, var(--mn-steel-3), var(--mn-chrome) 12%, var(--mn-steel-5) 28%, var(--mn-steel-3) 45%, var(--mn-chrome) 62%, var(--mn-steel-5) 80%, var(--mn-steel-3));
+  /* lit glass: primary fills */
+  --mn-lit: linear-gradient(180deg, color-mix(in srgb, var(--mn-cyan) 34%, var(--mn-cyan-deep)), var(--mn-cyan-deep) 55%, color-mix(in srgb, var(--mn-cyan-deep) 60%, var(--mn-void)));
+  /* the rim of a polished button: a specular top edge, a dark underside, a hairline of chrome */
+  --mn-rim: inset 0 1px 0 color-mix(in srgb, var(--mn-chrome) 38%, transparent), inset 0 -1px 0 color-mix(in srgb, var(--mn-void) 70%, transparent), 0 0 0 1px color-mix(in srgb, var(--mn-void) 85%, transparent), 0 0 0 2px color-mix(in srgb, var(--mn-steel-3) 22%, transparent);
+  --mn-rim-lit: inset 0 1px 0 color-mix(in srgb, var(--mn-ice) 60%, transparent), inset 0 -1px 0 color-mix(in srgb, var(--mn-void) 60%, transparent), 0 0 0 1px color-mix(in srgb, var(--mn-void) 85%, transparent), 0 0 0 2px color-mix(in srgb, var(--mn-cyan) 55%, transparent);
+  --mn-pressed: inset 0 3px 8px color-mix(in srgb, var(--mn-void) 85%, transparent), inset 0 0 0 1px color-mix(in srgb, var(--mn-void) 90%, transparent), 0 1px 0 color-mix(in srgb, var(--mn-chrome) 10%, transparent);
+  --mn-edge: inset 0 0 0 1px var(--mn-line), inset 0 1px 0 color-mix(in srgb, var(--mn-chrome) 12%, transparent);
+  /* city light: filled progress */
+  --mn-flow: linear-gradient(90deg, var(--mn-cyan-deep), var(--mn-cyan) 70%, var(--mn-ice));
+  --mn-flow-v: linear-gradient(0deg, var(--mn-cyan-deep), var(--mn-cyan) 70%, var(--mn-ice));
+
+  /* ---- the night behind everything ---- */
+  --mn-sky: linear-gradient(180deg, var(--mn-void) 0%, var(--mn-night) 38%, color-mix(in srgb, var(--mn-cyan-deep) 22%, var(--mn-night)) 72%, color-mix(in srgb, var(--mn-cyan-deep) 30%, var(--mn-void)) 100%);
+  /* the city's glow lighting the haze above it */
+  --mn-haze: radial-gradient(80% 34% at 50% 100%, color-mix(in srgb, var(--mn-cyan) 16%, transparent), transparent 75%);
+  /* the brightest street, one hard band of light low on the screen */
+  --mn-street: radial-gradient(42% 3.2% at 30% 88%, color-mix(in srgb, var(--mn-cyan) 40%, transparent), transparent 80%);
+  --mn-vignette: radial-gradient(130% 100% at 50% 40%, transparent 45%, color-mix(in srgb, var(--mn-void) 70%, transparent) 80%, var(--mn-void));
+  --mn-veil: color-mix(in srgb, var(--mn-void) 72%, transparent);
+  --mn-floor-shade: color-mix(in srgb, var(--mn-void) 62%, transparent);
+
+  /* ---- shape: machined, slightly rounded ---- */
+  --mn-r-sm: 6px;
+  --mn-r: 10px;
+  --mn-r-lg: 16px;
+  --mn-r-pill: 999px;
+
+  /* ---- motion: heavy, damped ---- */
+  --mn-ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --mn-t: 260ms;
+
+  /* ---- type ---- */
+  --mn-display: 'IBM Plex Sans', 'Segoe UI', sans-serif;  /* titles, thin */
+  --mn-ui: 'IBM Plex Sans', 'Segoe UI', sans-serif;
+  --mn-label: 'Michroma', 'IBM Plex Sans', sans-serif;    /* engraved labels */
+  --mn-num: 'JetBrains Mono', 'Cascadia Mono', Consolas, monospace;
+
+  /* ---- decorative assets (absolute paths, so they resolve the same from any stylesheet) ---- */
+  --mn-a-city: url('/renderer/assets/midnight/city.svg');
+
+  /* ---- the shared app variables, mapped onto the tokens ---- */
+  --bg: var(--mn-void);
+  --text: var(--mn-text);
+  --dim: var(--mn-text-dim);
+  --dimmer: var(--mn-text-dim);
+  --line: var(--mn-line);
+  --mono: var(--mn-num);
+  --acc-light: var(--mn-ice);
+  --acc-deep: var(--mn-cyan);
+  background: var(--mn-void);
+  color-scheme: dark;
+}

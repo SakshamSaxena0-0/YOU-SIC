@@ -1,0 +1,463 @@
+/* ==========================================================================
+   Midnight theme (html.theme-midnight): components
+   A city at 3 a.m. from a dark room: near-black blue air, a far skyline with a few cold cyan windows
+   and one bright street, and every control made of dark polished gunmetal: brushed metal, a wet gloss
+   across the top, chrome rims that catch the city's cyan light when you reach for them, and a play
+   button machined like the face of an old amplifier knob.
+   Tokens: css/midnight.tokens.css. Art: renderer/assets/midnight/city.svg. Seekbar: waveform.js (_drawMn).
+   Guide: THEME_MIDNIGHT.md.
+   Nothing loops: the backdrop is static, so the theme costs nothing while idle.
+   ========================================================================== */
+
+/* ---------- 1. base and type ---------- */
+html.theme-midnight body { font-family: var(--mn-ui); font-weight: 400; font-feature-settings: normal; letter-spacing: 0; color: var(--mn-text); }
+html.theme-midnight ::selection { background: var(--mn-cyan); color: var(--mn-text-on-cyan); }
+html.theme-midnight .app { text-shadow: none; }
+/* titles: thin and quiet */
+html.theme-midnight :is(#plTitle, .lib-title, .ah-title, .sheet-title, .ab-title, .empty-lib h3, .pl-cat-name, .tb-title, .ly-line) {
+  font-family: var(--mn-display); font-style: normal; font-weight: 300; letter-spacing: 0.01em; text-transform: none;
+}
+/* numbers */
+html.theme-midnight :is(.r-dur, .t-num, .tile-count, .b-val, .b-freq, .k-value, .seek-bubble, .pl-cat-pos, #volVal, .rv, .pl-meta, .ab-fmt span, .seek-times) {
+  font-family: var(--mn-num); font-weight: 400; letter-spacing: 0;
+}
+/* small labels: wide engraved capitals */
+html.theme-midnight :is(.pl-cat-label, .k-label, .knob-hint, .menu-head, .ab-kicker, .ab-grid dt, .badge) {
+  font-family: var(--mn-label); font-weight: 400; letter-spacing: 0.14em; text-transform: uppercase;
+}
+/* section dividers: an engraved label and a groove cut into the metal */
+html.theme-midnight :is(.sec-title, .set-sec) {
+  display: flex; align-items: center; gap: 12px; font-family: var(--mn-label); font-weight: 400; font-size: 9.5px;
+  letter-spacing: 0.2em; text-transform: uppercase; color: var(--mn-text-dim);
+}
+html.theme-midnight :is(.sec-title, .set-sec)::before { content: ''; width: 6px; height: 6px; flex: none; border-radius: 50%; background: var(--mn-cyan); box-shadow: var(--mn-glow-strong); }
+html.theme-midnight :is(.sec-title, .set-sec)::after {
+  content: ''; flex: 1; height: 2px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--mn-void) 90%, transparent) 50%, color-mix(in srgb, var(--mn-chrome) 9%, transparent) 50%);
+}
+html.theme-midnight .menu-sep { height: 2px; margin: 5px 12px; background: linear-gradient(180deg, color-mix(in srgb, var(--mn-void) 90%, transparent) 50%, color-mix(in srgb, var(--mn-chrome) 8%, transparent) 50%); }
+
+/* ---------- 2. no glass: none of the liquid-glass layers or blurs apply ---------- */
+html.theme-midnight :is(.lg, .btn, .sheet, .ctxmenu, .toast, .vol-pop, .pl-nav, .navbar, .eq-graph, .scan-bar, .swipe-hint, .b-thumb, .eqbars, .ab-btn, .ctl-md, .search-bar, .pl-meta, .tile, .chip) { backdrop-filter: none !important; }
+/* (single classes only, so the theme's own ::before rules below still win) */
+html.theme-midnight :is(.lg, .btn, .chip, .ctl-md, .ctl-glass, .sheet, .ctxmenu, .toast, .vol-pop, .navbar, .eq-graph, .pl-meta, .search-bar, .tile)::before { display: none; }
+html.theme-midnight :is(.aq, .aq-gloss, .froth, .ripple, .grain), html.theme-midnight .ctl-play::before { display: none; }
+html.theme-midnight :is(.lg, .btn, .icon-btn, .ctl, .chip) .ico { filter: none; }
+html.theme-midnight .bg { background: none; }
+html.theme-midnight :is(.bg-layer, .aa-glow, .bg-shade) { display: none; }
+
+/* ---------- 3. the night behind everything (static) ---------- */
+.mn-world { display: none; }
+html.theme-midnight .mn-world { display: block; position: fixed; inset: 0; overflow: hidden; pointer-events: none; background: var(--mn-void); }
+html.theme-midnight .mn-world :where(i) { position: absolute; display: block; }
+/* the sky: black at the top, a cold blue haze gathering over the city */
+html.theme-midnight .mn-sky { inset: 0; background: var(--mn-haze), var(--mn-sky); }
+/* the skyline, far off along the bottom */
+html.theme-midnight .mn-city { left: 0; right: 0; bottom: 0; height: min(46vh, 420px); background: var(--mn-a-city) center bottom / cover no-repeat; opacity: 0.95; }
+/* one bright street cutting through it, and its light spilling up the buildings */
+html.theme-midnight .mn-street { inset: 0; background: var(--mn-street); mix-blend-mode: screen; }
+html.theme-midnight .mn-vignette { inset: 0; background: var(--mn-vignette); }
+
+/* ---------- 4. panes ---------- */
+html.theme-midnight :is(.player, .library, .eq) { background: transparent; }
+/* the right-hand pane: a sheet of smoked glass in a gunmetal frame */
+html.theme-midnight .app.wide :is(#library, #eq) {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--mn-steel-9) 82%, transparent), var(--mn-veil) 60%);
+  box-shadow: inset 1px 0 0 color-mix(in srgb, var(--mn-void) 90%, transparent), inset 2px 0 0 color-mix(in srgb, var(--mn-chrome) 8%, transparent);
+}
+html.theme-midnight .app.wide #player { box-shadow: none; }
+html.theme-midnight .app:not(.wide) :is(#library, #eq) { background: linear-gradient(180deg, color-mix(in srgb, var(--mn-steel-8) 96%, transparent), color-mix(in srgb, var(--mn-void) 97%, transparent) 50%); box-shadow: inset 0 1px 0 color-mix(in srgb, var(--mn-chrome) 10%, transparent); }
+html.theme-midnight .app:not(.wide)[data-screen='library'] #player, html.theme-midnight .app:not(.wide)[data-screen='eq'] #player { filter: none; opacity: 0.12; }
+
+/* ---------- 5. title bar ---------- */
+html.theme-midnight .titlebar { background: transparent; }
+html.theme-midnight .tb-drag { gap: 10px; padding-left: 18px; }
+/* the logo: a single lit window */
+html.theme-midnight .tb-logo { width: 10px; height: 12px; border-radius: 1px; background: linear-gradient(180deg, var(--mn-ice), var(--mn-cyan)); box-shadow: var(--mn-glow-strong); }
+html.theme-midnight .tb-title { font-family: var(--mn-label); font-weight: 400; font-size: 11px; letter-spacing: 0.32em; text-transform: uppercase; color: var(--mn-text-dim); }
+/* window buttons: three small spun-metal studs, glyphs always showing */
+html.theme-midnight .tb-buttons { align-items: center; gap: 8px; padding: 0 14px 0 8px; }
+html.theme-midnight .tb-btn {
+  width: 24px; height: 24px; border-radius: 50%; color: var(--mn-text-dim); background: var(--mn-gloss-dome), var(--mn-spun); box-shadow: var(--mn-rim);
+  transition: color 200ms, box-shadow 200ms;
+}
+html.theme-midnight .tb-btn svg { width: 8px; height: 8px; stroke-width: 1.6; }
+html.theme-midnight .tb-btn:hover { color: var(--mn-ice); box-shadow: var(--mn-rim-lit), var(--mn-glow); }
+html.theme-midnight .tb-close:hover { color: var(--mn-white); box-shadow: inset 0 1px 0 color-mix(in srgb, var(--mn-chrome) 38%, transparent), 0 0 0 1px var(--mn-void), 0 0 0 2px var(--mn-ember), 0 0 18px -3px var(--mn-ember); }
+
+/* ---------- 6. buttons: dark polished gunmetal ----------
+   At rest: brushed metal, a wet gloss across the top half, a chrome hairline rim.
+   Hover: the rim catches the city's cyan light and the glyph lights up.
+   Press: the button sinks into the panel and the gloss goes dull.
+   On: a cyan light comes on inside (lit glass). */
+html.theme-midnight :is(.icon-btn.lg, .ctl.lg, .btn, .chip, .ab-btn, .fchip.add, .nb-play) {
+  border: 0; filter: none; color: var(--mn-text); background: var(--mn-gloss), var(--mn-drawn); box-shadow: var(--mn-rim), var(--mn-shadow-sm);
+  transition: color 200ms, box-shadow var(--mn-t) var(--mn-ease), translate var(--mn-t) var(--mn-ease);
+}
+/* round buttons are spun, not drawn, and their gloss is a dome */
+html.theme-midnight :is(.pl-header, .lib-header, .eq-header) .icon-btn.lg, html.theme-midnight :is(.ctl-md, .ctl-sm).lg { background: var(--mn-gloss-dome), var(--mn-spun); }
+html.theme-midnight :is(.icon-btn.lg, .ctl.lg, .btn, .chip, .ab-btn, .fchip.add, .nb-play):hover {
+  transform: none; filter: none; color: var(--mn-ice); translate: 0 -1px; box-shadow: var(--mn-rim-lit), var(--mn-glow), var(--mn-shadow-sm);
+}
+html.theme-midnight :is(.icon-btn.lg, .ctl.lg, .chip, .ab-btn, .nb-play):hover .ico { filter: var(--mn-glyph-glow); }
+html.theme-midnight :is(.icon-btn.lg, .ctl.lg, .btn, .chip, .ab-btn, .fchip.add, .nb-play):active {
+  transform: none; translate: 0 1px; box-shadow: var(--mn-pressed); transition-duration: 60ms;
+}
+html.theme-midnight :is(.icon-btn.lg, .ctl.lg, .btn, .chip, .ab-btn, .fchip.add):active { background: var(--mn-gloss-soft), var(--mn-drawn); }
+html.theme-midnight :is(.pl-header, .lib-header, .eq-header) .icon-btn.lg { width: 38px; height: 38px; border-radius: 50%; }
+html.theme-midnight .icon-btn.lg .ico { width: 19px; height: 19px; }
+html.theme-midnight .icon-btn:not(.lg) { color: var(--mn-text-dim); }
+html.theme-midnight .icon-btn:not(.lg):hover { background: color-mix(in srgb, var(--mn-steel-6) 70%, transparent); color: var(--mn-ice); box-shadow: none; }
+/* text buttons: machined plates; the primary one is lit glass with a cyan rim */
+html.theme-midnight .btn { height: 40px; padding: 0 22px; border-radius: var(--mn-r); font-family: var(--mn-ui); font-weight: 600; font-size: 13.5px; letter-spacing: 0.03em; }
+html.theme-midnight .btn:not(.ghost), html.theme-midnight .fchip.add { background: var(--mn-gloss), var(--mn-lit); color: var(--mn-text-on-lit); box-shadow: var(--mn-rim-lit), var(--mn-glow); }
+html.theme-midnight .btn:not(.ghost):hover, html.theme-midnight .fchip.add:hover { color: var(--mn-white); box-shadow: var(--mn-rim-lit), var(--mn-glow-strong); }
+html.theme-midnight .btn:not(.ghost):active, html.theme-midnight .fchip.add:active { background: var(--mn-gloss-soft), var(--mn-lit); box-shadow: var(--mn-pressed); }
+html.theme-midnight .btn .ico { width: 17px; height: 17px; }
+html.theme-midnight .fchip.add { border-radius: var(--mn-r); }
+/* chips: small plates; "on" is lit glass */
+html.theme-midnight .chip { border-radius: var(--mn-r-sm); font-family: var(--mn-ui); font-weight: 500; font-size: 12.5px; }
+html.theme-midnight .chip.on, html.theme-midnight .chip.on:hover { background: var(--mn-gloss), var(--mn-lit); color: var(--mn-text-on-lit); box-shadow: var(--mn-rim-lit), var(--mn-glow); }
+/* their indicator: a dark LED that lights cyan */
+html.theme-midnight :is(.eq-toggles .chip:not(.preset-chip), .reverb-presets .chip)::after { background: var(--mn-steel-9); box-shadow: inset 0 1px 1px var(--mn-void), 0 1px 0 color-mix(in srgb, var(--mn-chrome) 12%, transparent); border-radius: 50%; }
+html.theme-midnight :is(.eq-toggles .chip.on, .reverb-presets .chip.on)::after { background: var(--mn-ice); box-shadow: 0 0 6px var(--mn-cyan), 0 0 12px var(--mn-cyan); }
+html.theme-midnight .preset-chip i .ico { color: inherit; }
+.theme-row [data-v='midnight'] { font-family: 'Michroma', sans-serif; font-size: 0.82em; letter-spacing: 0.14em; text-transform: uppercase; }
+
+/* ---------- 7. transport ---------- */
+html.theme-midnight .controls { gap: clamp(10px, 2.8vw, 22px); }
+html.theme-midnight .ctl-md.lg { width: 50px; height: 50px; border-radius: 50%; }
+html.theme-midnight .ctl-md.lg .ico { width: 24px; height: 24px; }
+/* shuffle / repeat: smaller studs; while on, the glyph lights and an LED glows beneath */
+html.theme-midnight .ctl-sm.lg { width: 40px; height: 40px; border-radius: 50%; color: var(--mn-text-dim); }
+html.theme-midnight .ctl-sm.lg .ico { width: 19px; height: 19px; }
+html.theme-midnight .ctl-sm.on, html.theme-midnight .ctl-sm.on:hover { color: var(--mn-cyan); box-shadow: var(--mn-rim-lit), var(--mn-glow); }
+html.theme-midnight .ctl-sm.on .ico { filter: var(--mn-glyph-glow); }
+html.theme-midnight .ctl-sm.on::after {
+  display: block; top: auto; bottom: -10px; left: 50%; right: auto; width: 4px; height: 4px; margin: 0 0 0 -2px; border-radius: 50%;
+  background: var(--mn-ice); box-shadow: 0 0 6px var(--mn-cyan), 0 0 12px var(--mn-cyan);
+}
+/* play: a machined gunmetal knob face (spun rings and a dome of gloss) set in a polished chrome bezel.
+   It is dark while paused; while music plays, cold light comes up from beneath the face and the
+   progress ring round it glows cyan */
+html.theme-midnight .play-wrap { width: 112px; height: 112px; }
+html.theme-midnight .ctl-play.lg {
+  width: 78px; height: 78px; border-radius: 50%; border: 3px solid transparent; color: var(--mn-ice);
+  background:
+    var(--mn-gloss-dome) padding-box,
+    var(--mn-turned) padding-box,
+    radial-gradient(circle at 50% 30%, var(--mn-steel-6), var(--mn-steel-8) 55%, var(--mn-void)) padding-box,
+    var(--mn-bezel) border-box;
+  box-shadow: 0 0 0 1px var(--mn-void), 0 16px 30px -12px var(--mn-void), inset 0 0 0 1px color-mix(in srgb, var(--mn-void) 90%, transparent);
+  animation: none; transition: box-shadow 600ms var(--mn-ease), translate 220ms var(--mn-ease);
+}
+html.theme-midnight .playing .ctl-play.lg {
+  box-shadow: 0 0 0 1px var(--mn-void), 0 16px 30px -12px var(--mn-void), 0 0 34px -6px color-mix(in srgb, var(--mn-cyan) 60%, transparent),
+    inset 0 0 0 1px color-mix(in srgb, var(--mn-void) 90%, transparent), inset 0 -14px 20px -12px color-mix(in srgb, var(--mn-cyan) 55%, transparent);
+}
+html.theme-midnight .ctl-play.lg:hover { translate: 0 -2px; box-shadow: 0 0 0 1px var(--mn-void), 0 20px 34px -12px var(--mn-void), var(--mn-glow-strong), inset 0 0 0 1px color-mix(in srgb, var(--mn-void) 90%, transparent), inset 0 -14px 20px -12px color-mix(in srgb, var(--mn-cyan) 55%, transparent); }
+html.theme-midnight .ctl-play.lg:active { translate: 0 1px; box-shadow: 0 0 0 1px var(--mn-void), inset 0 4px 10px var(--mn-void); transition-duration: 60ms; }
+html.theme-midnight .ctl-play .pp { width: 28px; height: 28px; fill: var(--mn-ice); filter: drop-shadow(0 0 6px color-mix(in srgb, var(--mn-cyan) 75%, transparent)); }
+html.theme-midnight .ctl-play:not(:hover) .pp { opacity: 0.92; }
+html.theme-midnight .pr-track { stroke: color-mix(in srgb, var(--mn-chrome) 10%, transparent); stroke-width: 1.5; }
+html.theme-midnight .pr-fill { stroke: var(--mn-cyan); stroke-width: 2.2; filter: drop-shadow(0 0 4px var(--mn-cyan)); }
+@media (max-height: 720px) {
+  html.theme-midnight .play-wrap { width: 96px; height: 96px; }
+  html.theme-midnight .ctl-play.lg { width: 66px; height: 66px; }
+}
+
+/* ---------- 8. the dock: a gunmetal bar; the active tab is a slot cut into it, lit from below ---------- */
+html.theme-midnight .pl-nav { background: var(--mn-gloss-soft), var(--mn-drawn); border-radius: var(--mn-r-lg); box-shadow: var(--mn-rim), var(--mn-shadow); padding: 6px; overflow: visible; }
+html.theme-midnight .nav-btn { height: 52px; border-radius: var(--mn-r); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; color: var(--mn-text-dim); filter: none; }
+html.theme-midnight .nav-btn::after { content: attr(data-label); font-family: var(--mn-ui); font-weight: 600; font-size: 8.5px; letter-spacing: 0.2em; line-height: 1; }
+html.theme-midnight .nav-btn .ico { width: 21px; height: 21px; }
+html.theme-midnight .nav-btn:hover { color: var(--mn-white); }
+html.theme-midnight .nav-btn:active { transform: none; }
+html.theme-midnight .nav-btn.on { color: var(--mn-ice); filter: none; }
+html.theme-midnight .nav-btn.on .ico { filter: var(--mn-glyph-glow); }
+html.theme-midnight .nav-ink {
+  top: 6px; bottom: 6px; border-radius: var(--mn-r); overflow: visible;
+  background: radial-gradient(70% 50% at 50% 100%, color-mix(in srgb, var(--mn-cyan) 22%, transparent), transparent), var(--mn-steel-9);
+  box-shadow: var(--mn-pressed);
+}
+html.theme-midnight .nav-ink::after {
+  content: ''; position: absolute; left: 30%; right: 30%; bottom: 3px; height: 2px; border-radius: 2px;
+  background: var(--mn-cyan); box-shadow: 0 0 8px var(--mn-cyan), 0 0 16px color-mix(in srgb, var(--mn-cyan) 60%, transparent);
+}
+
+/* ---------- 9. player: header, the cover on a wet black floor, title block ---------- */
+html.theme-midnight .pl-cat { border-radius: var(--mn-r); }
+html.theme-midnight .pl-cat:hover { background: color-mix(in srgb, var(--mn-steel-7) 60%, transparent); }
+html.theme-midnight .pl-cat-label { font-size: 8.5px; color: var(--mn-text-dim); }
+html.theme-midnight .pl-cat-name { font-size: 18px; color: var(--mn-text); }
+html.theme-midnight .pl-cat-pos { font-size: 11px; color: var(--mn-text-dim); }
+/* a cold halo behind the cover, as if a window were lit behind it */
+html.theme-midnight .aa-wrap::before {
+  --aa: min(80cqw, calc(100cqh - 30px));
+  content: ''; position: absolute; z-index: 0; pointer-events: none; left: 50%; top: 50%; width: calc(var(--aa) * 1.6); height: calc(var(--aa) * 1.3);
+  translate: -50% -50%; border-radius: 50%;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--mn-cyan) 20%, transparent), color-mix(in srgb, var(--mn-cyan-deep) 14%, transparent) 55%, transparent);
+  transition: opacity 0.6s;
+}
+html.theme-midnight .aa-wrap:not(:has(.aa-card[data-slot='cur'] .aa-img:not(.ph)))::before { opacity: 0.5; }
+html.theme-midnight .aa-wrap:is(.lyrics-open, .vis-on)::before { opacity: 0.3; }
+/* the cover: a glossy print in a thin chrome frame, reflected in the wet floor beneath it */
+html.theme-midnight .aa-img {
+  border-radius: var(--mn-r); background-color: var(--mn-steel-8); filter: saturate(0.9) brightness(0.95);
+  box-shadow: 0 0 0 1px var(--mn-void), 0 0 0 2px color-mix(in srgb, var(--mn-chrome) 22%, transparent), 0 30px 60px -24px var(--mn-void);
+  -webkit-box-reflect: below 3px linear-gradient(transparent 78%, color-mix(in srgb, var(--mn-white) 16%, transparent));
+}
+html.theme-midnight .playing .aa-card[data-slot='cur'] .aa-img {
+  box-shadow: 0 0 0 1px var(--mn-void), 0 0 0 2px color-mix(in srgb, var(--mn-chrome) 28%, transparent), 0 0 44px -10px color-mix(in srgb, var(--mn-cyan) 45%, transparent), 0 30px 60px -24px var(--mn-void);
+}
+/* a gloss across the top of the print */
+html.theme-midnight .aa-img::before { display: block; content: ''; position: absolute; inset: 0; border-radius: inherit; background: var(--mn-gloss-soft); pointer-events: none; }
+html.theme-midnight .aa-img::after, html.theme-midnight .aa-img.sheen::after, html.theme-midnight .aa-img.flip-glint::after { display: none; animation: none; }
+html.theme-midnight .aa-img.ph { background: var(--mn-gloss-soft), var(--mn-drawn); filter: none; }
+html.theme-midnight .aa-img.ph .ico { fill: var(--mn-steel-3); filter: none; }
+/* the back: an opaque gunmetal plate */
+html.theme-midnight .aa-back, html.theme-midnight .aa-back.aa-info {
+  border-radius: var(--mn-r); background: var(--mn-gloss-soft), var(--mn-panel-solid); border: 0; backdrop-filter: none;
+  box-shadow: 0 0 0 1px var(--mn-void), 0 0 0 2px color-mix(in srgb, var(--mn-chrome) 18%, transparent), 0 30px 60px -24px var(--mn-void);
+}
+html.theme-midnight .ab-art { display: none; }
+html.theme-midnight .aa-back::before, html.theme-midnight .aa-back::after { display: none; }
+html.theme-midnight .ab-body { color: var(--mn-text); text-shadow: none; }
+html.theme-midnight .ab-kicker { color: var(--mn-cyan); font-size: 8.5px; }
+html.theme-midnight .ab-title { font-size: clamp(18px, 7cqw, 28px); color: var(--mn-text); }
+html.theme-midnight .ab-artist { color: var(--mn-cyan); font-weight: 500; }
+html.theme-midnight .ab-stars { color: var(--mn-sodium); }
+html.theme-midnight .ab-grid dt { color: var(--mn-text-dim); font-size: 0.7em; }
+html.theme-midnight .ab-grid dd { color: var(--mn-text); }
+html.theme-midnight .ab-fmt span, html.theme-midnight .ab-fmt span:nth-child(n) {
+  border-radius: var(--mn-r-sm); padding: 2px 8px; background: var(--mn-steel-9); color: var(--mn-cyan); box-shadow: inset 0 1px 2px var(--mn-void), 0 1px 0 color-mix(in srgb, var(--mn-chrome) 8%, transparent); border: 0; font-size: 10.5px;
+}
+html.theme-midnight :is(.ab-foot, .ab-file) { color: var(--mn-text-dim); }
+html.theme-midnight .ab-btn, html.theme-midnight .ab-btn:nth-child(n) { height: 30px; border-radius: var(--mn-r-sm); font-weight: 600; font-size: 12px; }
+/* title block: darker air in front of you keeps the text readable over the halo and the street */
+html.theme-midnight .pl-info { position: relative; isolation: isolate; }
+html.theme-midnight .pl-info::before {
+  content: ''; position: absolute; z-index: -1; left: 0; right: 0; top: -30px; bottom: -190px; pointer-events: none;
+  background: linear-gradient(180deg, transparent, var(--mn-floor-shade) 30%, var(--mn-floor-shade) 76%, transparent);
+}
+html.theme-midnight #plTitle { font-size: 34px; line-height: 1.2; color: var(--mn-text); }
+html.theme-midnight .pl-artist { color: var(--mn-cyan); font-weight: 500; font-size: 14.5px; letter-spacing: 0.03em; }
+html.theme-midnight .pl-album { color: var(--mn-text-dim); font-size: 13px; }
+html.theme-midnight .badge { border-radius: var(--mn-r-sm); font-size: 8.5px; padding: 3px 8px; background: var(--mn-steel-9); box-shadow: inset 0 1px 2px var(--mn-void), 0 1px 0 color-mix(in srgb, var(--mn-chrome) 8%, transparent); }
+html.theme-midnight .badge.hires { color: var(--mn-ice); }
+html.theme-midnight .badge.lossless { color: var(--mn-cyan); }
+html.theme-midnight .pl-meta { border-radius: var(--mn-r-sm); background: var(--mn-steel-9); color: var(--mn-text-dim); box-shadow: inset 0 1px 2px var(--mn-void), 0 1px 0 color-mix(in srgb, var(--mn-chrome) 8%, transparent); font-size: 11px; padding: 3px 10px; }
+html.theme-midnight .pl-meta:hover { color: var(--mn-text); }
+html.theme-midnight .rating .star { color: var(--mn-steel-5); }
+html.theme-midnight .star.on { color: var(--mn-sodium); filter: drop-shadow(0 0 4px color-mix(in srgb, var(--mn-sodium) 60%, transparent)); }
+html.theme-midnight .star:hover { color: var(--mn-sodium); transform: translateY(-1px); }
+/* track change: the title block fades in, slowly */
+html.theme-midnight .pl-info.enter > *, html.theme-midnight .pl-info.enter-r > *, html.theme-midnight .pl-info.enter-l > * { animation: mn-fade 700ms var(--mn-ease) both; }
+@keyframes mn-fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+html.theme-midnight .seek-times { font-size: 11px; color: var(--mn-text-dim); margin-top: 6px; }
+html.theme-midnight .seek-bubble { background: var(--mn-steel-9); color: var(--mn-ice); border-radius: var(--mn-r-sm); box-shadow: var(--mn-rim), var(--mn-glow); border: 0; padding: 4px 10px; }
+
+/* ---------- 10. library ---------- */
+html.theme-midnight .lib-title { font-size: 32px; color: var(--mn-text); }
+html.theme-midnight .lib-sub { color: var(--mn-text-dim); font-size: 12px; letter-spacing: 0.04em; }
+html.theme-midnight .app.wide #libBack.dim { opacity: 0.35; }
+html.theme-midnight .app:not(.wide) #libBack.dim { opacity: 1; }
+/* the search field: a groove cut into the metal */
+html.theme-midnight .search-bar { border-radius: var(--mn-r); background: var(--mn-steel-9); border: 0; box-shadow: inset 0 2px 5px var(--mn-void), inset 0 0 0 1px color-mix(in srgb, var(--mn-void) 90%, transparent), 0 1px 0 color-mix(in srgb, var(--mn-chrome) 9%, transparent); }
+html.theme-midnight .search-bar:focus-within { box-shadow: inset 0 2px 5px var(--mn-void), inset 0 0 0 1px color-mix(in srgb, var(--mn-cyan) 55%, transparent), var(--mn-glow); }
+html.theme-midnight .search-bar input { color: var(--mn-text); font-family: var(--mn-ui); }
+html.theme-midnight .search-bar input::placeholder { color: var(--mn-text-dim); }
+html.theme-midnight .search-ico { color: var(--mn-text-dim); }
+/* category tiles: brushed gunmetal plates with a glossy top; the icon sits in a spun-metal stud that
+   lights cyan on hover */
+html.theme-midnight .root-grid { gap: 14px; padding: 8px 16px 20px; }
+html.theme-midnight .tile {
+  height: 120px; border: 0; border-radius: var(--mn-r-lg); color: var(--mn-text); filter: none;
+  background: var(--mn-gloss-wide), var(--mn-drawn);
+  box-shadow: var(--mn-rim), var(--mn-shadow-sm); transition: box-shadow var(--mn-t) var(--mn-ease), translate var(--mn-t) var(--mn-ease);
+}
+html.theme-midnight .tile:hover { transform: none; filter: none; translate: 0 -2px; box-shadow: var(--mn-rim-lit), var(--mn-shadow), var(--mn-glow); }
+html.theme-midnight .tile:active { transform: none; translate: 0 1px; box-shadow: var(--mn-pressed); }
+html.theme-midnight .tile::after {
+  inset: 0; border-radius: inherit; opacity: 0; transform: none; animation: none;
+  background: radial-gradient(90% 70% at 50% 110%, color-mix(in srgb, var(--mn-cyan) 16%, transparent), transparent 70%);
+  transition: opacity var(--mn-t) var(--mn-ease);
+}
+html.theme-midnight .tile:hover::after { opacity: 1; animation: none; }
+html.theme-midnight .tile-title { position: relative; z-index: 1; font-weight: 500; font-size: 14px; letter-spacing: 0.02em; color: var(--mn-text); }
+html.theme-midnight .tile-ico { width: 40px; height: 40px; top: 14px; left: 14px; border-radius: 50%; background: var(--mn-gloss-dome), var(--mn-spun); color: var(--mn-mist); box-shadow: var(--mn-rim); transition: color 200ms, box-shadow 200ms; }
+html.theme-midnight .tile:hover .tile-ico { color: var(--mn-ice); box-shadow: var(--mn-rim-lit), var(--mn-glow); }
+html.theme-midnight .tile:hover .tile-ico .ico { filter: var(--mn-glyph-glow); }
+html.theme-midnight .tile-ico .ico { width: 19px; height: 19px; }
+html.theme-midnight .tile-count { top: 16px; right: 16px; color: var(--mn-text-dim); font-size: 11px; }
+/* folder chips */
+html.theme-midnight .fchip:not(.add) { border-radius: var(--mn-r); background: var(--mn-gloss-soft), var(--mn-drawn); color: var(--mn-text); border: 0; box-shadow: var(--mn-rim); }
+html.theme-midnight .fchip:not(.add) .ico { color: var(--mn-cyan); }
+html.theme-midnight .empty-lib .ico { color: var(--mn-cyan); filter: var(--mn-glyph-glow); }
+html.theme-midnight .empty-lib h3 { font-size: 24px; }
+/* list rows: hovering slides a strip of polished metal under the row */
+html.theme-midnight .item-list { display: flex; flex-direction: column; gap: 3px; padding: 6px 12px 12px; }
+html.theme-midnight .row { gap: 12px; padding: 0 12px 0 10px; border-radius: var(--mn-r); background: transparent; color: var(--mn-text); transition: background-color 200ms, box-shadow 200ms; }
+html.theme-midnight .row:hover { scale: 1; background: var(--mn-gloss-soft), color-mix(in srgb, var(--mn-steel-7) 85%, transparent); box-shadow: var(--mn-edge); }
+html.theme-midnight .row::after { display: none; }
+html.theme-midnight .screen :has(> .row:hover) > .row:not(:hover) { opacity: 1; }
+html.theme-midnight .r-title { color: var(--mn-text); font-weight: 500; }
+html.theme-midnight .row:hover .r-title { color: var(--mn-white); }
+html.theme-midnight .r-sub { color: var(--mn-text-dim); }
+html.theme-midnight .r-dur { color: var(--mn-text-dim); font-size: 11px; }
+html.theme-midnight .t-num { color: var(--mn-text-dim); }
+html.theme-midnight .r-chev { color: var(--mn-text-dim); }
+html.theme-midnight .r-more { width: 30px; height: 30px; border-radius: 50%; color: var(--mn-text-dim); }
+html.theme-midnight .r-more:hover { background: var(--mn-steel-9); color: var(--mn-ice); }
+html.theme-midnight .it-art { border-radius: var(--mn-r-sm); background-color: var(--mn-steel-7); box-shadow: 0 0 0 1px var(--mn-void), 0 0 0 2px color-mix(in srgb, var(--mn-chrome) 10%, transparent); filter: saturate(0.9) brightness(0.95); }
+html.theme-midnight .it-art.round { border-radius: 50%; }
+html.theme-midnight .it-art.ph { background: var(--mn-drawn); color: var(--mn-steel-3); filter: none; }
+html.theme-midnight .row:hover .it-art { scale: 1; }
+/* the playing row: lit from within, with a cyan light along its edge */
+html.theme-midnight .row.track.playing {
+  background: var(--mn-gloss-soft), linear-gradient(90deg, color-mix(in srgb, var(--mn-cyan-deep) 55%, var(--mn-steel-8)), color-mix(in srgb, var(--mn-steel-8) 85%, transparent) 80%);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--mn-cyan) 22%, transparent);
+}
+html.theme-midnight .row.track.playing :is(.r-title, .t-num) { color: var(--mn-ice); }
+html.theme-midnight .row.track.playing .r-sub { color: var(--mn-white); }
+html.theme-midnight .row.track.playing::before { left: 0; top: 10px; bottom: 10px; width: 2px; border-radius: 2px; background: var(--mn-cyan); box-shadow: 0 0 8px var(--mn-cyan); }
+html.theme-midnight .eqbars { background: color-mix(in srgb, var(--mn-void) 72%, transparent); backdrop-filter: none; }
+html.theme-midnight .eqbars i { background: var(--mn-cyan); box-shadow: 0 0 4px var(--mn-cyan); border-radius: 1px; }
+/* album grid: glossy prints in chrome frames */
+html.theme-midnight .gcell .it-art { border-radius: var(--mn-r); box-shadow: 0 0 0 1px var(--mn-void), 0 0 0 2px color-mix(in srgb, var(--mn-chrome) 12%, transparent), 0 18px 30px -16px var(--mn-void); transition: translate var(--mn-t) var(--mn-ease), box-shadow var(--mn-t) var(--mn-ease); }
+html.theme-midnight .gcell .it-art::after { display: none; }
+html.theme-midnight .gcell:hover .it-art { transform: none; scale: 1; translate: 0 -3px; box-shadow: 0 0 0 1px var(--mn-void), 0 0 0 2px color-mix(in srgb, var(--mn-cyan) 55%, transparent), 0 22px 34px -16px var(--mn-void), var(--mn-glow); }
+html.theme-midnight .screen :has(> .gcell:hover) > .gcell:not(:hover) { opacity: 1; }
+html.theme-midnight .g-title { color: var(--mn-text); font-weight: 500; margin-top: 10px; }
+html.theme-midnight .g-sub { color: var(--mn-text-dim); }
+/* album / artist header */
+html.theme-midnight .ah-art { border-radius: var(--mn-r); filter: saturate(0.9) brightness(0.95); box-shadow: 0 0 0 1px var(--mn-void), 0 0 0 2px color-mix(in srgb, var(--mn-chrome) 20%, transparent), 0 24px 44px -18px var(--mn-void); }
+html.theme-midnight .ah-art:not(.ph)::before { display: none; }
+html.theme-midnight .ah-art.ph { background: var(--mn-drawn); filter: none; }
+html.theme-midnight .ah-title { color: var(--mn-text); }
+html.theme-midnight .ah-artist { color: var(--mn-cyan); }
+html.theme-midnight .ah-meta { color: var(--mn-text-dim); }
+/* mini player: like the dock */
+html.theme-midnight .navbar { background: var(--mn-gloss-soft), var(--mn-drawn); border: 0; border-radius: var(--mn-r-lg); box-shadow: var(--mn-rim), var(--mn-shadow); color: var(--mn-text); }
+html.theme-midnight .nb-progress { height: 2px; background: var(--mn-flow); box-shadow: 0 0 6px var(--mn-cyan); }
+html.theme-midnight .nb-art { border-radius: var(--mn-r-sm); filter: saturate(0.9) brightness(0.95); }
+html.theme-midnight .nb-title { color: var(--mn-text); font-weight: 500; }
+html.theme-midnight .nb-artist { color: var(--mn-text-dim); }
+html.theme-midnight .navbar .icon-btn:not(.lg) { color: var(--mn-text); }
+html.theme-midnight .nb-play.lg { border-radius: 50%; color: var(--mn-ice); background: var(--mn-gloss-dome), var(--mn-turned), radial-gradient(circle at 50% 30%, var(--mn-steel-6), var(--mn-steel-9)); box-shadow: var(--mn-rim-lit), var(--mn-glow); }
+html.theme-midnight .nb-play.lg:hover { color: var(--mn-white); }
+html.theme-midnight .scan-bar { border-radius: var(--mn-r); background: var(--mn-panel-solid); color: var(--mn-text); box-shadow: var(--mn-rim); border: 0; }
+html.theme-midnight .scan-fill { background: var(--mn-flow); }
+
+/* ---------- 11. equalizer ---------- */
+html.theme-midnight .eq-tabs { background: var(--mn-steel-9); border: 0; border-radius: var(--mn-r); box-shadow: inset 0 2px 5px var(--mn-void), 0 1px 0 color-mix(in srgb, var(--mn-chrome) 9%, transparent); }
+html.theme-midnight .eq-tab { color: var(--mn-text-dim); font-weight: 500; border-radius: var(--mn-r-sm); }
+html.theme-midnight .eq-tab.active { color: var(--mn-text-on-lit); }
+html.theme-midnight .eq-tab-ink { background: var(--mn-gloss), var(--mn-lit); border-radius: var(--mn-r-sm); box-shadow: var(--mn-rim-lit), var(--mn-glow); }
+/* the graph: a dark screen set into the metal */
+html.theme-midnight .eq-graph {
+  border: 0; border-radius: var(--mn-r-lg); margin: 8px 18px;
+  background: radial-gradient(80% 60% at 50% 100%, color-mix(in srgb, var(--mn-cyan-deep) 26%, transparent), transparent), var(--mn-void);
+  box-shadow: inset 0 3px 10px var(--mn-void), inset 0 0 0 1px color-mix(in srgb, var(--mn-void) 90%, transparent), 0 0 0 1px color-mix(in srgb, var(--mn-chrome) 10%, transparent), var(--mn-shadow-sm);
+}
+html.theme-midnight .b-val { color: var(--mn-text-dim); }
+html.theme-midnight .band.nonzero .b-val, html.theme-midnight .band.active .b-val { color: var(--mn-cyan); }
+html.theme-midnight .b-freq { color: var(--mn-text-dim); }
+/* each band: a groove with a cyan light in it; the thumb is a small chrome stud */
+html.theme-midnight .b-track::before { width: 4px; margin-left: -2px; border-radius: 2px; background: var(--mn-steel-9); box-shadow: inset 0 1px 2px var(--mn-void), 0 1px 0 color-mix(in srgb, var(--mn-chrome) 8%, transparent); }
+html.theme-midnight .b-fill { width: 2px; margin-left: -1px; border-radius: 2px; background: var(--mn-flow-v); box-shadow: 0 0 6px var(--mn-cyan); }
+html.theme-midnight .b-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--mn-gloss-dome), var(--mn-spun); box-shadow: var(--mn-rim), var(--mn-shadow-sm); }
+html.theme-midnight .b-thumb::after { display: block; content: ''; position: absolute; left: 50%; top: 50%; width: 4px; height: 4px; margin: -2px 0 0 -2px; border-radius: 50%; background: var(--mn-cyan); box-shadow: 0 0 5px var(--mn-cyan); }
+html.theme-midnight .band.active .b-thumb { box-shadow: var(--mn-rim-lit), var(--mn-glow); }
+/* knobs: spun gunmetal with a gloss dome; the ticks light cyan */
+html.theme-midnight .knob-hint { color: var(--mn-text-dim); font-size: 8.5px; }
+html.theme-midnight .k-tick { stroke: color-mix(in srgb, var(--mn-chrome) 14%, transparent); }
+html.theme-midnight .k-tick.on { stroke: var(--mn-cyan); filter: drop-shadow(0 0 2px var(--mn-cyan)); }
+html.theme-midnight .k-tick.zero { stroke: var(--mn-white); }
+html.theme-midnight .k-cap { background: var(--mn-gloss-dome), var(--mn-spun); box-shadow: var(--mn-rim), var(--mn-shadow); }
+html.theme-midnight .k-cap::after { background: var(--mn-cyan); box-shadow: 0 0 6px var(--mn-cyan); width: 3px; margin-left: -1.5px; }
+html.theme-midnight .k-shine { display: none; }
+html.theme-midnight .k-value { color: var(--mn-text); }
+html.theme-midnight .knob.nonzero .k-value { color: var(--mn-cyan); }
+html.theme-midnight .k-label { color: var(--mn-text-dim); font-size: 8.5px; }
+
+/* ---------- 12. overlays ---------- */
+html.theme-midnight .scrim { background: color-mix(in srgb, var(--mn-void) 72%, transparent); backdrop-filter: none; }
+html.theme-midnight :is(.sheet, .ctxmenu, .vol-pop) { background: var(--mn-gloss-soft), var(--mn-panel-solid); color: var(--mn-text); border: 0; }
+html.theme-midnight .sheet { border-radius: var(--mn-r-lg) var(--mn-r-lg) 0 0; box-shadow: var(--mn-rim), 0 -20px 60px -20px var(--mn-void); }
+@media (min-width: 700px) { html.theme-midnight .sheet { border-radius: var(--mn-r-lg); box-shadow: var(--mn-rim), 0 40px 80px -30px var(--mn-void); } }
+html.theme-midnight .sheet-grip { background: var(--mn-steel-5); }
+html.theme-midnight .sheet-title { font-size: 28px; color: var(--mn-text); }
+html.theme-midnight .sheet-text { color: var(--mn-text-dim); }
+html.theme-midnight .ctxmenu { border-radius: var(--mn-r); box-shadow: var(--mn-rim), var(--mn-shadow); }
+html.theme-midnight .vol-pop { border-radius: var(--mn-r); box-shadow: var(--mn-rim), var(--mn-shadow); }
+html.theme-midnight .menu-head { color: var(--mn-text-dim); font-size: 8.5px; }
+html.theme-midnight .menu-item { border-radius: var(--mn-r-sm); color: var(--mn-text); }
+html.theme-midnight .menu-item:hover { background: var(--mn-gloss-soft), var(--mn-steel-6); }
+html.theme-midnight .mi-ico { color: var(--mn-text-dim); }
+html.theme-midnight .menu-item:hover .mi-ico { color: var(--mn-cyan); }
+html.theme-midnight .menu-item.checked { color: var(--mn-cyan); }
+html.theme-midnight .menu-item.danger { color: var(--mn-ember); }
+html.theme-midnight :is(.mi-hint, .choice-hint) { color: var(--mn-text-dim); }
+html.theme-midnight .choice { border-radius: var(--mn-r); }
+html.theme-midnight .choice.sel { background: var(--mn-gloss-soft), color-mix(in srgb, var(--mn-cyan-deep) 40%, var(--mn-steel-8)); color: var(--mn-text); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--mn-cyan) 40%, transparent); }
+html.theme-midnight .choice.sel :is(.choice-ico, .choice-check) { color: var(--mn-cyan); }
+html.theme-midnight .choice.sel .choice-hint { color: var(--mn-text-dim); }
+html.theme-midnight .choice-ico { color: var(--mn-text-dim); }
+html.theme-midnight #volIco { color: var(--mn-cyan); }
+html.theme-midnight #volVal { color: var(--mn-text); }
+html.theme-midnight .toast { border-radius: var(--mn-r); background: var(--mn-gloss-soft), var(--mn-panel-solid); color: var(--mn-text); border: 0; box-shadow: var(--mn-rim), var(--mn-shadow); font-family: var(--mn-ui); font-weight: 500; }
+html.theme-midnight .toast::after { background: var(--mn-cyan); box-shadow: 0 0 8px var(--mn-cyan); }
+html.theme-midnight .tip {
+  background: var(--mn-steel-9); color: var(--mn-white); border-radius: var(--mn-r-sm); border: 0; box-shadow: var(--mn-rim), var(--mn-shadow-sm);
+  font-family: var(--mn-ui); font-weight: 500; font-size: 12px; padding: 5px 10px;
+}
+/* settings */
+html.theme-midnight .set-row { border-radius: var(--mn-r); }
+html.theme-midnight .set-row:hover { background: color-mix(in srgb, var(--mn-steel-6) 45%, transparent); }
+html.theme-midnight .set-label { color: var(--mn-text); font-weight: 500; }
+html.theme-midnight .set-hint { color: var(--mn-text-dim); }
+html.theme-midnight .rv { color: var(--mn-text); }
+html.theme-midnight .folder-row { border-radius: var(--mn-r); background: var(--mn-steel-9); border: 0; box-shadow: inset 0 1px 3px var(--mn-void), 0 1px 0 color-mix(in srgb, var(--mn-chrome) 8%, transparent); color: var(--mn-text); }
+html.theme-midnight .folder-row > .ico { color: var(--mn-cyan); }
+html.theme-midnight .shortcuts span:nth-child(odd) { border-radius: var(--mn-r-sm); background: var(--mn-gloss), var(--mn-drawn); color: var(--mn-ice); box-shadow: var(--mn-rim); font-family: var(--mn-num); font-size: 11px; }
+html.theme-midnight .about { color: var(--mn-text-dim); }
+html.theme-midnight .info-table td { border-color: var(--mn-line); color: var(--mn-text); }
+html.theme-midnight .info-table td:first-child { color: var(--mn-text-dim); }
+/* text fields: grooves */
+html.theme-midnight .text-input { border-radius: var(--mn-r); background: var(--mn-steel-9); color: var(--mn-text); border: 0; box-shadow: inset 0 2px 5px var(--mn-void), 0 1px 0 color-mix(in srgb, var(--mn-chrome) 9%, transparent); }
+html.theme-midnight .text-input:focus { box-shadow: inset 0 2px 5px var(--mn-void), inset 0 0 0 1px var(--mn-cyan), var(--mn-glow); }
+/* sliders: a groove with cyan light in it and a chrome stud for a thumb */
+html.theme-midnight input[type='range'] {
+  height: 5px; border-radius: 3px; box-shadow: inset 0 1px 2px var(--mn-void), 0 1px 0 color-mix(in srgb, var(--mn-chrome) 9%, transparent);
+  background: linear-gradient(90deg, var(--mn-cyan-deep), var(--mn-cyan) var(--p, 50%), var(--mn-steel-9) var(--p, 50%));
+}
+html.theme-midnight input[type='range']::-webkit-slider-thumb { width: 16px; height: 16px; border-radius: 50%; background: var(--mn-gloss-dome), var(--mn-spun); box-shadow: var(--mn-rim), var(--mn-shadow-sm); }
+html.theme-midnight input[type='range']:hover::-webkit-slider-thumb { box-shadow: var(--mn-rim-lit), var(--mn-glow); }
+/* toggles: a slot in the metal; on, the slot lights cyan and the chrome ball slides across */
+html.theme-midnight .switch { width: 46px; height: 26px; border-radius: var(--mn-r-pill); background: var(--mn-steel-9); box-shadow: inset 0 2px 5px var(--mn-void), 0 1px 0 color-mix(in srgb, var(--mn-chrome) 9%, transparent); transition: background-color 200ms, box-shadow 200ms; }
+html.theme-midnight .switch::after { top: 3px; left: 3px; width: 20px; height: 20px; background: var(--mn-gloss-dome), var(--mn-spun); box-shadow: var(--mn-rim); transition: transform var(--mn-t) var(--mn-ease); }
+html.theme-midnight .switch:checked { background: var(--mn-lit); box-shadow: inset 0 2px 5px color-mix(in srgb, var(--mn-void) 70%, transparent), 0 0 0 1px color-mix(in srgb, var(--mn-cyan) 45%, transparent), var(--mn-glow); }
+html.theme-midnight .switch:checked::after { transform: translateX(20px); }
+/* scrollbar: a thin strip of steel */
+html.theme-midnight ::-webkit-scrollbar { width: 8px; height: 8px; }
+html.theme-midnight :is(::-webkit-scrollbar-track, ::-webkit-scrollbar-corner) { background: transparent; }
+html.theme-midnight ::-webkit-scrollbar-thumb { border-radius: 4px; background: var(--mn-steel-5); border: 2px solid transparent; background-clip: padding-box; }
+html.theme-midnight ::-webkit-scrollbar-thumb:hover { background-color: var(--mn-steel-3); }
+
+/* ---------- 13. lyrics, visualizer, hints ---------- */
+html.theme-midnight .ly-line { color: var(--mn-text-dim); filter: none; text-shadow: none; }
+html.theme-midnight .ly-line:hover { color: var(--mn-text); }
+html.theme-midnight .ly-line.active { color: var(--mn-white); text-shadow: var(--mn-text-glow); }
+html.theme-midnight .vis-host { border-radius: var(--mn-r); box-shadow: 0 0 0 1px var(--mn-void), 0 0 0 2px color-mix(in srgb, var(--mn-chrome) 14%, transparent); }
+html.theme-midnight .vis-host.full { border-radius: 0; box-shadow: none; }
+html.theme-midnight .swipe-hint { border-radius: var(--mn-r); background: var(--mn-steel-9); color: var(--mn-white); border: 0; box-shadow: var(--mn-rim); font-weight: 500; }
+
+/* ---------- 14. focus and reduced motion ---------- */
+html.theme-midnight :focus-visible { outline: 2px solid var(--mn-cyan); outline-offset: 3px; }
+html.theme-midnight .nav-btn:focus-visible { box-shadow: none; }
+html.theme-midnight .switch:focus-visible { outline-offset: 4px; }
+html.theme-midnight.fx-lite :is(.pl-info > *), html.theme-midnight:has(.app.reduce-motion) :is(.pl-info > *) { animation: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  html.theme-midnight .pl-info > * { animation: none !important; }
+}

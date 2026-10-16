@@ -1,6 +1,6 @@
 // Project checks (npm run check). There is no linter or test suite yet; this covers what can break silently:
 //  1. every JavaScript file parses,
-//  2. the Y2K, Vector Surrealism and Liminal component rules use only design tokens (no literal colours),
+//  2. the Y2K, Vector Surrealism, Liminal and Midnight component rules use only design tokens (no literal colours),
 //  3. every bundled font ships with its licence.
 const { spawnSync } = require('child_process');
 const fs = require('fs');
@@ -42,6 +42,15 @@ if (lmLit.length) fail(`liminal.css: ${lmLit.length} literal colour(s) (use the 
 else console.log('  no literal colours in component rules');
 for (const a of (fs.readFileSync(path.join(root, 'renderer/css/liminal.tokens.css'), 'utf8').match(/\/renderer\/assets\/[^')]+/g) || [])) {
   if (!fs.existsSync(path.join(root, a))) fail(`liminal.tokens.css: missing asset ${a}`);
+}
+
+console.log('2d. Midnight tokens');
+const mn = fs.readFileSync(path.join(root, 'renderer/css/midnight.css'), 'utf8');
+const mnLit = mn.match(/#[0-9a-fA-F]{3,8}\b|rgba?\(|hsla?\(/g) || [];
+if (mnLit.length) fail(`midnight.css: ${mnLit.length} literal colour(s) (use the tokens in midnight.tokens.css): ${mnLit.slice(0, 5).join(', ')}`);
+else console.log('  no literal colours in component rules');
+for (const a of (fs.readFileSync(path.join(root, 'renderer/css/midnight.tokens.css'), 'utf8').match(/\/renderer\/assets\/[^')]+/g) || [])) {
+  if (!fs.existsSync(path.join(root, a))) fail(`midnight.tokens.css: missing asset ${a}`);
 }
 
 console.log('3. font licences');

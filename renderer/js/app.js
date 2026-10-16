@@ -346,7 +346,7 @@ class App {
   }
 
   // ---------- look ----------
-  // glass is the default look; every other theme (cyber, subway, pixel, vector-surrealism) is solid: no wallpaper, glass or refraction
+  // glass is the default look; every other theme (cyber, subway, pixel, vector-surrealism, liminal) is solid: no wallpaper, glass or refraction
   get theme() { return THEMES.includes(this.store.settings.theme) ? this.store.settings.theme : 'glass'; }
   get solidTheme() { return this.theme !== 'glass'; }
 
@@ -508,7 +508,7 @@ class App {
         <div class="range-wrap"><input type="range" min="0" max="12" step="1" value="${s.crossfade}" data-r="crossfade" style="--p:${(s.crossfade / 12) * 100}%"><span class="rv">${s.crossfade}s</span></div></div>
       ${tog('resume', 'Resume playback on start', 'Restore the last track, list and position')}
       <div class="set-sec">Look and Feel</div>
-      ${pick('theme', 'Theme', 'Liquid Glass: clear glass over your wallpaper. Cyberpunk: neon HUD. Y2K Subway: dim teal, chrome and glass. Pixel: a retro 90s desktop in pixel art. Vector Surrealism: a dreamlike vector poster', [['glass', 'Liquid Glass'], ['cyber', 'Cyberpunk'], ['subway', 'Y2K Subway'], ['pixel', 'Pixel'], ['vector-surrealism', 'Vector Surrealism']])}
+      ${pick('theme', 'Theme', 'Liquid Glass: clear glass over your wallpaper. Cyberpunk: neon HUD. Y2K Subway: dim teal, chrome and glass. Pixel: a retro 90s desktop in pixel art. Vector Surrealism: a dreamlike vector poster. Liminal: an empty poolroom at night, half dream', [['glass', 'Liquid Glass'], ['cyber', 'Cyberpunk'], ['subway', 'Y2K Subway'], ['pixel', 'Pixel'], ['vector-surrealism', 'Vector Surrealism'], ['liminal', 'Liminal']])}
       <div class="glass-only">
       ${tog('dynamicAccent', 'Album art colors', 'Accent color follows the current album art')}
       <div class="set-row"><div><div class="set-label">Accent color</div><div class="set-hint">Used when album art colors are off or the cover has none</div></div><input type="color" value="${s.accent}" data-c="accent"></div>

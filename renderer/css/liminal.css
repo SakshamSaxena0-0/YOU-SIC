@@ -1,0 +1,494 @@
+/* ==========================================================================
+   Liminal theme (html.theme-liminal): components
+   An empty poolroom at 3 a.m.: a tiled corridor running away into haze, fluorescent panels on the
+   ceiling, still water on the floor and a cloud that has drifted indoors.
+   The album cover hangs where the corridor ends, so the hall seems to lead to it, and play is a
+   doorway of light. Surfaces are dim tiles; light is warm fluorescent; the accent is pool water.
+   Tokens: css/liminal.tokens.css. Art: renderer/assets/liminal/*.svg.
+   Parallax: js/vsWorld.js (shared with Vector Surrealism). Seekbar: waveform.js (_drawLm). Guide: THEME_LIMINAL.md.
+   Motion is transform/opacity only; idle loops pause while the window is unfocused (html.idle)
+   and stop under Reduce effects (html.fx-lite), Windows' reduced motion and Reduce motion.
+   ========================================================================== */
+
+/* ---------- 1. base and type ---------- */
+html.theme-liminal body { font-family: var(--lm-ui); font-weight: 400; font-feature-settings: normal; letter-spacing: 0; color: var(--lm-text); }
+html.theme-liminal ::selection { background: var(--lm-lamp); color: var(--lm-text-on-light); }
+html.theme-liminal .app { text-shadow: none; }
+/* titles: Cormorant Garamond in a light italic, like a half-remembered name */
+html.theme-liminal :is(#plTitle, .lib-title, .ah-title, .sheet-title, .ab-title, .empty-lib h3, .pl-cat-name, .tb-title, .ly-line) {
+  font-family: var(--lm-display); font-style: italic; font-weight: 500; letter-spacing: 0.005em; text-transform: none;
+}
+/* numbers and times: JetBrains Mono */
+html.theme-liminal :is(.seek-times, .r-dur, .t-num, .tile-count, .b-val, .b-freq, .k-value, .seek-bubble, .pl-cat-pos, #volVal, .rv, .pl-meta, .ab-fmt span) {
+  font-family: var(--lm-num); font-weight: 400; letter-spacing: 0;
+}
+/* small labels are the building's signage: mono capitals, widely spaced */
+html.theme-liminal :is(.pl-cat-label, .k-label, .knob-hint, .menu-head, .ab-kicker, .ab-grid dt, .badge) {
+  font-family: var(--lm-num); font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase;
+}
+/* section dividers: a sign, a small lit square, and a grout line running off into the haze */
+html.theme-liminal :is(.sec-title, .set-sec) {
+  display: flex; align-items: center; gap: 10px; font-family: var(--lm-num); font-weight: 500; font-size: 10.5px;
+  letter-spacing: 0.22em; text-transform: uppercase; color: var(--lm-pool);
+}
+html.theme-liminal :is(.sec-title, .set-sec)::before { content: ''; width: 6px; height: 6px; flex: none; background: var(--lm-lamp); box-shadow: var(--lm-glow-lamp); }
+html.theme-liminal :is(.sec-title, .set-sec)::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--lm-grout), transparent); }
+html.theme-liminal .menu-sep { height: 1px; margin: 5px 12px; background: linear-gradient(90deg, transparent, var(--lm-grout), transparent); }
+
+/* ---------- 2. no glass: none of the liquid-glass layers or blurs apply ---------- */
+html.theme-liminal :is(.lg, .btn, .sheet, .ctxmenu, .toast, .vol-pop, .pl-nav, .navbar, .eq-graph, .scan-bar, .swipe-hint, .b-thumb, .eqbars, .ab-btn, .ctl-md, .search-bar, .pl-meta, .tile, .chip) { backdrop-filter: none !important; }
+/* (single classes only, so the theme's own ::before rules below still win) */
+html.theme-liminal :is(.lg, .btn, .chip, .ctl-md, .ctl-glass, .sheet, .ctxmenu, .toast, .vol-pop, .navbar, .eq-graph, .pl-meta, .search-bar, .tile)::before { display: none; }
+html.theme-liminal :is(.aq, .aq-gloss, .froth, .ripple, .grain), html.theme-liminal .ctl-play::before { display: none; }
+html.theme-liminal :is(.lg, .btn, .icon-btn, .ctl, .chip) .ico { filter: none; }
+html.theme-liminal .bg { background: none; }
+html.theme-liminal :is(.bg-layer, .aa-glow, .bg-shade) { display: none; }
+
+/* ---------- 3. the hall behind everything ---------- */
+.lm-world { display: none; }
+html.theme-liminal .lm-world {
+  display: block; position: fixed; inset: 0; overflow: hidden; pointer-events: none; background: var(--lm-void);
+  --px: 0; --py: 0;
+  /* the corridor's vanishing point sits behind the album cover (js/vsWorld.js measures the cover and
+     writes --vx/--vy whenever the layout changes; these are the fallbacks) */
+  --vx: 50vw; --vy: 30vh;
+}
+html.theme-liminal:has(.app.wide) .lm-world { --vx: calc(var(--pw) / 2); }
+html.theme-liminal .lm-world :where(i) { position: absolute; display: block; background: center / 100% 100% no-repeat; }
+/* the corridor: one drawing, stretched to fit, its far end lined up with the cover. The mouse moves it a
+   little against the pointer, so it feels like looking down a real hallway (js/vsWorld.js) */
+html.theme-liminal .lm-hall {
+  left: calc(var(--vx) - 80vw); width: 160vw; top: calc(var(--vy) - 50.4vh); height: 120vh;
+  background-image: var(--lm-a-hall);
+  translate: calc(var(--px) * -26px) calc(var(--py) * -16px); transition: translate 1400ms var(--lm-ease);
+}
+/* a cloud that has drifted indoors, under the ceiling */
+html.theme-liminal .lm-cloud {
+  top: calc(var(--vy) - 150px); left: calc(var(--vx) - 250px); width: clamp(160px, 17vw, 220px); aspect-ratio: 420 / 230; opacity: 0.32;
+  background: var(--lm-a-cloud) center / contain no-repeat;
+  translate: calc(var(--px) * -54px) calc(var(--py) * -30px); transition: translate 1400ms var(--lm-ease);
+}
+html.theme-liminal .lm-cloud { animation: lm-drift 48s steps(96) infinite alternate; }
+@keyframes lm-drift { from { transform: translateX(0); } to { transform: translateX(7vw) translateY(-6px); } }
+/* low mist over the water, and a fine grain over everything (both static) */
+html.theme-liminal .lm-mist { left: 0; right: 0; bottom: 0; height: 34vh; background: linear-gradient(0deg, var(--lm-haze-strong), var(--lm-haze) 40%, transparent); }
+html.theme-liminal .lm-grain { inset: 0; background: var(--lm-a-grain) 0 0 / 180px 180px repeat; opacity: 0.06; }
+
+/* ---------- 4. panes ---------- */
+html.theme-liminal :is(.player, .library, .eq) { background: transparent; }
+/* the right-hand pane is a dim veil over the hall, its edge caught by the light */
+html.theme-liminal .app.wide :is(#library, #eq) { background: var(--lm-veil); box-shadow: inset 1px 0 0 var(--lm-line); }
+html.theme-liminal .app.wide #player { box-shadow: none; }
+html.theme-liminal .app:not(.wide) :is(#library, #eq) { background: linear-gradient(180deg, var(--lm-tile), var(--lm-night) 40%); box-shadow: inset 0 1px 0 var(--lm-line); }
+html.theme-liminal .app:not(.wide)[data-screen='library'] #player, html.theme-liminal .app:not(.wide)[data-screen='eq'] #player { filter: none; opacity: 0.15; }
+
+/* ---------- 5. title bar ---------- */
+html.theme-liminal .titlebar { background: transparent; }
+html.theme-liminal .tb-drag { gap: 10px; padding-left: 16px; }
+/* the logo is a small lit doorway */
+html.theme-liminal .tb-logo { width: 10px; height: 15px; border-radius: 5px 5px 1px 1px; background: var(--lm-doorlight); box-shadow: var(--lm-glow-lamp); }
+html.theme-liminal .tb-title { font-size: 17px; color: var(--lm-text); }
+/* window buttons: three square tiles, their glyphs always showing; hovering switches the light on */
+html.theme-liminal .tb-buttons { align-items: center; gap: 6px; padding: 0 10px 0 8px; }
+html.theme-liminal .tb-btn {
+  width: 28px; height: 24px; border-radius: var(--lm-r-sm); color: var(--lm-text-dim); background: var(--lm-tile); box-shadow: var(--lm-edge);
+  transition: background-color 240ms, color 240ms, box-shadow 240ms;
+}
+html.theme-liminal .tb-btn svg { width: 9px; height: 9px; stroke-width: 1.5; }
+html.theme-liminal .tb-btn:hover { background: var(--lm-lamp); color: var(--lm-text-on-light); box-shadow: var(--lm-glow-lamp); }
+html.theme-liminal .tb-close:hover { background: var(--lm-blush); color: var(--lm-text-on-light); box-shadow: 0 0 20px -4px var(--lm-blush); }
+html.theme-liminal .tb-btn:active { translate: 0 1px; }
+
+/* ---------- 6. buttons: dim tiles that light up like a panel switching on ---------- */
+html.theme-liminal :is(.icon-btn.lg, .ctl.lg, .btn, .chip, .ab-btn, .fchip.add, .nb-play) {
+  border: 0; filter: none; color: var(--lm-text); background: var(--lm-overhead), var(--lm-tile-hi); box-shadow: var(--lm-edge), var(--lm-shadow-sm);
+  transition: background-color 240ms, color 240ms, box-shadow 300ms var(--lm-ease), translate 300ms var(--lm-ease);
+}
+html.theme-liminal :is(.icon-btn.lg, .ctl.lg, .btn, .chip, .ab-btn, .fchip.add, .nb-play):hover {
+  transform: none; filter: none; color: var(--lm-lamp); translate: 0 -1px;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--lm-lamp) 45%, transparent), inset 0 1px 0 color-mix(in srgb, var(--lm-lamp) 40%, transparent), var(--lm-glow-lamp);
+}
+html.theme-liminal :is(.icon-btn.lg, .ctl.lg, .btn, .chip, .ab-btn, .fchip.add, .nb-play):active { transform: none; translate: 0 1px; transition-duration: 80ms; }
+html.theme-liminal :is(.pl-header, .lib-header, .eq-header) .icon-btn.lg { width: 38px; height: 38px; border-radius: var(--lm-r); }
+html.theme-liminal .icon-btn.lg .ico { width: 20px; height: 20px; }
+html.theme-liminal .icon-btn:not(.lg) { color: var(--lm-text-dim); }
+html.theme-liminal .icon-btn:not(.lg):hover { background: var(--lm-tile-hi); color: var(--lm-lamp); box-shadow: none; }
+/* primary text buttons: lit with pool water */
+html.theme-liminal .btn { height: 40px; padding: 0 20px; border-radius: var(--lm-r); font-family: var(--lm-ui); font-weight: 600; font-size: 14px; letter-spacing: 0.01em; }
+html.theme-liminal .btn:not(.ghost), html.theme-liminal .fchip.add { background: var(--lm-pool); color: var(--lm-text-on-light); box-shadow: var(--lm-glow-pool); }
+html.theme-liminal .btn:not(.ghost):hover, html.theme-liminal .fchip.add:hover { color: var(--lm-text-on-light); background: var(--lm-mist); box-shadow: var(--lm-glow-lamp); }
+html.theme-liminal .btn .ico { width: 18px; height: 18px; }
+html.theme-liminal .fchip.add { border-radius: var(--lm-r); }
+/* chips: small tiles; "on" is pool water */
+html.theme-liminal .chip { border-radius: var(--lm-r); font-family: var(--lm-ui); font-weight: 500; font-size: 13px; }
+html.theme-liminal .chip.on, html.theme-liminal .chip.on:hover { background: var(--lm-pool); color: var(--lm-text-on-light); box-shadow: var(--lm-glow-pool); }
+/* their indicator is a little pilot light: dark when off, lit when on */
+html.theme-liminal :is(.eq-toggles .chip:not(.preset-chip), .reverb-presets .chip)::after { background: var(--lm-void); box-shadow: inset 0 0 0 1px var(--lm-grout); border-radius: 2px; }
+html.theme-liminal :is(.eq-toggles .chip.on, .reverb-presets .chip.on)::after { background: var(--lm-lamp); box-shadow: 0 0 6px var(--lm-lamp); }
+html.theme-liminal .preset-chip i .ico { color: inherit; }
+.theme-row .liq-pick { flex: 1 1 100%; min-width: 0; }
+.theme-row [data-v='liminal'] { font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-weight: 600; font-size: 1.12em; }
+
+/* ---------- 7. transport ---------- */
+html.theme-liminal .controls { gap: clamp(10px, 2.8vw, 22px); }
+html.theme-liminal .ctl-md.lg { width: 50px; height: 50px; border-radius: var(--lm-r); }
+html.theme-liminal .ctl-md.lg .ico { width: 26px; height: 26px; }
+/* shuffle / repeat: smaller tiles; while on, the glyph turns to water and a pilot light glows beneath */
+html.theme-liminal .ctl-sm.lg { width: 40px; height: 40px; border-radius: var(--lm-r); color: var(--lm-text-dim); }
+html.theme-liminal .ctl-sm.lg .ico { width: 20px; height: 20px; }
+html.theme-liminal .ctl-sm.on, html.theme-liminal .ctl-sm.on:hover { color: var(--lm-pool); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--lm-pool) 55%, transparent), var(--lm-shadow-sm); }
+html.theme-liminal .ctl-sm.on::after {
+  display: block; top: auto; bottom: -9px; left: 50%; right: auto; width: 12px; height: 3px; margin: 0 0 0 -6px; border-radius: 2px;
+  background: var(--lm-pool); box-shadow: var(--lm-glow-pool);
+}
+/* play: a doorway with the light on behind it. While music plays the light is full and spills
+   onto the floor in front; paused, it dims */
+html.theme-liminal .play-wrap { width: 104px; height: 112px; }
+html.theme-liminal .play-ring { display: none; }
+html.theme-liminal .ctl-play.lg {
+  width: 66px; height: 88px; border-radius: var(--lm-r-door); background: var(--lm-doorlight); color: var(--lm-text-on-light);
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--lm-mist) 60%, transparent), 0 0 28px -4px color-mix(in srgb, var(--lm-lamp) 40%, transparent);
+  animation: none; transition: box-shadow 600ms var(--lm-ease), translate 300ms var(--lm-ease), opacity 600ms;
+  opacity: 0.86;
+}
+html.theme-liminal .playing .ctl-play.lg { opacity: 1; box-shadow: inset 0 0 0 2px var(--lm-mist), 0 0 46px 2px color-mix(in srgb, var(--lm-lamp) 55%, transparent), 0 0 110px 10px color-mix(in srgb, var(--lm-lamp) 16%, transparent); }
+html.theme-liminal .ctl-play.lg:hover { translate: 0 -2px; opacity: 1; }
+html.theme-liminal .ctl-play.lg:active { translate: 0 1px; }
+html.theme-liminal .ctl-play .pp { width: 32px; height: 32px; fill: var(--lm-void); filter: none; translate: 0 4px; }
+/* the spill of light on the floor in front of the doorway (static; it fades with play state) */
+html.theme-liminal .play-wrap::after {
+  content: ''; position: absolute; left: 50%; bottom: -10px; width: 120px; height: 22px; margin-left: -60px; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--lm-lamp) 38%, transparent), transparent);
+  opacity: 0.35; transition: opacity 600ms;
+}
+html.theme-liminal .playing .play-wrap::after { opacity: 1; }
+@media (max-height: 720px) {
+  html.theme-liminal .play-wrap { width: 92px; height: 96px; }
+  html.theme-liminal .ctl-play.lg { width: 58px; height: 76px; }
+}
+
+/* ---------- 8. the dock: a tiled ledge under a strip of fluorescent light ---------- */
+html.theme-liminal .pl-nav { background: var(--lm-panel); border-radius: var(--lm-r-lg); box-shadow: var(--lm-edge), var(--lm-shadow); padding: 6px; overflow: visible; }
+html.theme-liminal .pl-nav::after {
+  content: ''; position: absolute; left: 22%; right: 22%; top: -1px; height: 2px; border-radius: 2px; pointer-events: none;
+  background: var(--lm-lamp); box-shadow: 0 0 14px 1px color-mix(in srgb, var(--lm-lamp) 60%, transparent);
+}
+html.theme-liminal .nav-btn { height: 52px; border-radius: var(--lm-r); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: var(--lm-text-dim); filter: none; }
+html.theme-liminal .nav-btn::after { content: attr(data-label); font-family: var(--lm-num); font-weight: 500; font-size: 8.5px; letter-spacing: 0.16em; line-height: 1; }
+html.theme-liminal .nav-btn .ico { width: 22px; height: 22px; }
+html.theme-liminal .nav-btn:hover { color: var(--lm-lamp); }
+html.theme-liminal .nav-btn:active { transform: none; }
+html.theme-liminal .nav-btn.on { color: var(--lm-pool); filter: none; }
+/* the active tab: a darker tile with water-light along its floor */
+html.theme-liminal .nav-ink {
+  top: 6px; bottom: 6px; border-radius: var(--lm-r); background: var(--lm-void); overflow: visible;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--lm-pool) 30%, transparent), inset 0 -2px 0 var(--lm-pool), 0 6px 16px -8px var(--lm-pool);
+}
+
+/* ---------- 9. player: header, the cover at the end of the hall, title block ---------- */
+/* "Playing from" hangs in the hall like a sign: a dark plate with a lit edge */
+html.theme-liminal .pl-cat { flex: 0 1 auto; min-width: 160px; margin-inline: auto; border-radius: var(--lm-r-sm); background: color-mix(in srgb, var(--lm-void) 90%, transparent); box-shadow: var(--lm-edge), var(--lm-shadow-sm); padding-inline: 22px; }
+html.theme-liminal .pl-cat:hover { background: var(--lm-void); }
+html.theme-liminal .pl-cat-label { font-size: 9.5px; color: var(--lm-pool); }
+html.theme-liminal .pl-cat-name { font-size: 19px; color: var(--lm-text); }
+html.theme-liminal .pl-cat-pos { font-size: 11px; color: var(--lm-text-dim); }
+/* the light the hall leads to, glowing round the cover. Now and then it flickers, like a tube about to go
+   (stepped in twelfths of a second, so it costs a redraw only when it changes) */
+html.theme-liminal .aa-wrap::before {
+  --aa: min(80cqw, calc(100cqh - 30px));
+  content: ''; position: absolute; z-index: 0; pointer-events: none; left: 50%; top: 50%; width: calc(var(--aa) * 1.9); height: calc(var(--aa) * 1.9);
+  translate: -50% -50%; border-radius: 50%;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--lm-lamp) 24%, transparent), color-mix(in srgb, var(--lm-fog) 8%, transparent) 55%, transparent);
+  transition: opacity 0.4s; animation: lm-flicker 11s steps(132) infinite;
+}
+@keyframes lm-flicker {
+  0%, 71.9% { opacity: 1; } 72%, 72.6% { opacity: 0.4; } 72.7%, 73.4% { opacity: 1; } 73.5%, 75.5% { opacity: 0.5; } 75.6%, 100% { opacity: 1; }
+}
+html.theme-liminal .aa-wrap:is(.lyrics-open, .vis-on)::before { opacity: 0.35; animation: none; }
+/* the cover: a picture hung in the light, with a pale frame and a deep soft shadow */
+html.theme-liminal .aa-img { border-radius: var(--lm-r-sm); background-color: var(--lm-tile); box-shadow: 0 0 0 1px color-mix(in srgb, var(--lm-mist) 35%, transparent), 0 30px 60px -24px var(--lm-void); }
+html.theme-liminal .playing .aa-card[data-slot='cur'] .aa-img { box-shadow: 0 0 0 1px color-mix(in srgb, var(--lm-mist) 45%, transparent), 0 30px 60px -24px var(--lm-void), 0 0 70px -10px color-mix(in srgb, var(--lm-lamp) 35%, transparent); }
+html.theme-liminal .aa-img::before { display: none; }
+html.theme-liminal .aa-img::after, html.theme-liminal .aa-img.sheen::after, html.theme-liminal .aa-img.flip-glint::after { display: none; animation: none; }
+html.theme-liminal .aa-img.ph { background: var(--lm-tiles), var(--lm-tile); }
+html.theme-liminal .aa-img.ph .ico { fill: var(--lm-fog); filter: none; }
+/* the back: an opaque tiled panel under a fluorescent strip */
+html.theme-liminal .aa-back, html.theme-liminal .aa-back.aa-info {
+  border-radius: var(--lm-r-sm); background: var(--lm-overhead), var(--lm-tile); border: 0; backdrop-filter: none;
+  box-shadow: 0 0 0 1px var(--lm-grout), inset 0 2px 0 var(--lm-lamp), 0 30px 60px -24px var(--lm-void);
+}
+html.theme-liminal .ab-art { display: none; }
+html.theme-liminal .aa-back::before, html.theme-liminal .aa-back::after { display: none; }
+html.theme-liminal .ab-body { color: var(--lm-text); text-shadow: none; }
+html.theme-liminal .ab-kicker { color: var(--lm-pool); font-size: 9.5px; }
+html.theme-liminal .ab-title { font-size: clamp(18px, 7cqw, 30px); color: var(--lm-text); }
+html.theme-liminal .ab-artist { color: var(--lm-pool); font-weight: 500; }
+html.theme-liminal .ab-stars { color: var(--lm-blush); }
+html.theme-liminal .ab-grid dt { color: var(--lm-text-dim); font-size: 0.74em; }
+html.theme-liminal .ab-grid dd { color: var(--lm-text); }
+html.theme-liminal .ab-fmt span, html.theme-liminal .ab-fmt span:nth-child(n) {
+  border-radius: var(--lm-r-sm); padding: 2px 8px; background: transparent; color: var(--lm-lamp); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--lm-lamp) 50%, transparent); border: 0; font-size: 10.5px;
+}
+html.theme-liminal :is(.ab-foot, .ab-file) { color: var(--lm-text-dim); }
+html.theme-liminal .ab-btn, html.theme-liminal .ab-btn:nth-child(n) { height: 30px; border-radius: var(--lm-r-sm); font-weight: 600; font-size: 12px; }
+/* title block. The floor in front of you lies in shadow: a soft dark band behind the title block and the
+   seek bar keeps their text readable (AA) over the lit water */
+html.theme-liminal .pl-info { position: relative; isolation: isolate; }
+html.theme-liminal .pl-info::before {
+  content: ''; position: absolute; z-index: -1; left: 0; right: 0; top: -14px; bottom: -112px; pointer-events: none;
+  background: linear-gradient(180deg, transparent, var(--lm-floor-shade) 16%, var(--lm-floor-shade) 82%, transparent);
+}
+html.theme-liminal #plTitle { font-size: 34px; line-height: 1.2; color: var(--lm-text); }
+html.theme-liminal .pl-artist { color: var(--lm-pool); font-weight: 500; font-size: 15px; letter-spacing: 0.02em; }
+html.theme-liminal .pl-album { color: var(--lm-text-dim); font-size: 13px; }
+html.theme-liminal .badge { border-radius: var(--lm-r-sm); font-size: 9.5px; padding: 3px 8px; background: transparent; }
+html.theme-liminal .badge.hires { color: var(--lm-lamp); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--lm-lamp) 60%, transparent); }
+html.theme-liminal .badge.lossless { color: var(--lm-pool); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--lm-pool) 60%, transparent); }
+html.theme-liminal .pl-meta { border-radius: var(--lm-r-sm); background: var(--lm-tile); color: var(--lm-text-dim); box-shadow: var(--lm-edge); font-size: 11px; padding: 3px 10px; }
+html.theme-liminal .pl-meta:hover { color: var(--lm-text); background: var(--lm-tile-hi); }
+html.theme-liminal .rating .star { color: var(--lm-text-dim); }
+html.theme-liminal .star.on { color: var(--lm-blush); filter: none; }
+html.theme-liminal .star:hover { color: var(--lm-blush); transform: translateY(-2px); }
+/* track change: the title block surfaces out of the haze */
+html.theme-liminal .pl-info.enter > *, html.theme-liminal .pl-info.enter-r > *, html.theme-liminal .pl-info.enter-l > * { animation: lm-surface 620ms var(--lm-ease) both; }
+@keyframes lm-surface { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+/* seek: the reflection on water is drawn in waveform.js; the times and the hover bubble */
+html.theme-liminal .seek-times { color: var(--lm-text-dim); font-size: 11px; }
+html.theme-liminal .seek-bubble { background: var(--lm-void); color: var(--lm-lamp); border-radius: var(--lm-r-sm); box-shadow: inset 0 0 0 1px var(--lm-grout), var(--lm-shadow-sm); border: 0; padding: 4px 10px; }
+
+/* ---------- 10. library ---------- */
+html.theme-liminal .lib-title { font-size: 32px; color: var(--lm-text); }
+html.theme-liminal .lib-sub { color: var(--lm-text-dim); font-family: var(--lm-num); font-size: 11px; letter-spacing: 0.08em; }
+html.theme-liminal .app.wide #libBack.dim { opacity: 0.35; }
+html.theme-liminal .app:not(.wide) #libBack.dim { opacity: 1; }
+html.theme-liminal .search-bar { border-radius: var(--lm-r); background: var(--lm-tile); border: 0; box-shadow: var(--lm-edge); }
+html.theme-liminal .search-bar input { color: var(--lm-text); font-family: var(--lm-ui); }
+html.theme-liminal .search-bar input::placeholder { color: var(--lm-text-dim); }
+html.theme-liminal .search-ico { color: var(--lm-pool); }
+/* category tiles are rooms: tiled walls, a room number in the corner, and the overhead light comes on
+   when you hover */
+html.theme-liminal .root-grid { counter-reset: lm-room; gap: 14px; padding: 8px 16px 20px; }
+html.theme-liminal .tile {
+  counter-increment: lm-room; height: 120px; border: 0; border-radius: var(--lm-r); color: var(--lm-text); filter: none;
+  background: var(--lm-overhead), var(--lm-tiles), var(--lm-tile);
+  box-shadow: var(--lm-edge), var(--lm-shadow-sm); transition: box-shadow 400ms var(--lm-ease), translate 400ms var(--lm-ease);
+}
+html.theme-liminal .tile:hover { transform: none; filter: none; translate: 0 -2px; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--lm-lamp) 35%, transparent), inset 0 2px 0 var(--lm-lamp), var(--lm-shadow), 0 -10px 30px -16px var(--lm-lamp); }
+html.theme-liminal .tile:active { transform: none; translate: 0 1px; }
+/* the overhead light's glow, faded in on hover (opacity only) */
+html.theme-liminal .tile::after {
+  inset: 0; border-radius: inherit; opacity: 0; transform: none; animation: none;
+  background: radial-gradient(90% 70% at 50% 0%, color-mix(in srgb, var(--lm-lamp) 16%, transparent), transparent 70%);
+  transition: opacity 400ms var(--lm-ease);
+}
+html.theme-liminal .tile:hover::after { opacity: 1; animation: none; }
+html.theme-liminal .tile-title { position: relative; z-index: 1; font-weight: 600; font-size: 14.5px; color: var(--lm-text); }
+html.theme-liminal .tile-ico { width: 40px; height: 40px; top: 14px; left: 14px; border-radius: var(--lm-r-sm); background: var(--lm-void); color: var(--lm-pool); box-shadow: inset 0 0 0 1px var(--lm-grout); }
+html.theme-liminal .tile:hover .tile-ico { color: var(--lm-lamp); }
+html.theme-liminal .tile-ico .ico { width: 20px; height: 20px; }
+html.theme-liminal .tile-count { top: 34px; right: 14px; color: var(--lm-text-dim); font-size: 11px; }
+/* the room number, top right above the count (the title is taken out of flow so the number can sit in the tile's corner) */
+html.theme-liminal .root-grid .tile-title { position: static; }
+html.theme-liminal .root-grid .tile-title::after {
+  content: 'ROOM ' counter(lm-room, decimal-leading-zero); position: absolute; right: 14px; top: 17px;
+  font-family: var(--lm-num); font-weight: 400; font-size: 9px; letter-spacing: 0.2em; color: var(--lm-text-dim);
+}
+/* folder chips */
+html.theme-liminal .fchip:not(.add) { border-radius: var(--lm-r); background: var(--lm-tile); color: var(--lm-text); border: 0; box-shadow: var(--lm-edge); }
+html.theme-liminal .fchip:not(.add) .ico { color: var(--lm-pool); }
+html.theme-liminal .empty-lib .ico { color: var(--lm-lamp); filter: none; }
+html.theme-liminal .empty-lib h3 { font-size: 26px; }
+/* list rows: long tiles. Hovering lights a strip at the left edge */
+html.theme-liminal .item-list { display: flex; flex-direction: column; gap: 4px; padding: 6px 12px 12px; }
+html.theme-liminal .row { gap: 12px; padding: 0 12px 0 10px; border-radius: var(--lm-r); background: transparent; color: var(--lm-text); transition: background-color 300ms, box-shadow 300ms; }
+html.theme-liminal .row:hover { scale: 1; background: var(--lm-tile-hi); box-shadow: var(--lm-edge), inset 2px 0 0 var(--lm-lamp); }
+html.theme-liminal .row::after { display: none; }
+html.theme-liminal .screen :has(> .row:hover) > .row:not(:hover) { opacity: 1; }
+html.theme-liminal .r-title { color: var(--lm-text); font-weight: 500; }
+html.theme-liminal .row:hover .r-title { color: var(--lm-text); }
+html.theme-liminal .r-sub { color: var(--lm-text-dim); }
+html.theme-liminal .r-dur { color: var(--lm-text-dim); font-size: 11px; }
+html.theme-liminal .t-num { color: var(--lm-text-dim); }
+html.theme-liminal .r-chev { color: var(--lm-text-dim); }
+html.theme-liminal .r-more { width: 30px; height: 30px; border-radius: var(--lm-r-sm); color: var(--lm-text-dim); }
+html.theme-liminal .r-more:hover { background: var(--lm-void); color: var(--lm-lamp); }
+html.theme-liminal .it-art { border-radius: var(--lm-r-sm); background-color: var(--lm-tile-hi); box-shadow: 0 0 0 1px var(--lm-line); }
+html.theme-liminal .it-art.round { border-radius: 50%; }
+html.theme-liminal .it-art.ph { background: var(--lm-tile-hi); color: var(--lm-fog); }
+html.theme-liminal .row:hover .it-art { scale: 1; }
+/* the playing row: still water, with light moving on it (a static caustics pattern) and a lit edge */
+html.theme-liminal .row.track.playing {
+  background: linear-gradient(90deg, color-mix(in srgb, var(--lm-pool) 22%, var(--lm-tile)), color-mix(in srgb, var(--lm-pool) 8%, var(--lm-tile)) 70%);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--lm-pool) 30%, transparent);
+}
+html.theme-liminal .row.track.playing::after {
+  display: block; content: ''; position: absolute; inset: 0; border-radius: inherit; opacity: 0.06; pointer-events: none; z-index: 0;
+  background: var(--lm-a-caustics) 0 0 / 120px 120px repeat;
+}
+html.theme-liminal .row.track.playing :is(.r-title, .t-num) { color: var(--lm-pool); }
+html.theme-liminal .row.track.playing::before { left: 0; top: 12px; bottom: 12px; width: 2px; border-radius: 2px; background: var(--lm-pool); box-shadow: var(--lm-glow-pool); }
+html.theme-liminal .eqbars { background: color-mix(in srgb, var(--lm-void) 70%, transparent); backdrop-filter: none; }
+html.theme-liminal .eqbars i { background: var(--lm-pool); box-shadow: none; border-radius: 1px; }
+/* album grid: pictures hung in the hall */
+html.theme-liminal .gcell .it-art { border-radius: var(--lm-r-sm); box-shadow: 0 0 0 1px var(--lm-line), 0 18px 30px -18px var(--lm-void); transition: translate 400ms var(--lm-ease), box-shadow 400ms var(--lm-ease); }
+html.theme-liminal .gcell .it-art::after { display: none; }
+html.theme-liminal .gcell:hover .it-art { transform: none; scale: 1; translate: 0 -3px; box-shadow: 0 0 0 1px color-mix(in srgb, var(--lm-lamp) 45%, transparent), 0 22px 34px -18px var(--lm-void), 0 0 30px -8px color-mix(in srgb, var(--lm-lamp) 40%, transparent); }
+html.theme-liminal .screen :has(> .gcell:hover) > .gcell:not(:hover) { opacity: 1; }
+html.theme-liminal .g-title { color: var(--lm-text); font-weight: 500; margin-top: 10px; }
+html.theme-liminal .g-sub { color: var(--lm-text-dim); }
+/* album / artist header */
+html.theme-liminal .ah-art { border-radius: var(--lm-r-sm); box-shadow: 0 0 0 1px color-mix(in srgb, var(--lm-mist) 35%, transparent), 0 24px 44px -20px var(--lm-void), 0 0 50px -14px color-mix(in srgb, var(--lm-lamp) 30%, transparent); }
+html.theme-liminal .ah-art:not(.ph)::before { display: none; }
+html.theme-liminal .ah-art.ph { background: var(--lm-tiles), var(--lm-tile); }
+html.theme-liminal .ah-title { color: var(--lm-text); }
+html.theme-liminal .ah-artist { color: var(--lm-pool); }
+html.theme-liminal .ah-meta { color: var(--lm-text-dim); }
+/* mini player: a lit ledge like the dock */
+html.theme-liminal .navbar { background: var(--lm-panel); border: 0; border-radius: var(--lm-r-lg); box-shadow: var(--lm-edge), var(--lm-shadow); color: var(--lm-text); }
+html.theme-liminal .nb-progress { height: 2px; background: var(--lm-pool); box-shadow: var(--lm-glow-pool); }
+html.theme-liminal .nb-art { border-radius: var(--lm-r-sm); }
+html.theme-liminal .nb-title { color: var(--lm-text); font-weight: 500; }
+html.theme-liminal .nb-artist { color: var(--lm-text-dim); }
+html.theme-liminal .navbar .icon-btn:not(.lg) { color: var(--lm-text); }
+html.theme-liminal .nb-play.lg { background: var(--lm-doorlight); color: var(--lm-text-on-light); border-radius: 999px 999px 6px 6px; box-shadow: var(--lm-glow-lamp); }
+html.theme-liminal .nb-play.lg:hover { color: var(--lm-text-on-light); }
+html.theme-liminal .scan-bar { border-radius: var(--lm-r); background: var(--lm-tile); color: var(--lm-text); box-shadow: var(--lm-edge); border: 0; }
+html.theme-liminal .scan-fill { background: var(--lm-water); }
+
+/* ---------- 11. equalizer ---------- */
+html.theme-liminal .eq-tabs { background: var(--lm-tile); border: 0; border-radius: var(--lm-r); box-shadow: var(--lm-edge); }
+html.theme-liminal .eq-tab { color: var(--lm-text-dim); font-weight: 500; border-radius: var(--lm-r-sm); }
+html.theme-liminal .eq-tab.active { color: var(--lm-pool); }
+html.theme-liminal .eq-tab-ink { background: var(--lm-void); border-radius: var(--lm-r-sm); box-shadow: inset 0 -2px 0 var(--lm-pool); }
+/* the graph is the pool seen from above: dark water under a tiled rim */
+html.theme-liminal .eq-graph {
+  border: 0; border-radius: var(--lm-r); margin: 8px 18px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--lm-pool) 10%, var(--lm-void)), var(--lm-void));
+  box-shadow: 0 0 0 6px var(--lm-tile), 0 0 0 7px var(--lm-grout), var(--lm-shadow);
+}
+html.theme-liminal .b-val { color: var(--lm-text-dim); }
+html.theme-liminal .band.nonzero .b-val, html.theme-liminal .band.active .b-val { color: var(--lm-pool); }
+html.theme-liminal .b-freq { color: var(--lm-text-dim); }
+/* each band is a thin tube filling with water; the thumb is a small lit disc */
+html.theme-liminal .b-track::before { width: 4px; margin-left: -2px; border-radius: 2px; background: var(--lm-tile-hi); box-shadow: inset 0 0 0 1px var(--lm-line); }
+html.theme-liminal .b-fill { width: 4px; margin-left: -2px; border-radius: 2px; background: var(--lm-water-v); box-shadow: var(--lm-glow-pool); }
+html.theme-liminal .b-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--lm-mist); box-shadow: 0 0 0 3px var(--lm-void), 0 0 0 4px var(--lm-grout); }
+html.theme-liminal .b-thumb::after { display: none; }
+html.theme-liminal .band.active .b-thumb { background: var(--lm-lamp); box-shadow: 0 0 0 3px var(--lm-void), 0 0 0 4px var(--lm-lamp), var(--lm-glow-lamp); }
+/* knobs: frosted discs, ticks lit in water */
+html.theme-liminal .knob-hint { color: var(--lm-text-dim); font-size: 9.5px; }
+html.theme-liminal .k-tick { stroke: var(--lm-grout); }
+html.theme-liminal .k-tick.on { stroke: var(--lm-pool); filter: none; }
+html.theme-liminal .k-tick.zero { stroke: var(--lm-lamp); }
+html.theme-liminal .k-cap { background: var(--lm-overhead), var(--lm-tile-hi); box-shadow: var(--lm-edge), var(--lm-shadow); }
+html.theme-liminal .k-cap::after { background: var(--lm-lamp); box-shadow: 0 0 6px var(--lm-lamp); width: 3px; margin-left: -1.5px; }
+html.theme-liminal .k-shine { display: none; }
+html.theme-liminal .k-value { color: var(--lm-text); }
+html.theme-liminal .knob.nonzero .k-value { color: var(--lm-pool); }
+html.theme-liminal .k-label { color: var(--lm-text-dim); font-size: 9.5px; }
+
+/* ---------- 12. overlays ---------- */
+/* the room fogs over behind a dialog */
+html.theme-liminal .scrim { background: linear-gradient(180deg, color-mix(in srgb, var(--lm-void) 55%, transparent), color-mix(in srgb, var(--lm-void) 80%, transparent)); backdrop-filter: none; }
+/* panels: tiled, opaque, with a fluorescent strip along the top */
+html.theme-liminal :is(.sheet, .ctxmenu, .vol-pop) { background: var(--lm-overhead), var(--lm-tile); color: var(--lm-text); border: 0; }
+html.theme-liminal .sheet { border-radius: var(--lm-r-lg) var(--lm-r-lg) 0 0; box-shadow: 0 0 0 1px var(--lm-grout), inset 0 2px 0 var(--lm-lamp), 0 -20px 60px -20px var(--lm-void); }
+@media (min-width: 700px) { html.theme-liminal .sheet { border-radius: var(--lm-r-lg); box-shadow: 0 0 0 1px var(--lm-grout), inset 0 2px 0 var(--lm-lamp), 0 40px 80px -30px var(--lm-void); } }
+html.theme-liminal .sheet-grip { background: var(--lm-grout); }
+html.theme-liminal .sheet-title { font-size: 30px; color: var(--lm-text); }
+html.theme-liminal .sheet-text { color: var(--lm-text-dim); }
+html.theme-liminal .ctxmenu { border-radius: var(--lm-r); box-shadow: 0 0 0 1px var(--lm-grout), inset 0 1px 0 color-mix(in srgb, var(--lm-lamp) 40%, transparent), var(--lm-shadow); }
+html.theme-liminal .vol-pop { border-radius: var(--lm-r); box-shadow: 0 0 0 1px var(--lm-grout), var(--lm-shadow); }
+html.theme-liminal .menu-head { color: var(--lm-pool); font-size: 9.5px; }
+html.theme-liminal .menu-item { border-radius: var(--lm-r-sm); color: var(--lm-text); }
+html.theme-liminal .menu-item:hover { background: var(--lm-tile-hi); box-shadow: inset 2px 0 0 var(--lm-lamp); }
+html.theme-liminal .mi-ico { color: var(--lm-text-dim); }
+html.theme-liminal .menu-item:hover .mi-ico { color: var(--lm-lamp); }
+html.theme-liminal .menu-item.checked { color: var(--lm-pool); }
+html.theme-liminal .menu-item.danger { color: var(--lm-blush); }
+html.theme-liminal :is(.mi-hint, .choice-hint) { color: var(--lm-text-dim); }
+html.theme-liminal .choice { border-radius: var(--lm-r); }
+html.theme-liminal .choice.sel { background: color-mix(in srgb, var(--lm-pool) 16%, var(--lm-tile)); color: var(--lm-text); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--lm-pool) 50%, transparent); }
+html.theme-liminal .choice.sel :is(.choice-ico, .choice-check) { color: var(--lm-pool); }
+html.theme-liminal .choice.sel .choice-hint { color: var(--lm-text-dim); }
+html.theme-liminal .choice-ico { color: var(--lm-text-dim); }
+html.theme-liminal #volIco { color: var(--lm-pool); }
+html.theme-liminal #volVal { color: var(--lm-text); }
+/* the toast and tooltips are small signs: a dark plate with lettering lit from behind */
+html.theme-liminal .toast { border-radius: var(--lm-r-sm); background: var(--lm-void); color: var(--lm-lamp); border: 0; box-shadow: inset 0 0 0 1px var(--lm-grout), var(--lm-shadow); font-family: var(--lm-ui); font-weight: 500; }
+html.theme-liminal .toast::after { background: var(--lm-pool); box-shadow: var(--lm-glow-pool); }
+html.theme-liminal .tip {
+  background: var(--lm-void); color: var(--lm-lamp); border-radius: var(--lm-r-sm); border: 0; box-shadow: inset 0 0 0 1px var(--lm-grout), var(--lm-shadow-sm);
+  font-family: var(--lm-ui); font-weight: 500; font-size: 12px; padding: 5px 10px;
+}
+/* settings */
+html.theme-liminal .set-row { border-radius: var(--lm-r); }
+html.theme-liminal .set-row:hover { background: var(--lm-haze); }
+html.theme-liminal .set-label { color: var(--lm-text); font-weight: 500; }
+html.theme-liminal .set-hint { color: var(--lm-text-dim); }
+html.theme-liminal .rv { color: var(--lm-text); }
+html.theme-liminal .folder-row { border-radius: var(--lm-r); background: var(--lm-void); border: 0; box-shadow: inset 0 0 0 1px var(--lm-grout); color: var(--lm-text); }
+html.theme-liminal .folder-row > .ico { color: var(--lm-pool); }
+html.theme-liminal .shortcuts span:nth-child(odd) { border-radius: var(--lm-r-sm); background: var(--lm-void); color: var(--lm-lamp); box-shadow: inset 0 0 0 1px var(--lm-grout); font-family: var(--lm-num); font-size: 11px; }
+html.theme-liminal .about { color: var(--lm-text-dim); }
+html.theme-liminal .info-table td { border-color: var(--lm-line); color: var(--lm-text); }
+html.theme-liminal .info-table td:first-child { color: var(--lm-text-dim); }
+/* text fields */
+html.theme-liminal .text-input { border-radius: var(--lm-r); background: var(--lm-void); color: var(--lm-text); border: 0; box-shadow: inset 0 0 0 1px var(--lm-grout); }
+html.theme-liminal .text-input:focus { box-shadow: inset 0 0 0 1px var(--lm-lamp), var(--lm-glow-lamp); }
+/* sliders: a thin glass tube filling with water; the thumb is a small lit disc */
+html.theme-liminal input[type='range'] {
+  height: 4px; border-radius: 2px; box-shadow: inset 0 0 0 1px var(--lm-line);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--lm-pool) 55%, var(--lm-night)), var(--lm-pool) var(--p, 50%), var(--lm-tile-hi) var(--p, 50%));
+}
+html.theme-liminal input[type='range']::-webkit-slider-thumb {
+  width: 16px; height: 16px; border-radius: 50%; background: var(--lm-mist);
+  box-shadow: 0 0 0 3px var(--lm-void), 0 0 0 4px color-mix(in srgb, var(--lm-pool) 70%, transparent), var(--lm-glow-pool);
+}
+/* toggles are light switches: a rocker in a wall plate. Off, the plate is dark; on, the rocker
+   flips over and the plate's pilot light comes on */
+html.theme-liminal .switch {
+  width: 46px; height: 26px; border-radius: var(--lm-r-sm); background: var(--lm-void);
+  box-shadow: inset 0 0 0 1px var(--lm-grout), inset 0 2px 4px color-mix(in srgb, var(--lm-void) 80%, transparent); transition: background-color 240ms, box-shadow 240ms;
+}
+html.theme-liminal .switch::before {
+  content: ''; position: absolute; right: 8px; top: 50%; width: 4px; height: 4px; margin-top: -2px; border-radius: 1px;
+  background: var(--lm-grout); transition: background-color 240ms, box-shadow 240ms;
+}
+html.theme-liminal .switch::after {
+  top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 4px;
+  background: var(--lm-overhead), var(--lm-tile-hi); box-shadow: inset 0 0 0 1px var(--lm-grout), 0 2px 3px var(--lm-void);
+  transform: none; transition: transform 300ms var(--lm-ease), background-color 240ms;
+}
+html.theme-liminal .switch:checked { background: color-mix(in srgb, var(--lm-pool) 22%, var(--lm-void)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--lm-pool) 60%, transparent); }
+html.theme-liminal .switch:checked::before { right: auto; left: 8px; background: var(--lm-lamp); box-shadow: 0 0 6px var(--lm-lamp); }
+html.theme-liminal .switch:checked::after { transform: translateX(20px); background: var(--lm-mist); box-shadow: 0 2px 3px var(--lm-void); }
+/* scrollbar: a thin tube */
+html.theme-liminal ::-webkit-scrollbar { width: 8px; height: 8px; }
+html.theme-liminal :is(::-webkit-scrollbar-track, ::-webkit-scrollbar-corner) { background: transparent; }
+html.theme-liminal ::-webkit-scrollbar-thumb { border-radius: 4px; background: var(--lm-grout); border: 2px solid transparent; background-clip: padding-box; }
+html.theme-liminal ::-webkit-scrollbar-thumb:hover { background-color: var(--lm-fog); }
+
+/* ---------- 13. lyrics, visualizer, hints ---------- */
+html.theme-liminal .ly-line { color: var(--lm-text-dim); filter: none; text-shadow: none; }
+html.theme-liminal .ly-line:hover { color: var(--lm-text); }
+html.theme-liminal .ly-line.active { color: var(--lm-lamp); text-shadow: 0 0 18px color-mix(in srgb, var(--lm-lamp) 45%, transparent); }
+html.theme-liminal .vis-host { border-radius: var(--lm-r-sm); box-shadow: 0 0 0 1px var(--lm-grout), 0 30px 60px -24px var(--lm-void); }
+html.theme-liminal .vis-host.full { border-radius: 0; box-shadow: none; }
+html.theme-liminal .swipe-hint { border-radius: var(--lm-r-sm); background: var(--lm-void); color: var(--lm-lamp); border: 0; box-shadow: inset 0 0 0 1px var(--lm-grout); font-weight: 500; }
+
+/* ---------- 14. focus, reduced motion, idle ---------- */
+/* a visible focus ring in fluorescent light */
+html.theme-liminal :focus-visible { outline: 2px solid var(--lm-lamp); outline-offset: 3px; }
+html.theme-liminal .nav-btn:focus-visible { box-shadow: none; }
+html.theme-liminal .switch:focus-visible { outline-offset: 4px; }
+/* idle loops pause while the window is unfocused or minimised (playback carries on) */
+html.theme-liminal.idle :is(.lm-world i, .eqbars i), html.theme-liminal.idle .aa-wrap::before { animation-play-state: paused !important; }
+/* Reduce effects (which follows Windows' reduced motion until chosen) and the Reduce motion switch:
+   the hall stands still and stops following the mouse; the art stays */
+html.theme-liminal.fx-lite .lm-world i, html.theme-liminal:has(.app.reduce-motion) .lm-world i { animation: none !important; translate: none; transition: none; }
+html.theme-liminal.fx-lite .aa-wrap::before, html.theme-liminal:has(.app.reduce-motion) .aa-wrap::before { animation: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  html.theme-liminal .lm-world i { animation: none !important; translate: none; transition: none; }
+  html.theme-liminal .aa-wrap::before { animation: none !important; }
+}

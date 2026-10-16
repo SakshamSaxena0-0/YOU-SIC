@@ -1,6 +1,6 @@
 // Project checks (npm run check). There is no linter or test suite yet; this covers what can break silently:
 //  1. every JavaScript file parses,
-//  2. the Y2K and Vector Surrealism component rules use only design tokens (no literal colours),
+//  2. the Y2K, Vector Surrealism and Liminal component rules use only design tokens (no literal colours),
 //  3. every bundled font ships with its licence.
 const { spawnSync } = require('child_process');
 const fs = require('fs');
@@ -35,10 +35,19 @@ for (const a of (fs.readFileSync(path.join(root, 'renderer/css/vector-surrealism
   if (!fs.existsSync(path.join(root, a))) fail(`vector-surrealism.tokens.css: missing asset ${a}`);
 }
 
+console.log('2c. Liminal tokens');
+const lm = fs.readFileSync(path.join(root, 'renderer/css/liminal.css'), 'utf8');
+const lmLit = lm.match(/#[0-9a-fA-F]{3,8}\b|rgba?\(|hsla?\(/g) || [];
+if (lmLit.length) fail(`liminal.css: ${lmLit.length} literal colour(s) (use the tokens in liminal.tokens.css): ${lmLit.slice(0, 5).join(', ')}`);
+else console.log('  no literal colours in component rules');
+for (const a of (fs.readFileSync(path.join(root, 'renderer/css/liminal.tokens.css'), 'utf8').match(/\/renderer\/assets\/[^')]+/g) || [])) {
+  if (!fs.existsSync(path.join(root, a))) fail(`liminal.tokens.css: missing asset ${a}`);
+}
+
 console.log('3. font licences');
 const fonts = path.join(root, 'renderer/fonts');
 const files = fs.readdirSync(fonts);
-const need = { 'Michroma-Regular.ttf': 'OFL-Michroma.txt', 'ShareTechMono-Regular.ttf': 'OFL-ShareTechMono.txt', 'PressStart2P-Regular.ttf': 'OFL-PressStart2P.txt', 'VT323-Regular.ttf': 'OFL-VT323.txt', 'manrope-latin-wght-normal.woff2': 'OFL-Manrope.txt', 'manrope-latin-ext-wght-normal.woff2': 'OFL-Manrope.txt', 'jetbrains-mono-latin-wght-normal.woff2': 'OFL-JetBrainsMono.txt', 'fraunces-latin-full-normal.woff2': 'OFL-Fraunces.txt', 'space-grotesk-latin-wght-normal.woff2': 'OFL-SpaceGrotesk.txt' };
+const need = { 'Michroma-Regular.ttf': 'OFL-Michroma.txt', 'ShareTechMono-Regular.ttf': 'OFL-ShareTechMono.txt', 'PressStart2P-Regular.ttf': 'OFL-PressStart2P.txt', 'VT323-Regular.ttf': 'OFL-VT323.txt', 'manrope-latin-wght-normal.woff2': 'OFL-Manrope.txt', 'manrope-latin-ext-wght-normal.woff2': 'OFL-Manrope.txt', 'jetbrains-mono-latin-wght-normal.woff2': 'OFL-JetBrainsMono.txt', 'fraunces-latin-full-normal.woff2': 'OFL-Fraunces.txt', 'space-grotesk-latin-wght-normal.woff2': 'OFL-SpaceGrotesk.txt', 'cormorant-garamond-latin-wght-normal.woff2': 'OFL-CormorantGaramond.txt', 'cormorant-garamond-latin-wght-italic.woff2': 'OFL-CormorantGaramond.txt', 'ibm-plex-sans-latin-wght-normal.woff2': 'OFL-IBMPlexSans.txt' };
 for (const f of files.filter((x) => /\.(ttf|otf|woff2?)$/.test(x))) {
   if (!need[f]) fail(`${f}: no licence mapping`);
   else if (!files.includes(need[f])) fail(`${f}: missing ${need[f]}`);

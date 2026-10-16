@@ -132,6 +132,12 @@ export class Waveform {
       const v = (k) => cs.getPropertyValue(k).trim();
       this.vs = { coral: v('--vs-coral'), blush: v('--vs-blush'), lav: v('--vs-lavender'), cream: v('--vs-cream'), teal: v('--vs-teal'), ink: v('--vs-ink'), shade: v('--vs-shade') };
     }
+    // and the Liminal theme
+    if (name === 'liminal') {
+      const cs = getComputedStyle(document.documentElement);
+      const v = (k) => cs.getPropertyValue(k).trim();
+      this.lm = { pool: v('--lm-pool'), lamp: v('--lm-lamp'), mist: v('--lm-mist'), fog: v('--lm-fog'), void: v('--lm-void') };
+    }
     this.invalidate();
   }
 
@@ -264,6 +270,43 @@ export class Waveform {
     g.beginPath(); g.arc(ex, ey, r * 0.18, 0, Math.PI * 2); g.fillStyle = c.ink; g.fill();
   }
 
+  // Liminal theme: the waveform as reeds standing in still water. Thin bars rise from a waterline and
+  // are reflected, fainter and broken into ripples, beneath it. The played stretch is lit pool-blue, the
+  // rest is haze; the playhead is a fine thread of fluorescent light with a lit bead on the waterline.
+  _drawLm(g, w, h, prog) {
+    const c = this.lm;
+    const step = w / BARS, bw = Math.max(1, step * 0.42), line = Math.round(h * 0.6) + 0.5;
+    const pT = new Path2D(), pB = new Path2D(), uT = new Path2D(), uB = new Path2D();
+    for (let i = 0; i < BARS; i++) {
+      const x = i * step + (step - bw) / 2, v = this.cur[i];
+      const up = Math.max(1, v * (line - 3)), down = Math.max(1, v * (h - line - 2) * 0.85);
+      const played = (i + 0.5) / BARS <= prog;
+      (played ? pT : uT).rect(x, line - up - 1, bw, up);
+      // the reflection breaks into two strokes, as if the water moved
+      const brk = down * (0.45 + 0.2 * Math.sin(i * 1.7));
+      (played ? pB : uB).rect(x, line + 1, bw, brk);
+      (played ? pB : uB).rect(x, line + 2 + brk + 1.5, bw, Math.max(0, down - brk - 2));
+    }
+    g.fillStyle = c.fog;
+    g.globalAlpha = 0.38; g.fill(uT);
+    g.globalAlpha = 0.12; g.fill(uB);
+    g.fillStyle = c.pool;
+    g.globalAlpha = 1; g.fill(pT);
+    g.globalAlpha = 0.28; g.fill(pB);
+    // the waterline itself, brighter over the played stretch
+    const px = prog * w;
+    g.fillStyle = c.fog; g.globalAlpha = 0.25; g.fillRect(px, line, w - px, 1);
+    g.fillStyle = c.pool; g.globalAlpha = 0.7; g.fillRect(0, line, px, 1);
+    g.globalAlpha = 1;
+    if (this.hover >= 0 && !this.dragging) { g.fillStyle = c.mist; g.globalAlpha = 0.45; g.fillRect(this.hover * w - 0.5, 2, 1, h - 4); g.globalAlpha = 1; }
+    // the playhead: a thread of light and a bead where it meets the water
+    g.save();
+    g.shadowColor = c.lamp; g.shadowBlur = 8;
+    g.fillStyle = c.lamp; g.fillRect(px - 0.75, 1, 1.5, h - 2);
+    g.beginPath(); g.arc(px, line, this.dragging ? 5 : 3.5, 0, Math.PI * 2); g.fill();
+    g.restore();
+  }
+
   // Pixel theme: the waveform as a grid of square cells, like an old LED/pixel equalizer.
   _drawPixel(g, w, h, prog) {
     const cell = 6, gap = 1, pitch = cell + gap;
@@ -309,6 +352,7 @@ export class Waveform {
     if (this.theme === 'pixel') { this._drawPixel(g, w, h, prog); return moving; }
     if (this.theme === 'subway' && this.tok) { this._drawY2k(g, w, h, prog); return moving; }
     if (this.theme === 'vector-surrealism' && this.vs) { this._drawVs(g, w, h, prog); return moving; }
+    if (this.theme === 'liminal' && this.lm) { this._drawLm(g, w, h, prog); return moving; }
     const step = w / BARS;
     const cy = this.cyber;
     const bw = Math.max(1.2, step * (cy ? 0.62 : 0.56));

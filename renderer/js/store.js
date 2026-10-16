@@ -7,7 +7,7 @@ export const THEME_COLORS = {
   subway: { accent: [111, 227, 200], dark: [7, 18, 20] },
   pixel: { accent: [255, 43, 214], dark: [42, 10, 84] },
   'vector-surrealism': { accent: [255, 138, 91], dark: [15, 10, 43] },
-  liminal: { accent: [108, 212, 201], dark: [11, 17, 19] },
+  liminal: { accent: [247, 197, 159], dark: [36, 26, 38] },
 };
 
 export const DEFAULT_SETTINGS = {
@@ -19,7 +19,7 @@ export const DEFAULT_SETTINGS = {
   dynamicAccent: true,
   accent: '#ff9f1c',
   blurBg: true,
-  theme: 'glass', // glass (liquid glass over the wallpaper) | cyber (solid neon cyberpunk) | subway (y2k: dim teal, chrome, glass) | pixel (retro 90s desktop windows, pixel art) | vector-surrealism (flat dreamlike vector poster) | liminal (an empty, hazy poolroom at night)
+  theme: 'glass', // glass (liquid glass over the wallpaper) | cyber (solid neon cyberpunk) | subway (y2k: dim teal, chrome, glass) | pixel (retro 90s desktop windows, pixel art) | vector-surrealism (flat dreamlike vector poster) | liminal (a vintage dream: sunset over a sea of clouds, on old film)
   refraction: true,
   windowBg: 'wallpaper', // wallpaper | acrylic | solid
   buttonStyle: 'ios', // ios (clear glass) | bubble | aqua (liquid-filled)

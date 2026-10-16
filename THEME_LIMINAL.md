@@ -1,6 +1,6 @@
 # Liminal theme
 
-An empty poolroom at 3 a.m., half dream. The window looks down a tiled corridor that runs away into haze. Fluorescent panels line the ceiling, still water covers the floor, and a cloud has drifted indoors. The album cover hangs where the corridor ends, so the whole hall leads to it, and the light round it flickers now and then like a tube about to go. Play is a doorway with the light on behind it: it glows fully while music plays and dims when paused.
+A vintage dream, like an old film photograph. The sun is setting over a sea of clouds and everything is slightly out of focus. Anything bright gets a warm halo (halation), and there are light leaks, faint sun rays, heavy grain, a vignette and the rounded, darkened edge of a film print. The sun sits behind the album cover, so the cover glows. Play is the sun itself, its halo full while music plays and fading when paused. The seek times are printed like the orange date stamp of an old camera, and the seekbar is late sun glittering on water.
 
 To pick it, open **Settings → Look and feel → Theme → Liminal**. Its id is `liminal` and its root class is `html.theme-liminal`.
 
@@ -8,23 +8,16 @@ To pick it, open **Settings → Look and feel → Theme → Liminal**. Its id is
 
 | What | Where |
 | --- | --- |
-| Design tokens (palette, light, shapes, motion, fonts, asset paths) | `renderer/css/liminal.tokens.css` |
+| Design tokens (palette, light, film effects, shapes, motion, fonts, asset paths) | `renderer/css/liminal.tokens.css` |
 | Component rules (only read the tokens) | `renderer/css/liminal.css` |
-| Decorative SVG art (original, `aria-hidden` in the page) | `renderer/assets/liminal/`: `hall.svg` (the corridor), `cloud.svg`, `caustics.svg` (light on water, used on the playing row), `grain.svg` |
-| Backdrop markup (`#lmWorld`) | `renderer/index.html` |
-| Parallax, and lining the corridor up with the cover | `renderer/js/vsWorld.js` (shared with Vector Surrealism; `alignHall()`) |
-| Seekbar: reeds standing in still water, reflected beneath the waterline | `renderer/js/waveform.js`, `_drawLm()` |
+| Decorative SVG art (original, `aria-hidden` in the page) | `renderer/assets/liminal/`: `sky.svg` (sunset sky and the distant sea of clouds), `clouds.svg` (near cloud mounds), `grain.svg` |
+| Backdrop markup | `renderer/index.html`: `#lmWorld` behind the app (sky, clouds, light leaks, vignette, grain) and `.lm-film` over it (the print's edge and a fine grain) |
+| Parallax, and lining the sun up with the cover | `renderer/js/vsWorld.js` (shared with Vector Surrealism; `alignSun()`) |
+| Seekbar: sun glittering on water | `renderer/js/waveform.js`, `_drawLm()` |
 | Registration | `renderer/js/store.js` (`THEMES`, `THEME_COLORS`) and the Theme picker in `renderer/js/app.js` |
-| Fonts | `renderer/fonts/cormorant-garamond-latin-wght-normal.woff2`, `cormorant-garamond-latin-wght-italic.woff2` and `ibm-plex-sans-latin-wght-normal.woff2`, with `OFL-CormorantGaramond.txt` and `OFL-IBMPlexSans.txt`. JetBrains Mono was already bundled. |
+| Fonts | Cormorant Garamond (titles; `cormorant-garamond-latin-wght-normal.woff2`, `…-italic.woff2`), IBM Plex Sans (interface; `ibm-plex-sans-latin-wght-normal.woff2`) and DSEG7 Classic Italic (the date stamp; `DSEG7Classic-Italic.woff2`), with `OFL-CormorantGaramond.txt`, `OFL-IBMPlexSans.txt` and `OFL-DSEG.txt`. JetBrains Mono was already bundled. |
 
-The corridor is one drawing (`hall.svg`, 1600 × 1000, vanishing point at 800, 420) stretched to fit. `alignHall()` measures the current cover whenever the layout changes and writes its centre as `--vx`/`--vy` on `#lmWorld`, so the far end of the hall always sits behind the cover, in the wide and the narrow layout.
-
-## Look
-
-- **Type:** titles in Cormorant Garamond light italic, the interface in IBM Plex Sans, and labels set like a building's signage: JetBrains Mono capitals, widely spaced. Library tiles carry room numbers (ROOM 01, ROOM 02 …).
-- **Surfaces:** dim tiles with grout lines and a lit top edge. Hovering a button or tile switches its overhead light on.
-- **Controls:** toggles are light switches (a rocker in a wall plate with a pilot light), sliders are thin tubes filling with pool water, EQ thumbs are small lit discs, and the EQ graph is the pool seen from above.
-- **Overlays:** opaque tiled panels with a fluorescent strip along the top. The toast and tooltips are small dark signs with lettering lit from behind.
+The soft focus is baked into the SVG art with `feGaussianBlur`. Images are rasterised once, so nothing is blurred at run time. `sky.svg` (1600 × 1000, sun at 800, 566) is stretched to fit. `alignSun()` measures the cover whenever the layout changes and writes its centre as `--vx`/`--vy` on `#lmWorld`, so the sun stays behind the cover in the wide and the narrow layout.
 
 ## Tokens
 
@@ -32,43 +25,39 @@ All colours live in the tokens file. `npm run check` fails if `liminal.css` cont
 
 | Token | Value | Use |
 | --- | --- | --- |
-| `--lm-void` | `#0B1113` | the dark at the edges; glyphs on light fills |
-| `--lm-night` | `#111A1C` | base background |
-| `--lm-tile`, `--lm-tile-hi` | `#1A2528`, `#233337` | panels and rows; buttons and hover |
-| `--lm-grout` | `#33474C` | grout lines and edges |
-| `--lm-fog` | `#A3B9B8` | secondary text |
-| `--lm-mist` | `#E4ECE8` | primary text |
-| `--lm-pool` | `#6CD4C9` | the accent: active and selected states, progress |
-| `--lm-lamp` | `#F2E6B6` | fluorescent light: highlights, hover, the focus ring |
-| `--lm-blush` | `#E9A9C3` | favourites (rating stars) and warnings |
-| `--lm-haze`, `--lm-haze-strong` | fog at 14% / 26% | the air in the hall |
-| `--lm-glow-lamp`, `--lm-glow-pool` | soft glows | lit things (static elements only) |
-| `--lm-overhead` | a warm wash at the top | a panel lit from above |
-| `--lm-edge` | grout hairline + lit top edge | every tile's border |
-| `--lm-tiles` | 22px grout grid | tiled surfaces |
-| `--lm-water`, `--lm-water-v` | dark pool → pool | filled progress |
-| `--lm-doorlight` | mist → lamp | the play doorway, the mini player's play button, the logo |
-| `--lm-veil` | night at 74% | the right-hand pane over the hall |
-| `--lm-floor-shade` | void at 80% | the shadowed floor behind the player's title block and seek bar |
-| `--lm-r-sm`, `--lm-r`, `--lm-r-lg`, `--lm-r-door` | 6, 10, 16px, arch | shapes |
-| `--lm-ease`, `--lm-t` | slow ease-out, 360ms | transitions, like moving through water |
-| `--lm-display`, `--lm-ui`, `--lm-num` | Cormorant Garamond, IBM Plex Sans, JetBrains Mono | type |
+| `--lm-ink` | `#241A26` | the deepest shadow (plum-brown: faded film never reaches black); glyphs on light fills |
+| `--lm-dusk`, `--lm-dusk-hi` | `#3A2C40`, `#4A3A52` | panels; buttons and hover |
+| `--lm-cream` | `#FFF2E2` | primary text |
+| `--lm-haze` | `#D9C6DA` | secondary text |
+| `--lm-peach` | `#F7C59F` | the sunset: accent, selected states |
+| `--lm-gold` | `#FFD98A` | the sun: highlights, the playhead, the focus ring |
+| `--lm-rose` | `#EBA6B3` | favourites (rating stars), warnings |
+| `--lm-sky`, `--lm-cyan` | `#8E9CC8`, `#8FE3DC` | the upper sky; the cyan of a light leak |
+| `--lm-stamp` | `#FFA552` | the date-stamp orange |
+| `--lm-bloom`, `--lm-bloom-gold`, `--lm-text-glow` | soft glows | halation round lit things (static elements only) |
+| `--lm-panel`, `--lm-panel-solid`, `--lm-sunlit`, `--lm-edge` | | dusk-haze panels, a warm wash from above, a soft lit edge |
+| `--lm-sun`, `--lm-flow`, `--lm-flow-v` | gradients | the play button and small suns; filled progress (rose to gold) |
+| `--lm-veil`, `--lm-floor-shade`, `--lm-dusk-top` | | the right-hand pane; the shade behind the player's title block and times; dusk gathering at the top of the sky |
+| `--lm-vignette`, `--lm-leak-warm`, `--lm-leak-rose`, `--lm-flare`, `--lm-rays` | gradients | the film effects |
+| `--lm-r-sm`, `--lm-r`, `--lm-r-lg`, `--lm-r-pill` | 8, 14, 22px, pill | everything soft |
+| `--lm-ease`, `--lm-t` | slow ease-out, 420ms | transitions, slow like a memory |
+| `--lm-display`, `--lm-ui`, `--lm-num`, `--lm-stamp-font` | Cormorant Garamond, IBM Plex Sans, JetBrains Mono, DSEG7 Classic | type |
 
-## Tweaking the palette
+## Tweaking
 
-1. Change the palette values at the top of `liminal.tokens.css`. Nothing else in the components holds a colour.
-2. The SVG art uses the same hex values. It is generated by a script (kept outside the project), so to recolour it, find and replace the old hex values in `renderer/assets/liminal/*.svg`.
-3. The seekbar reads its colours from the tokens when the theme is applied, so it follows automatically.
-4. Keep contrast at WCAG AA. On the tile surfaces, mist is 10.9:1 or more, fog 6.4:1, pool 7.4:1 and lamp 10.5:1; void on pool, lamp, blush or mist is 9.9:1 or more. Text that sits straight on the hall art (the player's title block and the seek times) was measured from screenshots at 6.5:1 to 13.8:1, thanks to `--lm-floor-shade`. If you brighten the water in `hall.svg`, measure that again.
+1. Change the palette at the top of `liminal.tokens.css`. Nothing else in the components holds a colour.
+2. The SVG art uses its own copies of the sky colours. It is generated by a script (kept outside the project), so to recolour it, find and replace the hex values in `renderer/assets/liminal/*.svg`.
+3. The seekbar reads its colours from the tokens when the theme is applied.
+4. Keep contrast at WCAG AA. On panels, cream is 9.4:1 or more and haze 6.5:1; ink on peach, gold, rose or cream is 8.5:1 or more. Text that sits straight on the art was measured from screenshots in the wide, equalizer and narrow layouts, against the lighter pixels of its background: everything came out at 4.65:1 or better. That covers the header, the title block, the date-stamp times and the dock labels. It relies on `--lm-dusk-top`, `--lm-floor-shade`, the soft shadow behind "Playing from" and the dark halo behind the stamp digits. If you brighten the sky or the clouds, measure again.
 
 ## Motion and performance
 
-- **Idle loops:** only two, both `transform`/`opacity`. The cloud drifts in half-second steps and the light round the cover flickers, stepped in twelfths of a second. Both pause while the window is unfocused (`html.idle`).
-- **Parallax:** pointer moves are sampled at most every 90ms and written as two CSS variables; the hall and the cloud ease to them with a CSS transition. There is no per-frame JavaScript. The cover is measured only when the layout changes.
-- **Measured CPU** (whole app, test harness): 2.3% playing in the wide layout, 3.1% playing in the narrow layout, 0.9% paused, 0.4% with Reduce effects.
-- **When motion stops:** loops and parallax stop under Reduce effects (which follows Windows' reduced-motion setting until the user chooses), under Windows' reduced motion and under Reduce animations. The art stays.
+- **Idle loops:** two, both `transform`/`opacity` only. The grain jumps six times a second, like real film, and the light leaks breathe slowly in half-second steps. Both pause while the window is unfocused (`html.idle`).
+- **Parallax:** pointer moves are sampled at most every 90ms and written as two CSS variables, and the sky and the near clouds ease to them. There is no per-frame JavaScript.
+- **Measured CPU** (whole app, test harness): 3.3% playing in the wide layout, 4.3% playing in the narrow layout, 0.5% paused, 0.5% with Reduce effects.
+- **When motion stops:** under Reduce effects (which follows Windows' reduced-motion setting until the user chooses), Windows' reduced motion and Reduce animations, the grain stops jumping, the light stops breathing and the parallax stops. The picture stays.
 
 ## Not done
 
-- **Light mode:** the app has no light/dark mode, so only this night palette exists.
-- **Icons** keep their standard shapes: plain, institutional icons suit the theme.
+- **Light mode:** the app has no light/dark mode, so only this dusk palette exists.
+- **Icons** keep their standard shapes.

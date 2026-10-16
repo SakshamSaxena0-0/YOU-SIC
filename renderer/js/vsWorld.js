@@ -2,8 +2,9 @@
 // and Liminal (#lmWorld, see css/liminal.css).
 // No per-frame work: pointer moves are sampled at most every 90ms and written as two CSS variables
 // (--px, --py, each -0.5..0.5) on the active theme's backdrop; its layers ease to them with a CSS
-// transition on `translate`. Liminal also lines its corridor up with the album cover (alignHall).
-// The parallax stays still unless one of those themes is on, the window is focused and motion is allowed (Reduce effects / Windows' reduced motion / the Reduce motion switch).
+// transition on `translate`. Liminal also lines its sun up with the album cover (alignSun).
+// The parallax stays still unless one of those themes is on, the window is focused and motion is
+// allowed (Reduce effects / Windows' reduced motion / the Reduce motion switch).
 const WORLDS = [['vsWorld', 'theme-vector-surrealism'], ['lmWorld', 'theme-liminal']];
 
 export function initVsWorld() {
@@ -28,12 +29,12 @@ export function initVsWorld() {
     y = e.clientY / innerHeight - 0.5;
     if (!timer) timer = setTimeout(write, 90);
   }, { passive: true });
-  alignHall(html);
+  alignSun(html);
 }
 
-// Liminal: the corridor's vanishing point sits behind the album cover. Measure the cover whenever the
+// Liminal: the setting sun sits behind the album cover, so the cover glows. Measure the cover whenever the
 // layout changes (or the theme is switched on) and write its centre as --vx/--vy on #lmWorld.
-function alignHall(html) {
+function alignSun(html) {
   const world = document.getElementById('lmWorld'), wrap = document.getElementById('aaWrap');
   if (!world || !wrap) return;
   let queued = 0;

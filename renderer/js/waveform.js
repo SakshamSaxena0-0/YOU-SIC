@@ -136,7 +136,7 @@ export class Waveform {
     if (name === 'liminal') {
       const cs = getComputedStyle(document.documentElement);
       const v = (k) => cs.getPropertyValue(k).trim();
-      this.lm = { pool: v('--lm-pool'), lamp: v('--lm-lamp'), mist: v('--lm-mist'), fog: v('--lm-fog'), void: v('--lm-void') };
+      this.lm = { rose: v('--lm-rose'), peach: v('--lm-peach'), gold: v('--lm-gold'), cream: v('--lm-cream'), haze: v('--lm-haze') };
     }
     this.invalidate();
   }
@@ -270,40 +270,53 @@ export class Waveform {
     g.beginPath(); g.arc(ex, ey, r * 0.18, 0, Math.PI * 2); g.fillStyle = c.ink; g.fill();
   }
 
-  // Liminal theme: the waveform as reeds standing in still water. Thin bars rise from a waterline and
-  // are reflected, fainter and broken into ripples, beneath it. The played stretch is lit pool-blue, the
-  // rest is haze; the playhead is a fine thread of fluorescent light with a lit bead on the waterline.
+  // Liminal theme: the waveform as late sun glittering on water. Soft bars rise from a waterline and are
+  // reflected, fainter, beneath it; the played stretch glows sunset (rose to gold) with a halo and a few
+  // fixed glints on its peaks; the rest is lavender haze. The playhead is a small sun with a star glint.
   _drawLm(g, w, h, prog) {
     const c = this.lm;
-    const step = w / BARS, bw = Math.max(1, step * 0.42), line = Math.round(h * 0.6) + 0.5;
+    const step = w / BARS, bw = Math.max(1.2, step * 0.5), line = Math.round(h * 0.6) + 0.5;
     const pT = new Path2D(), pB = new Path2D(), uT = new Path2D(), uB = new Path2D();
+    const glints = [];
     for (let i = 0; i < BARS; i++) {
       const x = i * step + (step - bw) / 2, v = this.cur[i];
-      const up = Math.max(1, v * (line - 3)), down = Math.max(1, v * (h - line - 2) * 0.85);
+      const up = Math.max(1.5, v * (line - 4)), down = Math.max(1, v * (h - line - 2) * 0.7);
       const played = (i + 0.5) / BARS <= prog;
-      (played ? pT : uT).rect(x, line - up - 1, bw, up);
-      // the reflection breaks into two strokes, as if the water moved
-      const brk = down * (0.45 + 0.2 * Math.sin(i * 1.7));
-      (played ? pB : uB).rect(x, line + 1, bw, brk);
-      (played ? pB : uB).rect(x, line + 2 + brk + 1.5, bw, Math.max(0, down - brk - 2));
+      (played ? pT : uT).roundRect(x, line - up - 1, bw, up, bw / 2);
+      (played ? pB : uB).roundRect(x, line + 1.5, bw, down, bw / 2);
+      if (played && v > 0.62 && i % 7 === 3) glints.push([x + bw / 2, line - up - 3, 2 + v * 2.5]);
     }
-    g.fillStyle = c.fog;
-    g.globalAlpha = 0.38; g.fill(uT);
+    g.fillStyle = c.haze;
+    g.globalAlpha = 0.34; g.fill(uT);
     g.globalAlpha = 0.12; g.fill(uB);
-    g.fillStyle = c.pool;
-    g.globalAlpha = 1; g.fill(pT);
-    g.globalAlpha = 0.28; g.fill(pB);
-    // the waterline itself, brighter over the played stretch
-    const px = prog * w;
-    g.fillStyle = c.fog; g.globalAlpha = 0.25; g.fillRect(px, line, w - px, 1);
-    g.fillStyle = c.pool; g.globalAlpha = 0.7; g.fillRect(0, line, px, 1);
     g.globalAlpha = 1;
-    if (this.hover >= 0 && !this.dragging) { g.fillStyle = c.mist; g.globalAlpha = 0.45; g.fillRect(this.hover * w - 0.5, 2, 1, h - 4); g.globalAlpha = 1; }
-    // the playhead: a thread of light and a bead where it meets the water
+    const px = prog * w;
+    const pg = g.createLinearGradient(0, 0, Math.max(px, 1), 0);
+    pg.addColorStop(0, c.rose); pg.addColorStop(0.6, c.peach); pg.addColorStop(1, c.gold);
     g.save();
-    g.shadowColor = c.lamp; g.shadowBlur = 8;
-    g.fillStyle = c.lamp; g.fillRect(px - 0.75, 1, 1.5, h - 2);
-    g.beginPath(); g.arc(px, line, this.dragging ? 5 : 3.5, 0, Math.PI * 2); g.fill();
+    g.shadowColor = c.peach; g.shadowBlur = 9;
+    g.fillStyle = pg; g.fill(pT);
+    g.restore();
+    g.globalAlpha = 0.3; g.fillStyle = pg; g.fill(pB); g.globalAlpha = 1;
+    // a four-pointed glint, like sun catching a wave
+    const star = (x, y, r) => {
+      g.beginPath();
+      g.moveTo(x, y - r * 2); g.quadraticCurveTo(x, y, x + r * 2, y); g.quadraticCurveTo(x, y, x, y + r * 2);
+      g.quadraticCurveTo(x, y, x - r * 2, y); g.quadraticCurveTo(x, y, x, y - r * 2); g.fill();
+    };
+    g.save();
+    g.fillStyle = c.cream; g.shadowColor = c.gold; g.shadowBlur = 8;
+    for (const [x, y, r] of glints) star(x, y, r);
+    g.restore();
+    if (this.hover >= 0 && !this.dragging) { g.fillStyle = c.cream; g.globalAlpha = 0.45; g.fillRect(this.hover * w - 0.5, 2, 1, h - 4); g.globalAlpha = 1; }
+    // the playhead: a small sun on the waterline, haloed, with a glint across it
+    const r = this.dragging ? 6 : 4.5;
+    g.save();
+    g.shadowColor = c.gold; g.shadowBlur = 16;
+    const sg = g.createRadialGradient(px, line, 0, px, line, r);
+    sg.addColorStop(0, c.cream); sg.addColorStop(0.6, c.gold); sg.addColorStop(1, c.peach);
+    g.fillStyle = sg; g.beginPath(); g.arc(px, line, r, 0, Math.PI * 2); g.fill();
+    g.fillStyle = c.cream; star(px, line, r * 0.9);
     g.restore();
   }
 

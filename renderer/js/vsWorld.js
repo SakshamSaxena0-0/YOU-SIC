@@ -1,11 +1,11 @@
-// Mouse parallax for the themed backdrops: Vector Surrealism (#vsWorld, see css/vector-surrealism.css)
-// and Liminal (#lmWorld, see css/liminal.css).
+// Mouse parallax for the Vector Surrealism backdrop (#vsWorld, see css/vector-surrealism.css), and lining
+// up the Liminal theme's glow with the album cover (#lmWorld, see css/liminal.css).
 // No per-frame work: pointer moves are sampled at most every 90ms and written as two CSS variables
 // (--px, --py, each -0.5..0.5) on the active theme's backdrop; its layers ease to them with a CSS
-// transition on `translate`. Liminal also lines its sun up with the album cover (alignSun).
-// The parallax stays still unless one of those themes is on, the window is focused and motion is
+// transition on `translate`. Liminal has no parallax; alignSun() below places its glow.
+// The parallax stays still unless that theme is on, the window is focused and motion is
 // allowed (Reduce effects / Windows' reduced motion / the Reduce motion switch).
-const WORLDS = [['vsWorld', 'theme-vector-surrealism'], ['lmWorld', 'theme-liminal']];
+const WORLDS = [['vsWorld', 'theme-vector-surrealism']];
 
 export function initVsWorld() {
   const html = document.documentElement;
@@ -32,7 +32,7 @@ export function initVsWorld() {
   alignSun(html);
 }
 
-// Liminal: the setting sun sits behind the album cover, so the cover glows. Measure the cover whenever the
+// Liminal: the gradient's warm glow sits behind the album cover, so the cover glows. Measure the cover whenever the
 // layout changes (or the theme is switched on) and write its centre as --vx/--vy on #lmWorld.
 function alignSun(html) {
   const world = document.getElementById('lmWorld'), wrap = document.getElementById('aaWrap');

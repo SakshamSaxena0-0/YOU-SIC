@@ -1,6 +1,6 @@
 /* ==========================================================================
    Liminal theme (html.theme-liminal): design tokens
-   A vintage dream: a sunset over a sea of clouds, seen through old film. Every colour, light,
+   A vintage dream: a soft sunset gradient, seen through old film. Every colour, light,
    radius, font and asset the theme uses is defined here; css/liminal.css (the component rules)
    only reads these tokens (`npm run check` fails on a literal colour there). See THEME_LIMINAL.md.
    ========================================================================== */
@@ -25,7 +25,7 @@
 }
 
 html.theme-liminal {
-  /* ---- palette: dusk over the clouds, on faded film (the shadows never reach black) ---- */
+  /* ---- palette: dusk, on faded film (the shadows never reach black) ---- */
   --lm-ink: #241A26;      /* the deepest shadow, plum-brown: glyphs on light fills */
   --lm-dusk: #3A2C40;     /* panels */
   --lm-dusk-hi: #4A3A52;  /* buttons, hover */
@@ -34,8 +34,7 @@ html.theme-liminal {
   --lm-peach: #F7C59F;    /* the sunset: accent, selected */
   --lm-gold: #FFD98A;     /* the sun itself: highlights, focus, the playhead */
   --lm-rose: #EBA6B3;     /* favourites, warnings */
-  --lm-sky: #8E9CC8;      /* periwinkle: the upper sky */
-  --lm-cyan: #8FE3DC;     /* the cyan of a light leak */
+  --lm-sky: #8E9CC8;      /* periwinkle: the top of the gradient */
   --lm-stamp: #FFA552;    /* the date stamp */
 
   /* ---- text (contrast measured on dusk-hi, the lightest panel) ---- */
@@ -62,15 +61,13 @@ html.theme-liminal {
   --lm-flow-v: linear-gradient(0deg, var(--lm-rose), var(--lm-peach) 60%, var(--lm-gold));
   /* the right-hand pane, and the dimmer air behind the player's title block */
   --lm-veil: color-mix(in srgb, var(--lm-ink) 58%, transparent);
-  --lm-floor-shade: color-mix(in srgb, color-mix(in srgb, var(--lm-dusk) 45%, var(--lm-ink)) 80%, transparent);
-  /* film: a soft vignette, a warm light leak, a cyan flare, sun rays from above */
+  --lm-floor-shade: color-mix(in srgb, color-mix(in srgb, var(--lm-dusk) 45%, var(--lm-ink)) 66%, transparent);
+  /* film: a soft vignette and two light leaks */
   --lm-vignette: radial-gradient(125% 100% at 50% 45%, transparent 52%, color-mix(in srgb, var(--lm-ink) 55%, transparent) 82%, color-mix(in srgb, var(--lm-ink) 88%, transparent));
   /* dusk gathering at the top of the sky (it also keeps the header text readable) */
   --lm-dusk-top: linear-gradient(180deg, color-mix(in srgb, var(--lm-ink) 78%, transparent), color-mix(in srgb, var(--lm-ink) 50%, transparent) 10%, transparent 24%);
   --lm-leak-warm: radial-gradient(34% 44% at 0% 14%, color-mix(in srgb, var(--lm-stamp) 34%, transparent), transparent 70%);
   --lm-leak-rose: radial-gradient(30% 45% at 100% 92%, color-mix(in srgb, var(--lm-rose) 30%, transparent), transparent 70%);
-  --lm-flare: linear-gradient(100deg, transparent 0 40%, color-mix(in srgb, var(--lm-cyan) 22%, transparent) 46%, transparent 52%);
-  --lm-rays: repeating-conic-gradient(from 160deg at 70% -12%, color-mix(in srgb, var(--lm-cream) 6%, transparent) 0 3deg, transparent 3deg 9deg);
 
   /* ---- shape: everything soft ---- */
   --lm-r-sm: 8px;
@@ -89,8 +86,6 @@ html.theme-liminal {
   --lm-stamp-font: 'DSEG7 Classic', 'JetBrains Mono', monospace;
 
   /* ---- decorative assets (absolute paths, so they resolve the same from any stylesheet) ---- */
-  --lm-a-sky: url('/renderer/assets/liminal/sky.svg');
-  --lm-a-clouds: url('/renderer/assets/liminal/clouds.svg');
   --lm-a-grain: url('/renderer/assets/liminal/grain.svg');
 
   /* ---- the shared app variables, mapped onto the tokens ---- */

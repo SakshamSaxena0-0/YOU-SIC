@@ -1,11 +1,11 @@
 /* ==========================================================================
    Liminal theme (html.theme-liminal): components
-   A vintage dream, like an old film photograph: the sun setting over a sea of clouds, everything a
-   little out of focus, warm halation round anything bright, light leaks, heavy grain, a vignette and
-   the rounded edge of a film print. The sun sits behind the album cover, so the cover glows; play is
-   the sun itself; the times are printed like a camera's orange date stamp.
-   Tokens: css/liminal.tokens.css. Art: renderer/assets/liminal/*.svg (the blur is baked in).
-   Parallax and lining the sun up with the cover: js/vsWorld.js. Seekbar: waveform.js (_drawLm).
+   A vintage dream, like an old film photograph: a soft sunset gradient behind everything, warm
+   halation round anything bright, light leaks, heavy grain, a vignette and the rounded edge of a film
+   print. The gradient's warm glow sits behind the album cover, so the cover glows; play is the sun;
+   the times are printed like a camera's orange date stamp.
+   Tokens: css/liminal.tokens.css. Art: renderer/assets/liminal/grain.svg.
+   Lining the glow up with the cover: js/vsWorld.js (alignSun). Seekbar: waveform.js (_drawLm).
    Guide: THEME_LIMINAL.md.
    Motion is transform/opacity only; idle loops pause while the window is unfocused (html.idle)
    and stop under Reduce effects (html.fx-lite), Windows' reduced motion and Reduce motion.
@@ -50,34 +50,31 @@ html.theme-liminal :is(.bg-layer, .aa-glow, .bg-shade) { display: none; }
 .lm-world, .lm-film { display: none; }
 html.theme-liminal .lm-world {
   display: block; position: fixed; inset: 0; overflow: hidden; pointer-events: none; background: var(--lm-ink);
-  --px: 0; --py: 0;
-  /* the sun sits behind the album cover (js/vsWorld.js measures the cover and writes --vx/--vy
+  /* the warm glow sits behind the album cover (js/vsWorld.js measures the cover and writes --vx/--vy
      whenever the layout changes; these are the fallbacks) */
   --vx: 50vw; --vy: 30vh;
 }
 html.theme-liminal:has(.app.wide) .lm-world { --vx: calc(var(--pw) / 2); }
 html.theme-liminal .lm-world :where(i) { position: absolute; display: block; background: center / 100% 100% no-repeat; }
-/* the sky and the distant sea of clouds: one soft-focus image, stretched to fit, its sun behind the cover.
-   The mouse moves it a little; the near clouds move more (js/vsWorld.js) */
-html.theme-liminal .lm-sky {
-  left: calc(var(--vx) - 80vw); width: 160vw; top: calc(var(--vy) - 73.6vh); height: 130vh;
-  background-image: var(--lm-a-sky);
-  translate: calc(var(--px) * -14px) calc(var(--py) * -8px); transition: translate 1600ms var(--lm-ease);
+/* the dream: one soft gradient, dusk periwinkle at the top melting through mauve into dusty rose, with
+   a warm sunset glow behind the cover and soft blooms of colour in the corners (static) */
+html.theme-liminal .lm-gradient {
+  inset: 0;
+  background:
+    radial-gradient(circle at var(--vx) var(--vy), color-mix(in srgb, var(--lm-gold) 46%, transparent), color-mix(in srgb, var(--lm-peach) 22%, transparent) 16vmax, transparent 40vmax),
+    radial-gradient(60vmax 45vmax at 92% 4%, color-mix(in srgb, var(--lm-sky) 42%, transparent), transparent 70%),
+    radial-gradient(55vmax 45vmax at 96% 96%, color-mix(in srgb, var(--lm-rose) 42%, transparent), transparent 70%),
+    radial-gradient(50vmax 40vmax at 2% 78%, color-mix(in srgb, var(--lm-haze) 20%, transparent), transparent 70%),
+    linear-gradient(172deg, color-mix(in srgb, var(--lm-sky) 30%, var(--lm-ink)) 0%, color-mix(in srgb, var(--lm-haze) 22%, var(--lm-dusk)) 42%, color-mix(in srgb, var(--lm-rose) 34%, var(--lm-dusk)) 74%, color-mix(in srgb, var(--lm-peach) 34%, var(--lm-dusk)) 100%);
 }
-html.theme-liminal .lm-clouds {
-  left: -10vw; right: -10vw; bottom: -5vh; height: 44vh; background-image: var(--lm-a-clouds);
-  translate: calc(var(--px) * -40px) calc(var(--py) * -14px); transition: translate 1600ms var(--lm-ease);
-}
-/* old film: a warm light leak from the left edge, a rose one bottom right, a cyan flare and sun rays,
-   all screened onto the picture. The leaks breathe slowly */
-html.theme-liminal .lm-light { inset: 0; background: var(--lm-leak-warm), var(--lm-leak-rose), var(--lm-flare), var(--lm-rays); mix-blend-mode: screen; animation: lm-breathe 9s steps(18) infinite alternate; }
-@keyframes lm-breathe { from { opacity: 0.7; } to { opacity: 1; } }
+/* old film: a warm light leak from the left edge and a rose one bottom right, screened onto the picture */
+html.theme-liminal .lm-light { inset: 0; background: var(--lm-leak-warm), var(--lm-leak-rose); mix-blend-mode: screen; }
 html.theme-liminal .lm-vignette { inset: 0; background: var(--lm-dusk-top), var(--lm-vignette); }
-/* grain, jumping like real film (six positions a second) */
-html.theme-liminal .lm-grain { inset: -100px; background: var(--lm-a-grain) 0 0 / 200px 200px repeat; opacity: 0.2; mix-blend-mode: overlay; animation: lm-grain 1s steps(6) infinite; }
+/* grain, jumping like real film (four positions a second: each jump costs a frame) */
+html.theme-liminal .lm-grain { inset: -100px; background: var(--lm-a-grain) 0 0 / 200px 200px repeat; opacity: 0.2; mix-blend-mode: overlay; animation: lm-grain 1s steps(4) infinite; }
 @keyframes lm-grain {
-  0% { transform: translate(0, 0); } 17% { transform: translate(-37px, 23px); } 33% { transform: translate(51px, -12px); }
-  50% { transform: translate(-18px, -44px); } 67% { transform: translate(29px, 38px); } 83% { transform: translate(-56px, 8px); } 100% { transform: translate(0, 0); }
+  0%, 24.9% { transform: translate(0, 0); } 25%, 49.9% { transform: translate(-37px, 23px); }
+  50%, 74.9% { transform: translate(51px, -12px); } 75%, 100% { transform: translate(-18px, -44px); }
 }
 /* over everything: the rounded, slightly burnt edge of a film print, and a finer grain on the UI itself */
 html.theme-liminal .lm-film { display: block; position: fixed; inset: 0; z-index: 9000; overflow: hidden; pointer-events: none; }
@@ -242,11 +239,11 @@ html.theme-liminal .ab-fmt span, html.theme-liminal .ab-fmt span:nth-child(n) {
 html.theme-liminal :is(.ab-foot, .ab-file) { color: var(--lm-text-dim); }
 html.theme-liminal .ab-btn, html.theme-liminal .ab-btn:nth-child(n) { height: 30px; border-radius: var(--lm-r-pill); font-weight: 600; font-size: 12px; }
 /* title block. The air in front of you is dimmer: a soft dusk band behind the title block and the
-   seek bar keeps their text readable (AA) over the bright clouds */
+   seek bar keeps their text readable (AA) over the warm glow */
 html.theme-liminal .pl-info { position: relative; isolation: isolate; }
 html.theme-liminal .pl-info::before {
-  content: ''; position: absolute; z-index: -1; left: 0; right: 0; top: -16px; bottom: -164px; pointer-events: none;
-  background: linear-gradient(180deg, transparent, var(--lm-floor-shade) 18%, var(--lm-floor-shade) 80%, transparent);
+  content: ''; position: absolute; z-index: -1; left: 0; right: 0; top: -44px; bottom: -190px; pointer-events: none;
+  background: linear-gradient(180deg, transparent, var(--lm-floor-shade) 26%, var(--lm-floor-shade) 76%, transparent);
 }
 html.theme-liminal #plTitle { font-size: 36px; line-height: 1.2; color: var(--lm-text); }
 html.theme-liminal .pl-artist { color: var(--lm-peach); font-weight: 500; font-size: 15px; letter-spacing: 0.02em; }
@@ -465,7 +462,7 @@ html.theme-liminal .switch:focus-visible { outline-offset: 4px; }
 /* idle loops pause while the window is unfocused or minimised (playback carries on) */
 html.theme-liminal.idle :is(.lm-world i, .eqbars i) { animation-play-state: paused !important; }
 /* Reduce effects (which follows Windows' reduced motion until chosen) and the Reduce motion switch:
-   the dream stands still (no grain jumping, no breathing light, no parallax); the picture stays */
+   the grain stops jumping; the picture stays */
 html.theme-liminal.fx-lite .lm-world i, html.theme-liminal:has(.app.reduce-motion) .lm-world i { animation: none !important; translate: none; transition: none; }
 @media (prefers-reduced-motion: reduce) {
   html.theme-liminal .lm-world i { animation: none !important; translate: none; transition: none; }

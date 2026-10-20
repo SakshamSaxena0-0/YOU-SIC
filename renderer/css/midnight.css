@@ -216,6 +216,7 @@ html.theme-midnight .aa-img::before { display: block; content: ''; position: abs
 html.theme-midnight .aa-img::after, html.theme-midnight .aa-img.sheen::after, html.theme-midnight .aa-img.flip-glint::after { display: none; animation: none; }
 html.theme-midnight .aa-img.ph { background: var(--mn-gloss-soft), var(--mn-drawn); filter: none; }
 html.theme-midnight .aa-img.ph .ico { fill: var(--mn-steel-3); filter: none; }
+html.theme-midnight { --art-scrim: var(--mn-void); } /* wide layout: what the full-column cover fades into */
 /* the back: an opaque gunmetal plate */
 html.theme-midnight .aa-back, html.theme-midnight .aa-back.aa-info {
   border-radius: var(--mn-r); background: var(--mn-gloss-soft), var(--mn-panel-solid); border: 0; backdrop-filter: none;

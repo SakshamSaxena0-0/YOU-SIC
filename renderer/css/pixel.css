@@ -143,6 +143,7 @@ html.theme-pixel .aa-img::before, html.theme-pixel .aa-back::before {
 html.theme-pixel .aa-img::after { display: none; }
 html.theme-pixel .aa-img.ph { background: var(--px-lav); }
 html.theme-pixel .aa-img.ph .ico { fill: var(--px-violet); filter: none; }
+html.theme-pixel { --art-scrim: var(--px-ink); } /* wide layout: what the full-column cover fades into */
 
 /* the back: a text-file window */
 html.theme-pixel .aa-back { border: 4px solid var(--px-ink); border-radius: 8px; background: var(--px-lav); box-shadow: 8px 8px 0 var(--px-ink); }

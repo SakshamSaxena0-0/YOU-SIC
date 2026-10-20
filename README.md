@@ -14,7 +14,7 @@ On first start the app scans your Windows *Music* folder. Add more folders from 
 
 | Area | What it does |
 | --- | --- |
-| Window layout | Wide windows (980 px and up) have three columns: the library (or the equalizer) on the left, the player in the middle (album art above, controls below), and lyrics or the visualization on the right. The right-hand panel switches with its Lyrics / Visualizer tabs, the dock buttons or Y / V, and hides with its arrow button (the player then takes the room; LYRICS or WAVE brings it back). Narrow windows show one screen at a time. |
+| Window layout | Wide windows (980 px and up) have three columns: the library (or the equalizer) on the left, the player in the middle (the album art fills the whole column, edge to edge, with the title and controls over its lower part on a dark fade; tap it for the song info), and lyrics or the visualization on the right. The right-hand panel switches with its Lyrics / Visualizer tabs, the dock buttons or Y / V, and hides with its arrow button (the player then takes the room; LYRICS or WAVE brings it back). Narrow windows show one screen at a time. |
 | Player | Blurred, slowly drifting album-art background; accent color extracted from the cover; 3D album-art carousel |
 | Gestures | Album art: swipe ←/→ to change track, swipe ↓ (or click) for the track's category, swipe ↑ for lyrics. Mini-player: click to open the player, drag ←/→ to change track, long-press to open the playing category. Library: swipe → from the left edge (or Alt+drag, mouse Back, Backspace) for the parent category. Visualization: swipe ←/→ to change presets |
 | Seekbar | Real waveform, decoded from the file and morphed in, with a drag bubble; mouse wheel seeks |

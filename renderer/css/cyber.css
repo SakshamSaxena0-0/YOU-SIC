@@ -136,6 +136,7 @@ html.theme-cyber .playing .aa-card[data-slot='cur'] .aa-img { box-shadow: inset 
 html.theme-cyber .aa-img::after { background: linear-gradient(100deg, transparent 40%, rgba(0, 240, 255, 0.3) 48%, rgba(255, 42, 109, 0.2) 54%, transparent 62%); }
 html.theme-cyber .aa-img.ph { background: repeating-linear-gradient(45deg, #0d0d18 0 10px, #10101c 10px 20px); }
 html.theme-cyber .aa-img.ph .ico { fill: rgba(0, 240, 255, 0.5); filter: none; }
+html.theme-cyber { --art-scrim: #04040a; } /* wide layout: what the full-column cover fades into */
 /* HUD corner brackets around the current cover (drawn on the frame behind the cards) */
 html.theme-cyber .aa-wrap::before {
   --aa: min(80cqw, calc(100cqh - 30px));

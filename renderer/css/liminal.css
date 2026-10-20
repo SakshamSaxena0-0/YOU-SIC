@@ -220,6 +220,7 @@ html.theme-liminal .aa-img::before { display: none; }
 html.theme-liminal .aa-img::after, html.theme-liminal .aa-img.sheen::after, html.theme-liminal .aa-img.flip-glint::after { display: none; animation: none; }
 html.theme-liminal .aa-img.ph { background: var(--lm-panel-solid); filter: none; }
 html.theme-liminal .aa-img.ph .ico { fill: var(--lm-haze); filter: none; }
+html.theme-liminal { --art-scrim: var(--lm-ink); } /* wide layout: what the full-column cover fades into */
 /* the back: an opaque dusk panel with the sunset along its top */
 html.theme-liminal .aa-back, html.theme-liminal .aa-back.aa-info {
   border-radius: var(--lm-r); background: var(--lm-sunlit), var(--lm-panel-solid); border: 0; backdrop-filter: none;

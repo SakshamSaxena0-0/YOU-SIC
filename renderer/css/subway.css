@@ -186,6 +186,7 @@ html.theme-subway .pl-cat:hover { background: color-mix(in srgb, var(--chrome-hi
 html.theme-subway .aa-img { border-radius: var(--r-art); background-color: var(--bg-2); box-shadow: 0 30px 60px -20px var(--shade); }
 html.theme-subway .aa-img.ph { background: var(--bg-2); }
 html.theme-subway .aa-img.ph .ico { fill: var(--text-dim); filter: none; }
+html.theme-subway { --art-scrim: var(--bg-0); } /* wide layout: what the full-column cover fades into */
 html.theme-subway .aa-img::before { background: none; }
 html.theme-subway .badge { border-radius: var(--r-orb); }
 html.theme-subway .badge.hires { background: var(--holo); color: var(--ink); box-shadow: none; }

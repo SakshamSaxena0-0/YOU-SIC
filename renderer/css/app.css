@@ -159,6 +159,41 @@ input { font: inherit; color: inherit; }
 .side .vis-host:not(.full) { inset: 6px 16px 18px; }
 .side .ly-pad { height: 40%; }
 
+/* the cover fills the middle column, edge to edge. #aaWrap stays the space between the header and the
+   title (taps, swipes, the info card); the cards reach past it by --bt/--br/--bb/--bl, which
+   PlayerView._bleed() measures, and sit under everything else in the player. The themes' frames, halos
+   and stickers belong to a square cover, so they are left out here. */
+:root { --art-scrim: color-mix(in srgb, var(--tint) 45%, #050507); } /* the colour the cover fades into (the album tint here); each theme sets its own */
+.aa-scrim { display: none; }
+.app.wide #aaWrap { z-index: 0; }
+.app.wide #aaWrap :is(.aa-track, .aa-scrim) {
+  inset: calc(-1 * var(--bt, 0px)) calc(-1 * var(--br, 0px)) calc(-1 * var(--bb, 0px)) calc(-1 * var(--bl, 0px));
+}
+/* flat, clipped to the column: the neighbouring covers wait just outside it */
+.app.wide #aaWrap .aa-track { overflow: hidden; transform-style: flat; perspective: 1800px; transition: filter 0.4s ease; }
+.app.wide #aaWrap .aa-card { left: 0; top: 0; width: 100%; height: 100%; margin: 0; }
+.app.wide #aaWrap .aa-img {
+  border: 0; border-radius: 0; padding: 0; box-shadow: none; clip-path: none; transform: none; -webkit-box-reflect: none;
+  background-position: 50% 38%;
+}
+.app.wide #aaWrap .aa-img::before { display: none; }
+.app.wide #aaWrap .aa-img.ph .ico { width: min(22%, 160px); height: min(22%, 160px); }
+.app.wide #aaWrap::before, .app.wide #aaWrap :is(.aa-glow, .cd, .sticker, .spark) { display: none; }
+.app.wide #aaWrap .aa-flip > .aa-back { display: none; }
+.app.wide #aaWrap .aa-scrim {
+  display: block; position: absolute; pointer-events: none;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--art-scrim) 90%, transparent), color-mix(in srgb, var(--art-scrim) 80%, transparent) calc(var(--tb) + 58px),
+      color-mix(in srgb, var(--art-scrim) 36%, transparent) calc(var(--tb) + 120px), transparent calc(var(--tb) + 200px)),
+    linear-gradient(0deg, color-mix(in srgb, var(--art-scrim) 94%, transparent), color-mix(in srgb, var(--art-scrim) 82%, transparent) calc(var(--bb, 0px) - 30px),
+      color-mix(in srgb, var(--art-scrim) 45%, transparent) calc(var(--bb, 0px) + 50px), transparent calc(var(--bb, 0px) + 150px));
+}
+/* tap the cover: it dims and the song's details fade in over it */
+.app.wide #aaWrap.info-on .aa-card[data-slot='cur'] { visibility: visible; }
+.app.wide #aaWrap.info-on .aa-track { filter: brightness(0.42) saturate(0.9); }
+.app.wide #aaWrap .aa-back.aa-info { visibility: visible; opacity: 0; transition: opacity 0.35s ease, width 0.8s var(--spring), height 0.8s var(--spring), margin 0.8s var(--spring); }
+.app.wide #aaWrap.info-on .aa-back.aa-info { opacity: 1; }
+
 /* ---------- player ---------- */
 .player { display: flex; flex-direction: column; background: var(--bg); overflow: hidden; }
 .bg { position: absolute; inset: 0; overflow: hidden; z-index: 0; background: var(--tint); }

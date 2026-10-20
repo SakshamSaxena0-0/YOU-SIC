@@ -260,6 +260,7 @@ html.theme-vector-surrealism .aa-img::before { display: none; }
 html.theme-vector-surrealism .aa-img::after, html.theme-vector-surrealism .aa-img.sheen::after, html.theme-vector-surrealism .aa-img.flip-glint::after { display: none; animation: none; }
 html.theme-vector-surrealism .aa-img.ph { background: var(--vs-dusk); }
 html.theme-vector-surrealism .aa-img.ph .ico { fill: var(--vs-lavender); filter: none; }
+html.theme-vector-surrealism { --art-scrim: var(--vs-ink); } /* wide layout: what the full-column cover fades into */
 /* the back: the same doorway with a night sky inside, opaque */
 html.theme-vector-surrealism .aa-back, html.theme-vector-surrealism .aa-back.aa-info {
   border-radius: var(--vs-r-door); background: var(--vs-sky-window); border: 0; backdrop-filter: none;

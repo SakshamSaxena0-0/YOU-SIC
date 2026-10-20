@@ -157,10 +157,24 @@ export class PlayerView {
     this._stopSpring = spring(null, { from: this.x || 0, to, stiffness: 320, damping: 32, onUpdate: (v) => this._setX(v), onDone: done });
   }
 
+  // Wide layout: the cover fills the whole middle column, not just the space between the header and the
+  // title block that #aaWrap takes up (css: .app.wide .aa-track). Measure how far the column reaches past
+  // #aaWrap on each side; its right edge is the side panel's left edge while that panel is open.
+  _bleed() {
+    if (this.app.narrow) return;
+    const wrap = $('#aaWrap'), w = wrap.getBoundingClientRect(), p = $('#player').getBoundingClientRect();
+    const side = $('#side').getBoundingClientRect();
+    const right = Math.min(p.right, side.width ? side.left : p.right);
+    const set = (k, v) => wrap.style.setProperty(k, `${Math.max(0, Math.round(v))}px`);
+    set('--bt', w.top - p.top); set('--bb', p.bottom - w.bottom);
+    set('--bl', w.left - p.left); set('--br', right - w.right);
+  }
+
   _bindArt() {
     const wrap = $('#aaWrap');
     this._setX(0);
-    new ResizeObserver(() => this._setX(this.x || 0)).observe(wrap);
+    new ResizeObserver(() => { this._bleed(); this._setX(this.x || 0); }).observe(wrap);
+    $('#side').addEventListener('transitionend', (e) => { if (e.target.id === 'side') { this._bleed(); this._setX(this.x || 0); } });
     let sx, sy, st, axis = null, id = null, lastX, lastT, vx = 0;
     wrap.addEventListener('pointerdown', (e) => {
       if (e.button !== 0 || (this.app.visOpen && this.app.narrow) || wrap.classList.contains('lyrics-open') && e.target.closest('.lyrics-scroll')) return;
@@ -254,7 +268,8 @@ export class PlayerView {
     // At rest the info is shown on #aaInfo, a flat panel outside the 3D card: Chromium lowers the
     // resolution of anything that has been through a 3D turn, so the turning face is only used in motion.
     if (!on) wrap.classList.remove('info-on');
-    if (!animate || this.store.settings.reduceMotion) { wrap.classList.toggle('info-on', on); return; }
+    // wide layout: the cover fills the column, so it doesn't turn over; the info card fades in over it
+    if (!animate || this.store.settings.reduceMotion || !this.app.narrow) { wrap.classList.toggle('info-on', on); return; }
     const [a, b] = on ? [0, 180] : [180, 360];
     // lifts off the page mid-turn, overshoots slightly and settles, like a real card
     const anim = flip.animate([

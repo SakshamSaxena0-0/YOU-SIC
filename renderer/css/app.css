@@ -194,29 +194,22 @@ input { font: inherit; color: inherit; }
 .app.wide #aaWrap .aa-back.aa-info { visibility: visible; opacity: 0; transition: opacity 0.35s ease, width 0.8s var(--spring), height 0.8s var(--spring), margin 0.8s var(--spring); }
 .app.wide #aaWrap.info-on .aa-back.aa-info { opacity: 1; }
 
-/* only the art (A, or the button at the end of the title row): the header, title block, seekbar, controls
-   and dock fade away with the fades over the cover, so nothing covers it. The button is anchored to the
-   title row, so it stays exactly where it was to bring everything back (as do A, Esc and a tap on the cover). */
-#btnArt { display: none; }
-.app.wide .pl-title-row { anchor-name: --title-row; padding-right: 48px; }
-.app.wide #btnArt {
-  display: grid; position: absolute; z-index: 2; position-anchor: --title-row;
-  right: anchor(right); top: anchor(center); translate: 0 -50%; transition: opacity 0.3s ease;
-  position-visibility: always; /* the title row it is pinned to is hidden while only the art shows */
-}
+/* Admire art (the button beside the library's search, or A): the header, title block, seekbar, controls
+   and dock fade away with the fades over the cover, so nothing covers it. The same button, A, Esc and a
+   tap on the cover bring them back. Wide layout only. */
+#libAdmire { display: none; }
+.app.wide #libAdmire { display: grid; }
+/* while admiring, the button stays lit in the accent colour */
+.app.wide.art-only #libAdmire { color: var(--accent); filter: drop-shadow(0 0 6px var(--acc-mid)); }
 .app.wide #player > :is(.pl-header, .pl-info, .seek, .controls, .pl-nav) { transition: opacity 0.35s ease, translate 0.45s var(--ease), visibility 0s linear 0s; }
 .app.wide.art-only #player > :is(.pl-header, .pl-info, .seek, .controls, .pl-nav) {
   opacity: 0; visibility: hidden; pointer-events: none;
   transition: opacity 0.3s ease, translate 0.4s var(--ease), visibility 0s linear 0.3s;
 }
 .app.wide.art-only #player > .pl-header { translate: 0 -12px; }
-/* the title block only fades: the button pinned to it must not move */
-.app.wide.art-only #player > :is(.seek, .controls, .pl-nav) { translate: 0 14px; }
+.app.wide.art-only #player > :is(.pl-info, .seek, .controls, .pl-nav) { translate: 0 14px; }
 .app.wide #aaWrap .aa-scrim { transition: opacity 0.45s ease; }
 .app.wide.art-only #aaWrap .aa-scrim { opacity: 0; }
-/* on its own over the art it stays quiet until the pointer comes to it */
-.app.wide.art-only #btnArt { opacity: 0.55; }
-.app.wide.art-only #btnArt:is(:hover, :focus-visible) { opacity: 1; }
 
 /* ---------- player ---------- */
 .player { display: flex; flex-direction: column; background: var(--bg); overflow: hidden; }

@@ -14,7 +14,7 @@ On first start the app scans your Windows *Music* folder. Add more folders from 
 
 | Area | What it does |
 | --- | --- |
-| Window layout | Wide windows (980 px and up) have three columns: the library (or the equalizer) on the left, the player in the middle (the album art fills the whole column, edge to edge, with the title and controls over its lower part on a dark fade; tap it for the song info). The button at the end of the title row (or A) hides the header and the controls to show only the art; the same button, A, Esc or a tap on the cover brings them back, and lyrics or the visualization on the right. The right-hand panel switches with its Lyrics / Visualizer tabs, the dock buttons or Y / V, and hides with its arrow button (the player then takes the room; LYRICS or WAVE brings it back). Narrow windows show one screen at a time. |
+| Window layout | Wide windows (980 px and up) have three columns: the library (or the equalizer) on the left, the player in the middle (the album art fills the whole column, edge to edge, with the title and controls over its lower part on a dark fade; tap it for the song info). *Admire art* (the picture button beside the library's search, or A) hides the header and the controls to show only the art; the same button, A, Esc or a tap on the cover brings them back, and lyrics or the visualization on the right. The right-hand panel switches with its Lyrics / Visualizer tabs, the dock buttons or Y / V, and hides with its arrow button (the player then takes the room; LYRICS or WAVE brings it back). Narrow windows show one screen at a time. |
 | Player | Blurred, slowly drifting album-art background; accent color extracted from the cover; 3D album-art carousel |
 | Gestures | Album art: swipe ←/→ to change track, swipe ↓ (or click) for the track's category, swipe ↑ for lyrics. Mini-player: click to open the player, drag ←/→ to change track, long-press to open the playing category. Library: swipe → from the left edge (or Alt+drag, mouse Back, Backspace) for the parent category. Visualization: swipe ←/→ to change presets |
 | Seekbar | Real waveform, decoded from the file and morphed in, with a drag bubble; mouse wheel seeks |
@@ -30,7 +30,7 @@ Supported formats: MP3, FLAC, M4A/AAC, OGG/Opus, WAV, WebM.
 ## Shortcuts
 
 Space play/pause · Ctrl+←/→ prev/next · ←/→ seek 5 s (Shift: 30 s) · ↑/↓ volume · M mute · E equalizer ·
-V visualization (F fullscreen) · Y lyrics · A only the album art (wide windows) · S shuffle · R repeat · Ctrl+F search · Backspace back · Alt+0…5 rate
+V visualization (F fullscreen) · Y lyrics · A admire art (wide windows) · S shuffle · R repeat · Ctrl+F search · Backspace back · Alt+0…5 rate
 
 ## Layout
 

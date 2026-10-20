@@ -50,7 +50,7 @@ class App {
 
     $$('#side .eq-tab').forEach((t) => (t.onclick = () => this.showSide(t.dataset.side)));
     $('#sideClose').onclick = () => this.showSide(null);
-    $('#btnArt').onclick = () => this.toggleArt();
+    $('#libAdmire').onclick = () => this.toggleArt();
     this._layout();
     new ResizeObserver(() => { this._layout(); this._navInk(); if (!this.narrow) this._sideInk(); }).observe(document.body);
     document.fonts.ready.then(() => { if (!this.narrow) this._sideInk(); });
@@ -116,17 +116,13 @@ class App {
     this._syncSide();
   }
 
-  // Wide layout: show only the album art, with nothing over it (css: .art-only). The art button, A, Esc and a
-  // tap on the cover bring the header and the controls back. Narrow windows don't have it.
+  // Admire art (wide layout): show only the album art, with nothing over it (css: .art-only). The Admire art
+  // button beside the library's search, A, Esc and a tap on the cover bring the header and the controls back.
   toggleArt(force) {
     const on = !this.narrow && (force ?? !this.root.classList.contains('art-only'));
     if (on && this.playerView.flipped) this.playerView.flipArt(false);
     this.root.classList.toggle('art-only', on);
-    const b = $('#btnArt'), tip = on ? 'Show the controls (A)' : 'Show only the album art (A)';
-    setIcon(b, on ? 'fullscreen_exit' : 'fullscreen');
-    if (b.hasAttribute('title')) b.title = tip; else b.dataset.tip = tip;
-    b.setAttribute('aria-label', tip);
-    b.setAttribute('aria-pressed', String(on));
+    $('#libAdmire').setAttribute('aria-pressed', String(on));
   }
 
   // the panel's tabs: 'lyrics', 'vis', or null to hide the panel

@@ -50,6 +50,7 @@ class App {
 
     $$('#side .eq-tab').forEach((t) => (t.onclick = () => this.showSide(t.dataset.side)));
     $('#sideClose').onclick = () => this.showSide(null);
+    $('#btnArt').onclick = () => this.toggleArt();
     this._layout();
     new ResizeObserver(() => { this._layout(); this._navInk(); if (!this.narrow) this._sideInk(); }).observe(document.body);
     document.fonts.ready.then(() => { if (!this.narrow) this._sideInk(); });
@@ -89,6 +90,7 @@ class App {
       if (wide && this.screen === 'player') this.screen = 'library';
       else if (!wide && this.screen === 'library') this.screen = 'player';
       this._placePanes();
+      if (!wide) this.toggleArt(false);
       this._applyScreen(false);
     }
   }
@@ -112,6 +114,19 @@ class App {
       else if (this.store.settings.sidePanel !== false) this.lyrics.toggle(true);
     }
     this._syncSide();
+  }
+
+  // Wide layout: show only the album art, with nothing over it (css: .art-only). The art button, A, Esc and a
+  // tap on the cover bring the header and the controls back. Narrow windows don't have it.
+  toggleArt(force) {
+    const on = !this.narrow && (force ?? !this.root.classList.contains('art-only'));
+    if (on && this.playerView.flipped) this.playerView.flipArt(false);
+    this.root.classList.toggle('art-only', on);
+    const b = $('#btnArt'), tip = on ? 'Show the controls (A)' : 'Show only the album art (A)';
+    setIcon(b, on ? 'fullscreen_exit' : 'fullscreen');
+    if (b.hasAttribute('title')) b.title = tip; else b.dataset.tip = tip;
+    b.setAttribute('aria-label', tip);
+    b.setAttribute('aria-pressed', String(on));
   }
 
   // the panel's tabs: 'lyrics', 'vis', or null to hide the panel
@@ -253,12 +268,13 @@ class App {
       else if (k === 'f' && e.ctrlKey) { e.preventDefault(); this.show('library'); this.library.toggleSearch(true); }
       else if (k === 'l' && e.ctrlKey) { e.preventDefault(); this.openLibrary(); }
       else if (k === 'Backspace' || (k === 'ArrowLeft' && e.altKey) || k === 'BrowserBack') { if (this.screen === 'library') this.library.back(); else this.showPlayer(); }
-      else if (k === 'Escape') { if (this.vis.host.classList.contains('full')) this.vis.toggleFull(); else if (this.visOpen) this.toggleVis(false); else if (this.screen !== 'player') this.showPlayer(); }
+      else if (k === 'Escape') { if (this.vis.host.classList.contains('full')) this.vis.toggleFull(); else if (this.root.classList.contains('art-only')) this.toggleArt(false); else if (this.visOpen) this.toggleVis(false); else if (this.screen !== 'player') this.showPlayer(); }
       else if (k === 'e' || k === 'E') this.openEq();
       else if (k === 'v' || k === 'V') this.toggleVis();
       else if ((k === 'f' || k === 'F') && this.visOpen) this.vis.toggleFull();
       else if (k === 'y' || k === 'Y') this.toggleLyrics();
       else if (k === 'i' || k === 'I') this.playerView.flipArt();
+      else if (k === 'a' || k === 'A') this.toggleArt();
       else if (k === 's' || k === 'S') $('#btnShuffle').click();
       else if (k === 'r' || k === 'R') $('#btnRepeat').click();
       else if (k === 'm' || k === 'M') this.toggleMute();

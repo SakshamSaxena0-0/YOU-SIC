@@ -210,6 +210,8 @@ export class PlayerView {
         if (performance.now() - st > 400) return;
         // a tap on the cover flips it over (buttons on the back do their own thing)
         if (e.target.closest('.aa-back button')) return;
+        // showing only the art: a tap brings the controls back
+        if (this.app.root.classList.contains('art-only')) { this.app.toggleArt(false); return; }
         if (e.target.closest('[data-slot=cur], #aaInfo') && !wrap.classList.contains('lyrics-open')) this.flipArt();
         else this.app.openLibrary(this.player.source?.node);
         return;

@@ -14,13 +14,14 @@ On first start the app scans your Windows *Music* folder. Add more folders from 
 
 | Area | What it does |
 | --- | --- |
+| Window layout | Wide windows (980 px and up) have three columns: the library (or the equalizer) on the left, the player in the middle (album art above, controls below), and lyrics or the visualization on the right. The right-hand panel switches with its Lyrics / Visualizer tabs, the dock buttons or Y / V, and hides with its arrow button (the player then takes the room; LYRICS or WAVE brings it back). Narrow windows show one screen at a time. |
 | Player | Blurred, slowly drifting album-art background; accent color extracted from the cover; 3D album-art carousel |
 | Gestures | Album art: swipe ←/→ to change track, swipe ↓ (or click) for the track's category, swipe ↑ for lyrics. Mini-player: click to open the player, drag ←/→ to change track, long-press to open the playing category. Library: swipe → from the left edge (or Alt+drag, mouse Back, Backspace) for the parent category. Visualization: swipe ←/→ to change presets |
 | Seekbar | Real waveform, decoded from the file and morphed in, with a drag bubble; mouse wheel seeks |
 | Library | Folders, Folders Hierarchy, All Songs, Albums, Artists, Album Artists, Genres, Years, Composers, Playlists, Queue, Recently Added/Played, Most Played, Top Rated; search; sort options; Ctrl+wheel zoom; virtualized lists |
 | Playback | Gapless (next track preloaded) or crossfade (1–12 s); shuffle; repeat off/category/song; Play Next / Queue; resumes the last session |
 | Equalizer | 10-band graphic EQ with a live frequency-response curve, 21 presets plus your own; Preamp, Bass, Treble, Balance and Tempo knobs; Limiter; Reverb tab with 7 knobs and 8 presets |
-| Visualization | MilkDrop presets (butterchurn) over the album art or fullscreen; shuffle / locked / sequential preset modes |
+| Visualization | MilkDrop presets (butterchurn) in the right-hand panel (over the album art in narrow windows) or fullscreen; shuffle / locked / sequential preset modes |
 | Lyrics | Synced `.lrc` files next to the song, plus embedded (synced or plain) lyrics tags; click a line to seek |
 | Windows | Custom title bar, media keys and the Windows media flyout (SMTC), taskbar thumbnail prev/play/next buttons, sleep timer with fade-out, star ratings, track info |
 

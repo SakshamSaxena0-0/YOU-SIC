@@ -31,6 +31,7 @@ export const DEFAULT_SETTINGS = {
   waveform: true,
   rating: true,
   libZoom: 1,
+  sidePanel: true, // wide layout: the right-hand lyrics / visualization panel is open
   sorts: {},
   eq: {
     enabled: true, tone: true, limiter: true, reverb: false,

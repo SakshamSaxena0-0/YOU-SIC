@@ -83,13 +83,16 @@ html.theme-vector-surrealism .vs-lid {
 }
 /* the soft clock hangs off the left edge, beside the cover */
 html.theme-vector-surrealism .vs-clock { left: -10px; top: 26vh; width: clamp(110px, 12vw, 170px); aspect-ratio: 320 / 280; opacity: 0.6; background-image: var(--vs-a-clock); transform-origin: 0 40%; animation: vs-sag 16s steps(32) infinite alternate; }
-/* wide layout only (the library pane is open beside the player): a melting moon rising behind the
-   hills, a doorway to nowhere, a hand holding up a crescent, a ribbon blowing across */
+/* wide layout only, behind the right-hand panel (lyrics / visualization) while it is open: a melting
+   moon rising behind the hills, a doorway to nowhere, a hand holding up a crescent, a ribbon blowing
+   across. --vs-pane is that panel's width (app.css .app.wide --rw-open); the layers overhang the
+   window by 24px, hence the + 24px. */
 html.theme-vector-surrealism :is(.vs-moon, .vs-door, .vs-hand, .vs-ribbon) { display: none; }
-html.theme-vector-surrealism:has(.app.wide) :is(.vs-moon, .vs-door, .vs-hand, .vs-ribbon) { display: block; }
-html.theme-vector-surrealism .vs-moon { left: calc(var(--pw) + 6%); bottom: 11vh; width: clamp(220px, 30vw, 420px); aspect-ratio: 400 / 440; background-image: var(--vs-a-moon); animation: vs-bob 20s steps(40) infinite alternate; }
-html.theme-vector-surrealism .vs-ribbon { left: calc(var(--pw) + 30%); bottom: 26vh; width: clamp(240px, 30vw, 420px); aspect-ratio: 640 / 200; opacity: 0.75; background-image: var(--vs-a-ribbon); animation: vs-drift 12s steps(24) infinite alternate; }
-html.theme-vector-surrealism .vs-door { right: 26%; bottom: 13vh; width: clamp(110px, 11vw, 170px); aspect-ratio: 300 / 280; background-image: var(--vs-a-door); }
+html.theme-vector-surrealism:has(.app.wide.side-on) :is(.vs-moon, .vs-door, .vs-hand, .vs-ribbon) { display: block; }
+html.theme-vector-surrealism .vs-world { --vs-pane: clamp(280px, 25vw, 440px); }
+html.theme-vector-surrealism .vs-moon { right: calc(var(--vs-pane) / 2 - clamp(170px, 16vw, 280px) / 2 + 24px); bottom: 11vh; width: clamp(170px, 16vw, 280px); aspect-ratio: 400 / 440; background-image: var(--vs-a-moon); animation: vs-bob 20s steps(40) infinite alternate; }
+html.theme-vector-surrealism .vs-ribbon { right: -2vw; bottom: 24vh; width: clamp(200px, 20vw, 340px); aspect-ratio: 640 / 200; opacity: 0.75; background-image: var(--vs-a-ribbon); animation: vs-drift 12s steps(24) infinite alternate; }
+html.theme-vector-surrealism .vs-door { right: calc(var(--vs-pane) * 0.7 + 24px - clamp(80px, 7vw, 120px) / 2); bottom: 12vh; width: clamp(80px, 7vw, 120px); aspect-ratio: 300 / 280; background-image: var(--vs-a-door); }
 html.theme-vector-surrealism .vs-hand { right: 3vw; bottom: 1vh; width: clamp(110px, 10vw, 150px); aspect-ratio: 300 / 380; background-image: var(--vs-a-hand); transform-origin: 50% 100%; animation: vs-sway 10s steps(20) infinite alternate; }
 /* fine film grain over the whole world (one static tile) */
 html.theme-vector-surrealism .vs-grain { inset: 0; background: var(--vs-a-grain) 0 0 / 160px 160px repeat; opacity: 0.07; }
@@ -104,8 +107,9 @@ html.theme-vector-surrealism .vs-grain { inset: 0; background: var(--vs-a-grain)
 
 /* ---------- 4. panes ---------- */
 html.theme-vector-surrealism :is(.player, .library, .eq) { background: transparent; }
-/* the right-hand pane is a veil of night with one big rounded corner */
-html.theme-vector-surrealism .app.wide :is(#library, #eq) { background: color-mix(in srgb, var(--vs-ink) 42%, transparent); border-radius: 48px 0 0 0; box-shadow: -6px 0 0 var(--vs-shade); }
+/* the side panes are veils of night, each with one big rounded corner toward the player */
+html.theme-vector-surrealism .app.wide :is(#library, #eq) { background: color-mix(in srgb, var(--vs-ink) 42%, transparent); border-radius: 0 48px 0 0; box-shadow: 6px 0 0 var(--vs-shade); }
+html.theme-vector-surrealism .app.wide .side { background: color-mix(in srgb, var(--vs-ink) 42%, transparent); border-radius: 48px 0 0 0; box-shadow: -6px 0 0 var(--vs-shade); }
 html.theme-vector-surrealism .app.wide #player { box-shadow: none; }
 html.theme-vector-surrealism .app:not(.wide) :is(#library, #eq) { background: var(--vs-sky-window); border-radius: 48px 12px 0 0; box-shadow: 0 -6px 0 var(--vs-shade); }
 html.theme-vector-surrealism .app:not(.wide)[data-screen='library'] #player, html.theme-vector-surrealism .app:not(.wide)[data-screen='eq'] #player { filter: none; opacity: 0.2; }

@@ -172,7 +172,8 @@ html.theme-subway .app { text-shadow: none; }
 html.theme-subway .grain { display: none; }
 html.theme-subway .app:not(.wide) #library { border-radius: 0; box-shadow: 0 -1px 0 var(--glass-line), 0 -24px 60px color-mix(in srgb, var(--shade) 75%, transparent); }
 html.theme-subway .app:not(.wide)[data-screen='library'] #player, html.theme-subway .app:not(.wide)[data-screen='eq'] #player { filter: none; opacity: 0.18; }
-html.theme-subway .app.wide #player { box-shadow: 1px 0 0 var(--glass-line), 18px 0 40px -18px var(--shade); }
+html.theme-subway .app.wide :is(#library, #eq) { box-shadow: 1px 0 0 var(--glass-line), 18px 0 40px -18px var(--shade); }
+html.theme-subway .app.wide .side { box-shadow: -1px 0 0 var(--glass-line), -18px 0 40px -18px var(--shade); }
 
 /* ---------- §0 type colours ---------- */
 html.theme-subway :is(.r-sub, .g-sub, .lib-sub, .pl-album, .set-hint, .ah-meta, .nb-artist, .mi-hint, .choice-hint, .b-freq, .k-label, .knob-hint, .about, .sheet-text) { color: var(--text-dim); }
@@ -366,10 +367,10 @@ html.theme-subway .fx-aurora i:nth-child(3) { left: 20vw; bottom: -30vmax; backg
 @keyframes y2k-drift-c { to { transform: translate(10vmax, -12vmax); } }
 /* grain at 3% */
 html.theme-subway .grain { display: block; opacity: 0.03; }
-/* a faint perspective grid floor under the right pane only */
+/* a faint perspective grid floor under the right-hand panel only */
 html.theme-subway .fx-grid { display: none; }
 html:has(.app.wide).theme-subway .fx-grid {
-  display: block; position: absolute; left: var(--pw); right: 0; bottom: 0; height: 34vh; transform-origin: 50% 100%;
+  display: block; position: absolute; left: auto; right: 0; width: clamp(280px, 25vw, 440px); bottom: 0; height: 34vh; transform-origin: 50% 100%;
   transform: perspective(320px) rotateX(58deg) scale(1.6);
   background:
     repeating-linear-gradient(90deg, color-mix(in srgb, var(--teal) 8%, transparent) 0 1px, transparent 1px 48px),

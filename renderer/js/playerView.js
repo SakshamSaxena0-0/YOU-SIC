@@ -163,7 +163,7 @@ export class PlayerView {
     new ResizeObserver(() => this._setX(this.x || 0)).observe(wrap);
     let sx, sy, st, axis = null, id = null, lastX, lastT, vx = 0;
     wrap.addEventListener('pointerdown', (e) => {
-      if (e.button !== 0 || this.app.visOpen || wrap.classList.contains('lyrics-open') && e.target.closest('.lyrics-scroll')) return;
+      if (e.button !== 0 || (this.app.visOpen && this.app.narrow) || wrap.classList.contains('lyrics-open') && e.target.closest('.lyrics-scroll')) return;
       id = e.pointerId; sx = lastX = e.clientX; sy = e.clientY; st = lastT = performance.now(); axis = null; vx = 0;
       if (this._stopSpring) this._stopSpring();
     });
@@ -228,7 +228,7 @@ export class PlayerView {
     wrap.addEventListener('pointerup', end);
     wrap.addEventListener('pointercancel', end);
     wrap.addEventListener('wheel', (e) => {
-      if (this.app.visOpen || e.target.closest('.lyrics-scroll')) return;
+      if ((this.app.visOpen && this.app.narrow) || e.target.closest('.lyrics-scroll')) return;
       // horizontal wheel/touchpad swipe changes tracks
       if (Math.abs(e.deltaX) > 30 && Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
         const now = performance.now();

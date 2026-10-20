@@ -48,8 +48,11 @@ class App {
     pa.onCommand((c) => ({ prev: () => this.player.prev(), next: () => this.player.next(), toggle: () => this.player.toggle() })[c]?.());
     pa.onProgress((m) => this._scanProgress(m));
 
+    $$('#side .eq-tab').forEach((t) => (t.onclick = () => this.showSide(t.dataset.side)));
+    $('#sideClose').onclick = () => this.showSide(null);
     this._layout();
-    new ResizeObserver(() => { this._layout(); this._navInk(); }).observe(document.body);
+    new ResizeObserver(() => { this._layout(); this._navInk(); if (!this.narrow) this._sideInk(); }).observe(document.body);
+    document.fonts.ready.then(() => { if (!this.narrow) this._sideInk(); });
     this._bindPremium();
     // liquid glass refraction for every .lg element, now and as screens build new ones
     document.fonts.ready.then(() => { liquidAll(); watchLiquid(); });
@@ -77,14 +80,60 @@ class App {
   // ---------- layout & navigation ----------
   get narrow() { return !this.root.classList.contains('wide'); }
 
+  // Wide windows get three columns: the library (or the equalizer) on the left, the player in the middle
+  // and lyrics or the visualization on the right (#side). Narrow windows keep one screen at a time.
   _layout() {
     const wide = innerWidth >= 980;
     if (wide !== this.root.classList.contains('wide')) {
       this.root.classList.toggle('wide', wide);
       if (wide && this.screen === 'player') this.screen = 'library';
       else if (!wide && this.screen === 'library') this.screen = 'player';
+      this._placePanes();
       this._applyScreen(false);
     }
+  }
+
+  // where lyrics and the visualization show: the right-hand panel when wide, over the cover when narrow
+  paneHost() { return this.narrow ? $('#aaWrap') : $('#side'); }
+
+  _placePanes() {
+    const ly = $('#lyricsPanel'), vis = $('#visHost');
+    if (this.narrow) {
+      // the panel is gone: close what it showed, so the cover isn't hidden
+      $('#side').classList.remove('lyrics-open', 'vis-on');
+      if (this.visOpen) { this.visOpen = false; this.vis.hide(); $('.nav-btn[data-act=vis]').classList.remove('on'); }
+      if (this.lyrics.open) this.lyrics.toggle(false);
+      $('#swipeHint').before(ly, vis);
+    } else {
+      $('#aaWrap').classList.remove('lyrics-open', 'vis-on');
+      $('#sideBody').append(ly, vis);
+      if (this.visOpen) this.paneHost().classList.add('vis-on');
+      else if (this.lyrics.open) this.paneHost().classList.add('lyrics-open');
+      else if (this.store.settings.sidePanel !== false) this.lyrics.toggle(true);
+    }
+    this._syncSide();
+  }
+
+  // the panel's tabs: 'lyrics', 'vis', or null to hide the panel
+  showSide(which) {
+    if (which === 'vis') { if (!this.visOpen) this.toggleVis(true); return; }
+    if (this.visOpen) { this._lyricsUnderVis = false; this.toggleVis(false); }
+    if (this.lyrics.open !== (which === 'lyrics')) this.lyrics.toggle(which === 'lyrics');
+  }
+
+  _syncSide() {
+    if (this.narrow) { this.root.classList.remove('side-on'); return; }
+    const on = this.visOpen || this.lyrics.open;
+    this.root.classList.toggle('side-on', on);
+    if (this.store.settings.sidePanel !== on) { this.store.settings.sidePanel = on; this.store.saveSettings(); }
+    this._sideInk();
+  }
+
+  _sideInk() {
+    const tabs = $$('#side .eq-tab'), act = tabs.find((t) => t.dataset.side === (this.visOpen ? 'vis' : 'lyrics'));
+    tabs.forEach((t) => t.classList.toggle('active', t === act));
+    const ink = $('#side .eq-tab-ink');
+    requestAnimationFrame(() => { ink.style.width = `${act.offsetWidth}px`; ink.style.transform = `translateX(${act.offsetLeft}px)`; });
   }
 
   _applyScreen(animate = true) {
@@ -112,13 +161,18 @@ class App {
   toggleVis(force) {
     this.visOpen = force ?? !this.visOpen;
     $('.nav-btn[data-act=vis]').classList.toggle('on', this.visOpen);
-    $('#aaWrap').classList.toggle('vis-on', this.visOpen);
-    if (this.visOpen) { if (this.lyrics.open) this.lyrics.toggle(false); this.vis.show(); }
-    else this.vis.hide();
+    this.paneHost().classList.toggle('vis-on', this.visOpen);
+    if (this.visOpen) { this._lyricsUnderVis = this.lyrics.open; if (this.lyrics.open) this.lyrics.toggle(false); this.vis.show(); }
+    else {
+      this.vis.hide();
+      // in the side panel, closing the visualization goes back to the lyrics it replaced
+      if (!this.narrow && this._lyricsUnderVis) this.lyrics.toggle(true);
+    }
+    this._syncSide();
   }
 
   toggleLyrics() {
-    if (this.visOpen) this.toggleVis(false);
+    if (this.visOpen) { this._lyricsUnderVis = false; this.toggleVis(false); }
     this.lyrics.toggle();
   }
 

@@ -37,7 +37,7 @@ All colours live in the tokens file. `npm run check` fails if `liminal.css` cont
 | `--lm-bloom`, `--lm-bloom-gold`, `--lm-text-glow` | soft glows | halation round lit things (static elements only) |
 | `--lm-panel`, `--lm-panel-solid`, `--lm-sunlit`, `--lm-edge` | | dusk-haze panels, a warm wash from above, a soft lit edge |
 | `--lm-sun`, `--lm-flow`, `--lm-flow-v` | gradients | the play button and small suns; filled progress (rose to gold) |
-| `--lm-veil`, `--lm-floor-shade`, `--lm-dusk-top` | | the right-hand pane; a soft shade behind the player's title block and times; dusk gathering at the top |
+| `--lm-veil`, `--lm-floor-shade`, `--lm-dusk-top` | | the library pane; a soft shade behind the player's title block and times; dusk gathering at the top |
 | `--lm-vignette`, `--lm-leak-warm`, `--lm-leak-rose` | gradients | the film effects |
 | `--lm-r-sm`, `--lm-r`, `--lm-r-lg`, `--lm-r-pill` | 8, 14, 22px, pill | everything soft |
 | `--lm-ease`, `--lm-t` | slow ease-out, 420ms | transitions, slow like a memory |

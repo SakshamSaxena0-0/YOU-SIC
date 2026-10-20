@@ -89,7 +89,8 @@ html.theme-cyber .app { text-shadow: none; }
 /* screens: hard edges and neon dividers instead of rounded sheets and shadows */
 html.theme-cyber .app:not(.wide) #library { border-radius: 0; box-shadow: 0 -1px 0 var(--cy-y), 0 -20px 60px rgba(0, 0, 0, 0.7); }
 html.theme-cyber .app:not(.wide)[data-screen='library'] #player, html.theme-cyber .app:not(.wide)[data-screen='eq'] #player { filter: none; opacity: 0.15; }
-html.theme-cyber .app.wide #player { box-shadow: 1px 0 0 rgba(0, 240, 255, 0.35), 6px 0 24px -12px rgba(0, 240, 255, 0.35); }
+html.theme-cyber .app.wide :is(#library, #eq) { box-shadow: 1px 0 0 rgba(0, 240, 255, 0.35), 6px 0 24px -12px rgba(0, 240, 255, 0.35); }
+html.theme-cyber .app.wide .side { box-shadow: -1px 0 0 rgba(0, 240, 255, 0.35), -6px 0 24px -12px rgba(0, 240, 255, 0.35); }
 
 /* ---------- title bar ---------- */
 html.theme-cyber .titlebar { background: #040408; box-shadow: 0 1px 0 rgba(252, 238, 10, 0.4); }

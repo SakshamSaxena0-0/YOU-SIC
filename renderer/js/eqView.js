@@ -275,7 +275,7 @@ export class EqView {
       '-',
       { label: 'Reset Equalizer', icon: 'refresh', action: () => { this.animateBands(EQ_PRESETS.Flat, 'Flat'); ['preamp', 'bass', 'treble', 'balance', 'tempo'].forEach((k) => this.knobs[k].animateTo(this.knobs[k].def)); } },
     ]);
-    const tabs = $$('.eq-tab');
+    const tabs = $$('#eq .eq-tab');
     tabs.forEach((t) => (t.onclick = () => this.tab(t.dataset.tab)));
     this.tab('equ', false);
     // tab widths change once the custom font has loaded
@@ -285,10 +285,10 @@ export class EqView {
 
   tab(name, animate = true) {
     this.curTab = name;
-    const tabs = $$('.eq-tab');
+    const tabs = $$('#eq .eq-tab');
     tabs.forEach((t) => t.classList.toggle('active', t.dataset.tab === name));
     const act = tabs.find((t) => t.dataset.tab === name);
-    const ink = $('.eq-tab-ink');
+    const ink = $('#eq .eq-tab-ink');
     requestAnimationFrame(() => { ink.style.width = `${act.offsetWidth}px`; ink.style.transform = `translateX(${act.offsetLeft}px)`; });
     $('#eqPages').style.setProperty('--page', name === 'equ' ? 0 : 1);
     $('#eqPages').classList.toggle('no-anim', !animate);

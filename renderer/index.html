@@ -220,6 +220,21 @@
           </div>
         </div>
       </section>
+
+      <!-- ============ SIDE PANEL (wide layout only) ============
+           The right-hand column: lyrics or the visualization. App._placePanes() moves #lyricsPanel and
+           #visHost in here when the window is wide, and back over the cover when it is narrow. -->
+      <aside class="side" id="side" aria-label="Lyrics and visualization">
+        <div class="side-header">
+          <div class="eq-tabs side-tabs lg">
+            <button class="eq-tab" data-side="lyrics">Lyrics</button>
+            <button class="eq-tab" data-side="vis">Visualizer</button>
+            <div class="eq-tab-ink"></div>
+          </div>
+          <button class="icon-btn lg" id="sideClose" data-icon="chevron_right" title="Hide this panel"></button>
+        </div>
+        <div class="side-body" id="sideBody"></div>
+      </aside>
     </div>
 
     <!-- overlays -->

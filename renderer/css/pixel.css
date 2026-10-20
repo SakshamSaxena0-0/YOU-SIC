@@ -79,7 +79,8 @@ html.theme-pixel .grain { display: none; }
 html.theme-pixel .app { text-shadow: none; }
 html.theme-pixel .app:not(.wide) #library { border-radius: 0; box-shadow: 0 -4px 0 var(--px-ink); }
 html.theme-pixel .app:not(.wide)[data-screen='library'] #player, html.theme-pixel .app:not(.wide)[data-screen='eq'] #player { filter: none; opacity: 0.25; }
-html.theme-pixel .app.wide #player { box-shadow: 4px 0 0 var(--px-ink); }
+html.theme-pixel .app.wide :is(#library, #eq) { box-shadow: 4px 0 0 var(--px-ink); }
+html.theme-pixel .app.wide .side { box-shadow: -4px 0 0 var(--px-ink); }
 
 /* ---------- title bar ---------- */
 html.theme-pixel .titlebar { background: #2a0a54; box-shadow: 0 3px 0 var(--px-ink); }

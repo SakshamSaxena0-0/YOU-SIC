@@ -87,7 +87,8 @@ html.theme-liminal .lm-film::after { content: ''; position: absolute; inset: 0; 
 /* ---------- 4. panes ---------- */
 html.theme-liminal :is(.player, .library, .eq) { background: transparent; }
 /* the right-hand pane is dusk haze over the same sky */
-html.theme-liminal .app.wide :is(#library, #eq) { background: linear-gradient(180deg, color-mix(in srgb, var(--lm-ink) 46%, transparent), var(--lm-veil) 40%); box-shadow: inset 1px 0 0 var(--lm-line); }
+html.theme-liminal .app.wide :is(#library, #eq) { background: linear-gradient(180deg, color-mix(in srgb, var(--lm-ink) 46%, transparent), var(--lm-veil) 40%); box-shadow: inset -1px 0 0 var(--lm-line); }
+html.theme-liminal .app.wide .side { box-shadow: inset 1px 0 0 var(--lm-line); }
 html.theme-liminal .app.wide #player { box-shadow: none; }
 html.theme-liminal .app:not(.wide) :is(#library, #eq) { background: linear-gradient(180deg, color-mix(in srgb, var(--lm-dusk) 92%, transparent), color-mix(in srgb, var(--lm-ink) 94%, transparent) 50%); box-shadow: inset 0 1px 0 var(--lm-line); }
 html.theme-liminal .app:not(.wide)[data-screen='library'] #player, html.theme-liminal .app:not(.wide)[data-screen='eq'] #player { filter: none; opacity: 0.15; }

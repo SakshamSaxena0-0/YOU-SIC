@@ -24,10 +24,12 @@ export class LyricsView {
   }
 
   toggle(force) {
+    const was = this.open;
     this.open = force ?? !this.open;
-    $('#aaWrap').classList.toggle('lyrics-open', this.open);
+    this.app.paneHost().classList.toggle('lyrics-open', this.open);
     document.querySelector('.nav-btn[data-act=lyrics]').classList.toggle('on', this.open);
-    if (this.open) { this.load(); this._loop(); }
+    if (this.open && !was) { this.load(); this._loop(); }
+    this.app._syncSide();
   }
 
   async load() {
@@ -78,6 +80,7 @@ export class LyricsView {
         }
       }
     }
-    setTimeout(() => this._loop(), 100); // 10 Hz is plenty for line changes, and far cheaper than every frame
+    clearTimeout(this._loopT); // one loop at a time, however often the panel is reopened
+    this._loopT = setTimeout(() => this._loop(), 100); // 10 Hz is plenty for line changes, and far cheaper than every frame
   }
 }

@@ -60,11 +60,12 @@ html.theme-midnight .mn-vignette { inset: 0; background: var(--mn-vignette); }
 
 /* ---------- 4. panes ---------- */
 html.theme-midnight :is(.player, .library, .eq) { background: transparent; }
-/* the right-hand pane: a sheet of smoked glass in a gunmetal frame */
+/* the library pane: a sheet of smoked glass in a gunmetal frame */
 html.theme-midnight .app.wide :is(#library, #eq) {
   background: linear-gradient(180deg, color-mix(in srgb, var(--mn-steel-9) 82%, transparent), var(--mn-veil) 60%);
-  box-shadow: inset 1px 0 0 color-mix(in srgb, var(--mn-void) 90%, transparent), inset 2px 0 0 color-mix(in srgb, var(--mn-chrome) 8%, transparent);
+  box-shadow: inset -1px 0 0 color-mix(in srgb, var(--mn-void) 90%, transparent), inset -2px 0 0 color-mix(in srgb, var(--mn-chrome) 8%, transparent);
 }
+html.theme-midnight .app.wide .side { box-shadow: inset 1px 0 0 color-mix(in srgb, var(--mn-void) 90%, transparent), inset 2px 0 0 color-mix(in srgb, var(--mn-chrome) 8%, transparent); }
 html.theme-midnight .app.wide #player { box-shadow: none; }
 html.theme-midnight .app:not(.wide) :is(#library, #eq) { background: linear-gradient(180deg, color-mix(in srgb, var(--mn-steel-8) 96%, transparent), color-mix(in srgb, var(--mn-void) 97%, transparent) 50%); box-shadow: inset 0 1px 0 color-mix(in srgb, var(--mn-chrome) 10%, transparent); }
 html.theme-midnight .app:not(.wide)[data-screen='library'] #player, html.theme-midnight .app:not(.wide)[data-screen='eq'] #player { filter: none; opacity: 0.12; }

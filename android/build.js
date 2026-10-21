@@ -109,7 +109,7 @@ const pass = /storePassword=(.*)/.exec(fs.readFileSync(ksProps, 'utf8'))[1].trim
 fs.mkdirSync(DIST, { recursive: true });
 const apk = path.join(DIST, 'YouSic.apk');
 const signer = path.join(BT, 'lib', 'apksigner.jar');
-run(JAVA, ['-jar', signer, 'sign', '--ks', ks, '--ks-key-alias', 'yousic', '--ks-pass', 'pass:' + pass, '--key-pass', 'pass:' + pass,
+run(JAVA, ['-jar', signer, 'sign', '--v4-signing-enabled', 'false', '--ks', ks, '--ks-key-alias', 'yousic', '--ks-pass', 'pass:' + pass, '--key-pass', 'pass:' + pass,
   '--out', apk, aligned]);
 run(JAVA, ['-jar', signer, 'verify', '--verbose', apk]);
 console.log(`\nBuilt ${apk} (${(fs.statSync(apk).size / 1048576).toFixed(1)} MB, version ${VERSION} / ${versionCode})`);

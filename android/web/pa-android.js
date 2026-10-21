@@ -8,6 +8,30 @@
   window.PA_BASE = location.origin + '/';
   document.documentElement.classList.add('android');
 
+  // Diagnostics: if the app hasn't started a few seconds after loading, show what went wrong (files that
+  // failed, script errors, the WebView and Android versions) instead of a blank screen.
+  var problems = [];
+  window.addEventListener('error', function (e) {
+    var t = e.target;
+    if (t && t !== window && (t.src || t.href)) problems.push('could not load ' + String(t.src || t.href).replace(location.origin, ''));
+    else if (e.message) problems.push(e.message + (e.filename ? ' (' + e.filename.replace(location.origin, '') + ':' + e.lineno + ')' : ''));
+  }, true);
+  window.addEventListener('unhandledrejection', function (e) {
+    var r = e.reason;
+    problems.push('promise: ' + (r && (r.stack || r.message) || r));
+  });
+  setTimeout(function () {
+    if (window.__app && window.__app.playerView) return; // started (playerView exists once the library and settings loaded)
+    var d = document.createElement('pre');
+    d.style.cssText = 'position:fixed;left:0;top:0;right:0;bottom:0;z-index:99999;margin:0;padding:16px;overflow:auto;background:#07070a;color:#ddd;'
+      + 'font:12px/1.5 monospace;white-space:pre-wrap;-webkit-user-select:text;user-select:text';
+    var diag = '';
+    try { diag = N.diag(); } catch (e) { diag = 'diag: ' + e; }
+    d.textContent = "YouSic didn't start. Please send a screenshot of this.\n\n" + (problems.join('\n') || 'No errors were reported.')
+      + '\n\n' + diag + '\n' + navigator.userAgent;
+    (document.body || document.documentElement).appendChild(d);
+  }, 8000);
+
   var seq = 0, pending = {}, listeners = { progress: [], cmd: [] };
   window.__paResolve = function (id, json) {
     var cb = pending[id];

@@ -109,6 +109,21 @@ final class Bridge {
         return Files.canReadAll(app);
     }
 
+    /** For the page's diagnostics panel: versions and what failed (see pa-android.js). */
+    @JavascriptInterface
+    public String diag() {
+        StringBuilder b = new StringBuilder();
+        android.content.pm.PackageInfo wv = WebView.getCurrentWebViewPackage();
+        b.append("WebView: ").append(wv == null ? "?" : wv.packageName + " " + wv.versionName).append('\n');
+        b.append("Android ").append(Build.VERSION.RELEASE).append(" (API ").append(Build.VERSION.SDK_INT).append("), ")
+                .append(Build.MANUFACTURER).append(' ').append(Build.MODEL).append('\n');
+        b.append("Music permission: ").append(MainActivity.canReadMusic(app)).append('\n');
+        if (MainActivity.mainError != null) b.append("Page load: ").append(MainActivity.mainError).append(" (loaded the second way)\n");
+        Server s = MainActivity.server;
+        if (s != null) for (String e : s.errors) b.append(e).append('\n');
+        return b.toString();
+    }
+
     @JavascriptInterface
     public void moveToBack() {
         main.post(() -> { if (MainActivity.current != null) MainActivity.current.moveTaskToBack(true); });

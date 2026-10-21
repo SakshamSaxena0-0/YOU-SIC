@@ -46,11 +46,20 @@ final class Server {
     private final Context ctx;
     private final AssetManager assets;
     private final Library lib;
+    /** the last few failures, for the page's diagnostics (Bridge.diag) */
+    final java.util.Deque<String> errors = new java.util.concurrent.ConcurrentLinkedDeque<>();
 
     Server(Context ctx, Library lib) {
         this.ctx = ctx;
         this.assets = ctx.getAssets();
         this.lib = lib;
+    }
+
+    /** The app's own copy of a page file (for MainActivity's fallback load). */
+    String readAsset(String path) throws IOException {
+        try (InputStream in = assets.open("www" + path)) {
+            return new String(Files.readAll(in), StandardCharsets.UTF_8);
+        }
     }
 
     WebResourceResponse handle(WebResourceRequest req) {
@@ -64,26 +73,59 @@ final class Server {
                 if (!name.matches("[a-f0-9]{40}(_s)?\\.jpg")) return status(400);
                 File f = new File(lib.coverDir, name);
                 if (!f.isFile()) return status(404);
-                return ok("image/jpeg", null, new FileInputStream(f), f.length(), "max-age=31536000");
+                return ok("image/jpeg", null, new FileInputStream(f), "max-age=31536000");
             }
             if (p.equals("/__pa/library.json")) {
                 lib.load();
-                return ok("application/json", "utf-8", new FileInputStream(lib.file), lib.file.length(), "no-store");
+                return ok("application/json", "utf-8", new FileInputStream(lib.file), "no-store");
             }
             if (p.equals("/") || p.isEmpty()) p = "/renderer/index.html";
             for (String dir : ASSET_DIRS) {
                 if (p.startsWith(dir) && !p.contains("..")) {
                     String type = mime(p);
                     InputStream in;
-                    try { in = assets.open("www" + p); } catch (IOException e) { return status(404); }
-                    return ok(type, type.startsWith("text/") || type.endsWith("json") || type.endsWith("javascript") ? "utf-8" : null, in, -1, "no-cache");
+                    try {
+                        in = assets.open("www" + p);
+                    } catch (IOException e) {
+                        return explain(404, p, "the app's file www" + p + " could not be opened: " + e + "\n\n" + assetList());
+                    }
+                    return ok(type, type.startsWith("text/") || type.endsWith("json") || type.endsWith("javascript") ? "utf-8" : null, in, "no-cache");
                 }
             }
-            return status(404);
-        } catch (Exception e) {
+            return explain(404, p, "no such address in the app");
+        } catch (Throwable e) {
             Log.w(MainActivity.TAG, "serve " + p, e);
-            return status(500);
+            return explain(500, p, Log.getStackTraceString(e));
         }
+    }
+
+    /**
+     * An error with a page that says what went wrong (an error with no body only gets WebView's bare
+     * "Web page not available"). Shown in place of the app if its own page fails to load.
+     */
+    WebResourceResponse explain(int code, String path, String why) {
+        Log.e(MainActivity.TAG, code + " " + path + ": " + why);
+        errors.addLast(code + " " + path + ": " + why);
+        while (errors.size() > 12) errors.pollFirst();
+        String html = "<!doctype html><meta name=viewport content='width=device-width'><body style='background:#07070a;color:#eee;"
+                + "font:14px sans-serif;padding:16px'><h3>YouSic couldn't load " + esc(path) + " (" + code + ")</h3><pre style='white-space:"
+                + "pre-wrap;font-size:12px;color:#bbb'>" + esc(why) + "\n\nAndroid " + android.os.Build.VERSION.RELEASE + " (API "
+                + android.os.Build.VERSION.SDK_INT + "), " + android.os.Build.MANUFACTURER + " " + android.os.Build.MODEL + "</pre>";
+        return new WebResourceResponse("text/html", "utf-8", code, code == 404 ? "Not Found" : "Error", baseHeaders("no-store"),
+                new ByteArrayInputStream(html.getBytes(StandardCharsets.UTF_8)));
+    }
+
+    private String assetList() {
+        StringBuilder b = new StringBuilder("What the app has inside:\n");
+        for (String d : new String[]{"", "www", "www/renderer"}) {
+            try { b.append("  ").append(d.isEmpty() ? "(top)" : d).append(": ").append(java.util.Arrays.toString(assets.list(d))).append('\n'); }
+            catch (Exception e) { b.append("  ").append(d).append(": ").append(e).append('\n'); }
+        }
+        return b.toString();
+    }
+
+    private static String esc(String s) {
+        return s == null ? "" : s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
     }
 
     private static String mime(String p) {
@@ -131,9 +173,8 @@ final class Server {
         long len = end - start + 1;
         Map<String, String> h = baseHeaders("no-cache");
         h.put("Accept-Ranges", "bytes");
-        h.put("Content-Length", String.valueOf(len));
         if (code == 206) h.put("Content-Range", "bytes " + start + "-" + end + "/" + size);
-        InputStream body = "HEAD".equalsIgnoreCase(req.getMethod()) ? new ByteArrayInputStream(new byte[0]) : new Limited(in, len);
+        InputStream body = "HEAD".equalsIgnoreCase(req.getMethod()) ? new ByteArrayInputStream(new byte[0]) : new Range(in, start, len);
         return new WebResourceResponse(mime(path), null, code, code == 206 ? "Partial Content" : "OK", h, body);
     }
 
@@ -144,21 +185,29 @@ final class Server {
         return h;
     }
 
-    private static WebResourceResponse ok(String type, String enc, InputStream in, long len, String cache) {
-        Map<String, String> h = baseHeaders(cache);
-        if (len >= 0) h.put("Content-Length", String.valueOf(len));
-        return new WebResourceResponse(type, enc, 200, "OK", h, in);
+    // No Content-Length of our own: WebView works it out from the stream's available(), and two different
+    // Content-Length headers would break the response.
+    private static WebResourceResponse ok(String type, String enc, InputStream in, String cache) {
+        return new WebResourceResponse(type, enc, 200, "OK", baseHeaders(cache), in);
     }
 
-    private static WebResourceResponse status(int code) {
-        return new WebResourceResponse("text/plain", "utf-8", code, code == 404 ? "Not Found" : code == 403 ? "Forbidden" : "Error",
-                baseHeaders("no-store"), new ByteArrayInputStream(new byte[0]));
+    private WebResourceResponse status(int code) {
+        return explain(code, "", code == 403 ? "not a song in the library" : code == 400 ? "bad address" : "not found");
     }
 
-    /** Reads at most n bytes, then reports the end (closing the file when done). */
-    private static final class Limited extends FilterInputStream {
+    /**
+     * One byte range of a song, already positioned at its start.
+     *
+     * WebView reads intercepted responses in its own way: it takes available() as the size of the whole
+     * stream, checks the request's Range against it, skips to the range's first byte and sets Content-Length.
+     * The range is applied here already (with a 206 and Content-Range for the media player), so available()
+     * reports the bytes up to the range's end (making WebView's check and Content-Length come out right) and
+     * skip() does nothing (so the start isn't skipped twice).
+     */
+    private static final class Range extends FilterInputStream {
+        private final long start;
         private long left;
-        Limited(InputStream in, long n) { super(in); left = n; }
+        Range(InputStream in, long start, long len) { super(in); this.start = start; left = len; }
         @Override public int read() throws IOException {
             if (left <= 0) return -1;
             int b = super.read();
@@ -171,11 +220,7 @@ final class Server {
             if (r > 0) left -= r;
             return r;
         }
-        @Override public long skip(long n) throws IOException {
-            long s = super.skip(Math.min(n, left));
-            left -= s;
-            return s;
-        }
-        @Override public int available() throws IOException { return (int) Math.min(super.available(), left); }
+        @Override public long skip(long n) { return n; }
+        @Override public int available() { return (int) Math.min(Integer.MAX_VALUE, start + left); }
     }
 }

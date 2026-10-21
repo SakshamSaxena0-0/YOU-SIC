@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.webkit.ConsoleMessage;
 import android.webkit.RenderProcessGoneDetail;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
@@ -38,7 +39,11 @@ public class MainActivity extends Activity {
     static WebView web;
     static MutableContextWrapper webCtx;
     static Bridge bridge;
+    static Server server;
     static MainActivity current;
+    /** why the page had to be loaded the second way (for the diagnostics), or null */
+    static String mainError;
+    private static boolean triedFallback;
 
     @Override
     protected void onCreate(Bundle state) {
@@ -48,8 +53,9 @@ public class MainActivity extends Activity {
         if (fresh) {
             Context app = getApplicationContext();
             Library library = new Library(app);
-            Server server = new Server(app, library);
+            server = new Server(app, library);
             bridge = new Bridge(app, library);
+            triedFallback = false;
             webCtx = new MutableContextWrapper(this);
             web = new WebView(webCtx);
             setup(web, server);
@@ -124,6 +130,18 @@ public class MainActivity extends Activity {
                 return true;
             }
 
+            // The page itself failed to load: load the app's copy of it directly instead (on the same origin, so
+            // everything else still comes through shouldInterceptRequest), and remember why for the diagnostics.
+            @Override
+            public void onReceivedHttpError(WebView view, WebResourceRequest request, WebResourceResponse response) {
+                if (request.isForMainFrame()) fallback(view, "HTTP " + response.getStatusCode() + " " + response.getReasonPhrase());
+            }
+
+            @Override
+            public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+                if (request.isForMainFrame()) fallback(view, error.getDescription() + " (" + error.getErrorCode() + ")");
+            }
+
             // if the page's process dies, start again with a fresh WebView rather than crash
             @Override
             public boolean onRenderProcessGone(WebView view, RenderProcessGoneDetail detail) {
@@ -145,6 +163,20 @@ public class MainActivity extends Activity {
                 return true;
             }
         });
+    }
+
+    private static void fallback(WebView view, String why) {
+        Log.e(TAG, "page failed: " + why);
+        mainError = why;
+        if (triedFallback) return;
+        triedFallback = true;
+        String url = ORIGIN + "renderer/index.html";
+        try {
+            view.loadDataWithBaseURL(url, server.readAsset("/renderer/index.html"), "text/html", "utf-8", null);
+        } catch (Exception e) {
+            view.loadDataWithBaseURL(null, "<body style='background:#07070a;color:#eee;font:14px sans-serif;padding:16px'><h3>YouSic couldn't open its page</h3><pre style='white-space:pre-wrap'>"
+                    + why + "\n" + e + "</pre>", "text/html", "utf-8", null);
+        }
     }
 
     /** Android's back button: the page goes back a step if it can (closes a menu, leaves the library...). */

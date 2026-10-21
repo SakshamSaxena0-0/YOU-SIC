@@ -27,6 +27,25 @@ On first start the app scans your Windows *Music* folder. Add more folders from 
 
 Supported formats: MP3, FLAC, M4A/AAC, OGG/Opus, WAV, WebM.
 
+## Android
+
+`dist-android/YouSic.apk` is the same player for Android phones and tablets (Android 8.0 or newer). The interface is the
+same code as the Windows app (`renderer/`), running in a WebView; a small native layer (`android/src`) takes the place of
+`main.js`:
+
+- **Music:** found through Android's media library, all storage by default. *Add Folder* opens Android's folder picker to
+  narrow it down. Covers come from the songs' embedded art (or Android's thumbnails), lyrics from `.lrc` files or the tags.
+- **Playing in the background:** a media notification with lock-screen and headset controls. Music keeps playing with the
+  screen off and after the app is closed from the recent apps; it pauses for calls and when headphones are unplugged.
+- **What differs:** no window background setting (no desktop wallpaper or acrylic on a phone), no keyboard shortcuts, no
+  *Show in Explorer*. Android's back button steps back through the app. Reading `.lrc` files needs *All files access*,
+  which the lyrics panel offers when it finds none.
+
+**Install:** copy the APK to the phone and open it (allow installing from that app when Android asks).
+**Build:** `npm run android` (needs the Android SDK: build-tools 35, platform 34, and a JDK; see `android/build.js`). The
+first build creates the signing key `android/yousic.keystore` (not in git). Keep it: updates must be signed with the
+same key to install over the app.
+
 ## Shortcuts
 
 Space play/pause · Ctrl+←/→ prev/next · ←/→ seek 5 s (Shift: 30 s) · ↑/↓ volume · M mute · E equalizer ·

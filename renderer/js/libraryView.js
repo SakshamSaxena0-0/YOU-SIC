@@ -1,4 +1,4 @@
-import { $, esc, fmtTime, fmtDuration, coverUrl, clamp, debounce } from './util.js';
+import { $, esc, fmtTime, fmtDuration, coverUrl, clamp, debounce, ANDROID } from './util.js';
 import { icon, hydrateIcons, setIcon } from './icons.js';
 import { SORTS } from './store.js';
 import { menu, menuAt, prompt, chooser, toast, confirmSheet } from './ui.js';
@@ -468,7 +468,7 @@ export class LibraryView {
     ];
     if (t.albumKey) items.push({ label: 'Go to Album', icon: 'album', action: () => this.push({ type: 'album', key: t.albumKey, title: t.album }) });
     if (t.artist) items.push({ label: 'Go to Artist', icon: 'person', action: () => this.push({ type: 'person', field: 'artist', key: t.artist, title: t.artist }) });
-    items.push({ label: 'Show in Explorer', icon: 'open_in_new', action: () => pa.showInFolder(t.path) });
+    if (!ANDROID) items.push({ label: 'Show in Explorer', icon: 'open_in_new', action: () => pa.showInFolder(t.path) });
     if (page.content.playlist) items.push('-', { label: 'Remove from Playlist', icon: 'delete', danger: true, action: () => { this.store.removeFromPlaylist(page.content.playlist, page.content.tracks.indexOf(t)); this.refresh(); } });
     if (page.content.queue) items.push('-', { label: 'Remove from Queue', icon: 'delete', danger: true, action: () => { p.userQueue.splice(i, 1); p.dispatchEvent(new Event('queue')); } });
     menu(x, y, items);

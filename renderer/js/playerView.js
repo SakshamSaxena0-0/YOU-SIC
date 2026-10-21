@@ -1,4 +1,4 @@
-import { $, $$, esc, fmtTime, coverUrl, clamp, spring } from './util.js';
+import { $, $$, esc, fmtTime, coverUrl, clamp, spring, ANDROID } from './util.js';
 import { setIcon, icon } from './icons.js';
 import { extractColors } from './palette.js';
 import { Waveform } from './waveform.js';
@@ -328,7 +328,7 @@ export class PlayerView {
         <div class="ab-actions">
           ${t.album ? `<button class="ab-btn" data-ab="album" title="Go to album">${icon('album')}<span>Album</span></button>` : ''}
           ${t.artist ? `<button class="ab-btn" data-ab="artist" title="Go to artist">${icon('person')}<span>Artist</span></button>` : ''}
-          <button class="ab-btn" data-ab="folder" title="Show in folder">${icon('folder')}<span>Show file</span></button>
+          ${ANDROID ? '' : `<button class="ab-btn" data-ab="folder" title="Show in folder">${icon('folder')}<span>Show file</span></button>`}
         </div>
       </div>`;
     $('#aaBack').innerHTML = html;

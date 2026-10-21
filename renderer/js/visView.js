@@ -1,4 +1,4 @@
-import { $, esc } from './util.js';
+import { $, esc, BASE } from './util.js';
 import { icon, hydrateIcons } from './icons.js';
 import { chooser, toast } from './ui.js';
 
@@ -49,8 +49,8 @@ export class VisView {
   async ensure() {
     if (this.viz || this.fallback) return;
     try {
-      await loadScript('app://local/node_modules/butterchurn/lib/butterchurn.min.js');
-      await loadScript('app://local/node_modules/butterchurn-presets/lib/butterchurnPresets.min.js');
+      await loadScript(BASE + 'node_modules/butterchurn/lib/butterchurn.min.js');
+      await loadScript(BASE + 'node_modules/butterchurn-presets/lib/butterchurnPresets.min.js');
       const bc = window.butterchurn.default || window.butterchurn;
       const bp = window.butterchurnPresets.default || window.butterchurnPresets;
       this.presets = bp.getPresets();

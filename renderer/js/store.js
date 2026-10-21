@@ -98,6 +98,8 @@ export class Store extends EventTarget {
     if (this.settings.theme === 'tlou') this.settings.theme = 'subway'; // the last of us theme was replaced
     if (this.settings.theme === 'console') this.settings.theme = 'pixel'; // so was the console theme
     if ((s.v || 0) < 2) Object.assign(this.settings, { v: 2, buttonStyle: 'ios', windowBg: 'wallpaper' });
+    // phones: the glass refraction is heavy on a mobile GPU, so it starts off there (it can be turned on)
+    if (!settings && pa.platform === 'android') this.settings.refraction = false;
     this.setLibrary(lib);
   }
 
@@ -163,7 +165,8 @@ export class Store extends EventTarget {
 
   // Folder hierarchy: immediate subfolders + direct tracks of a path (null = library roots).
   hierarchy(dir) {
-    const sep = '\\';
+    const sep = dir && !dir.includes('\\') && dir.includes('/') ? '/' : '\\'; // Windows paths, or Android's
+
     const norm = (p) => p.replace(/[\\/]+$/, '');
     if (!dir) {
       return { dirs: this.folders.map((f) => ({ path: norm(f), title: norm(f) })), tracks: [] };

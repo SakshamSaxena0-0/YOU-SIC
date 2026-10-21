@@ -1,4 +1,4 @@
-import { $, esc } from './util.js';
+import { $, esc, ANDROID } from './util.js';
 import { icon } from './icons.js';
 
 // Lyrics panel shown over the album art (swipe up). Supports synced .lrc / tag lyrics and plain text.
@@ -20,6 +20,8 @@ export class LyricsView {
       if (l && l.dataset.t) this.engine.seek(+l.dataset.t);
       const a = e.target.closest('[data-q]');
       if (a) window.open(a.dataset.q);
+      // Android: open the system page that lets the app read .lrc files; look again when the user comes back
+      if (e.target.closest('[data-fa]')) pa.requestFileAccess().then((ok) => { if (ok) { this.cache.clear(); this.load(); } });
     });
   }
 
@@ -49,7 +51,9 @@ export class LyricsView {
       this.scroll.innerHTML = `<div class="ly-empty">${icon('lyrics')}<div>No lyrics found</div>
         <small>Put a <b>.lrc</b> file with the same name next to the song, or embed lyrics in the tags.</small>
         <div class="ly-actions"><button class="btn ghost" data-q="https://genius.com/search?q=${q}">Genius</button>
-        <button class="btn ghost" data-q="https://www.google.com/search?q=${q}">Google</button></div></div>`;
+        <button class="btn ghost" data-q="https://www.google.com/search?q=${q}">Google</button></div>
+        ${ANDROID && !pa.fileAccess() ? `<small>Android only lets YouSic read .lrc files once it may open all your files.</small>
+        <div class="ly-actions"><button class="btn" data-fa="1">Allow .lrc files</button></div>` : ''}</div>`;
       return;
     }
     if (data.synced) {

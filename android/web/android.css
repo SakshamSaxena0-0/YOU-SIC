@@ -1,0 +1,19 @@
+/* YouSic for Android: what differs from the Windows window. Added to the Android copy of index.html
+   only (android/build.js); the themes are untouched. */
+
+/* no title bar: Android's status bar sits above the app. --tb keeps a little air above the headers. */
+html.android .titlebar { display: none; }
+html.android { --tb: 6px; }
+
+/* touch: no grey flash on tap, no long-press text selection or callouts, no rubber-band scrolling */
+html.android body { -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; overscroll-behavior: none; }
+
+/* no hover on a touch screen: the row's menu button is always there */
+html.android .row .r-more { opacity: 1; }
+
+/* the styled tooltips follow a mouse pointer; a finger has none */
+html.android .tip { display: none; }
+
+/* battery: the blurred album-art background stays still. Its slow drift re-blurs the whole screen every
+   frame, which a phone's GPU pays for the whole time the app is open. */
+html.android .bg-layer { animation: none; }

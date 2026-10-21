@@ -25,13 +25,18 @@ export function debounce(fn, ms) {
   return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); };
 }
 
+// Where the app's own files, songs and covers are served from: app://local/ on Windows (main.js). The
+// Android app sets PA_BASE to its in-app origin before anything runs (android/web/pa-android.js).
+export const BASE = window.PA_BASE || 'app://local/';
+export const ANDROID = window.pa?.platform === 'android';
+
 export function mediaUrl(path) {
   const b = btoa(String.fromCharCode(...new TextEncoder().encode(path)));
-  return 'app://local/media/' + b.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  return BASE + 'media/' + b.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 
 export function coverUrl(key, small = false) {
-  return key ? `app://local/cover/${key}${small ? '_s' : ''}.jpg` : '';
+  return key ? `${BASE}cover/${key}${small ? '_s' : ''}.jpg` : '';
 }
 
 export const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);

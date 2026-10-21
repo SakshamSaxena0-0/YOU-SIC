@@ -1,4 +1,4 @@
-import { $, $$, coverUrl, installRipples, esc, clamp } from './util.js';
+import { $, $$, coverUrl, installRipples, esc, clamp, ANDROID } from './util.js';
 import { hydrateIcons, setIcon, iconPng, icon } from './icons.js';
 import { AudioEngine } from './audio.js';
 import { Store, THEMES } from './store.js';
@@ -45,7 +45,12 @@ class App {
     this._mediaSession();
     this._thumbIcons = { prev: iconPng('skip_previous'), next: iconPng('skip_next'), play: iconPng('play'), pause: iconPng('pause') };
     this.updateThumbar(false);
-    pa.onCommand((c) => ({ prev: () => this.player.prev(), next: () => this.player.next(), toggle: () => this.player.toggle() })[c]?.());
+    pa.onCommand((c) => {
+      // Android's notification and lock screen can also play, pause and seek ("seek:<seconds>")
+      if (typeof c === 'string' && c.startsWith('seek:')) return this.engine.seek(Number(c.slice(5)) || 0);
+      ({ prev: () => this.player.prev(), next: () => this.player.next(), toggle: () => this.player.toggle(),
+        play: () => { if (!this.engine.playing) this.player.toggle(); }, pause: () => { if (this.engine.playing) this.player.toggle(); } })[c]?.();
+    });
     pa.onProgress((m) => this._scanProgress(m));
 
     $$('#side .eq-tab').forEach((t) => (t.onclick = () => this.showSide(t.dataset.side)));
@@ -296,8 +301,9 @@ class App {
   }
 
   _applyGlassWindow() {
-    // wallpaper: the real desktop wallpaper painted behind the app (sharp); acrylic: Windows blur
-    const mode = this.solidTheme ? 'solid' : this.store.settings.windowBg || 'wallpaper';
+    // wallpaper: the real desktop wallpaper painted behind the app (sharp); acrylic: Windows blur.
+    // Android has neither: the glass theme sits on the blurred album art there.
+    const mode = this.solidTheme || ANDROID ? 'solid' : this.store.settings.windowBg || 'wallpaper';
     const acrylic = mode === 'acrylic' && this.glassSupported;
     const wallpaper = mode === 'wallpaper';
     const html = document.documentElement;
@@ -461,12 +467,29 @@ class App {
   updateThumbar(playing) {
     if (!this._thumbIcons) return;
     pa.setThumbar({ ...this._thumbIcons, playing });
+    this._nowPlaying();
+  }
+
+  // Android: the playback notification, lock screen and headset buttons are native, so tell them what is
+  // playing (the track, whether it plays, and where it is). Windows has no pa.nowPlaying.
+  _nowPlaying() {
+    if (!pa.nowPlaying) return;
+    const t = this.player?.track, en = this.engine;
+    pa.nowPlaying(t ? {
+      title: t.title, artist: t.artist || '', album: t.album || '', cover: t.cover || null,
+      duration: en.duration || t.duration || 0, position: en.currentTime || 0, playing: !!en.playing, rate: en.tempo || 1,
+    } : null);
   }
 
   _mediaSession() {
+    const p = this.player, en = this.engine;
+    if (pa.nowPlaying) {
+      p.addEventListener('track', () => this._nowPlaying());
+      en.addEventListener('seek', () => this._nowPlaying());
+      en.addEventListener('meta', () => this._nowPlaying());
+    }
     if (!('mediaSession' in navigator)) return;
     const ms = navigator.mediaSession;
-    const p = this.player, en = this.engine;
     ms.setActionHandler('play', () => en.play());
     ms.setActionHandler('pause', () => en.pause());
     ms.setActionHandler('previoustrack', () => p.prev());
@@ -502,7 +525,7 @@ class App {
         { label: 'Add to Queue', icon: 'queue', action: () => { p.enqueue([t]); toast('Added to Queue'); } },
         { label: 'Go to Album', icon: 'album', disabled: !t.albumKey, action: () => this.openLibrary({ type: 'album', key: t.albumKey, title: t.album }) },
         { label: 'Go to Artist', icon: 'person', disabled: !t.artist, action: () => this.openLibrary({ type: 'person', field: 'artist', key: t.artist, title: t.artist }) },
-        { label: 'Show in Explorer', icon: 'open_in_new', action: () => pa.showInFolder(t.path) },
+        ...(ANDROID ? [] : [{ label: 'Show in Explorer', icon: 'open_in_new', action: () => pa.showInFolder(t.path) }]),
         { label: 'Track Info', icon: 'info', action: () => this.trackInfo(t) },
         '-');
     }
@@ -578,7 +601,7 @@ class App {
       <div class="glass-only">
       ${tog('dynamicAccent', 'Album art colors', 'Accent color follows the current album art')}
       <div class="set-row"><div><div class="set-label">Accent color</div><div class="set-hint">Used when album art colors are off or the cover has none</div></div><input type="color" value="${s.accent}" data-c="accent"></div>
-      ${pick('windowBg', 'Window background', 'Wallpaper: your desktop wallpaper shows through, sharp. Blur: Windows acrylic', [['wallpaper', 'Wallpaper'], ...(this.glassSupported ? [['acrylic', 'Blur']] : []), ['solid', 'Solid']])}
+      ${ANDROID ? '' : pick('windowBg', 'Window background', 'Wallpaper: your desktop wallpaper shows through, sharp. Blur: Windows acrylic', [['wallpaper', 'Wallpaper'], ...(this.glassSupported ? [['acrylic', 'Blur']] : []), ['solid', 'Solid']])}
       ${pick('buttonStyle', 'Button style', 'Clear iOS-style glass, soap bubbles, or glass filled with liquid', [['ios', 'Glass'], ['bubble', 'Bubble'], ['aqua', 'Liquid']])}
       ${pick('liquid', 'Bubble / liquid color', 'Tint of the Bubble and Liquid styles', [['aqua', 'Aqua'], ['lime', 'Lime'], ['accent', 'Album']])}
       ${tog('refraction', 'Liquid glass refraction', 'Buttons bend the background at their edges like thick glass (GPU)')}
@@ -589,15 +612,15 @@ class App {
       ${tog('reduceMotion', 'Reduce animations')}
       <label class="set-row"><div><div class="set-label">Reduce effects</div><div class="set-hint">No blur, spinning CD, aurora, sparkles or grain; solid panels instead of glass. On automatically when Windows asks for less motion</div></div>
       <input type="checkbox" class="switch" data-k="reduceEffects" ${this.reduceEffects ? 'checked' : ''}></label>
-      <div class="set-sec">Shortcuts</div>
+      ${ANDROID ? '' : `<div class="set-sec">Shortcuts</div>
       <div class="shortcuts">
         <span>Space</span><span>Play / Pause</span><span>Ctrl + ← / →</span><span>Previous / Next</span>
         <span>← / →</span><span>Seek 5s (Shift: 30s)</span><span>↑ / ↓</span><span>Volume</span>
         <span>E</span><span>Equalizer</span><span>V</span><span>Visualization</span><span>Y</span><span>Lyrics</span>
         <span>S / R</span><span>Shuffle / Repeat</span><span>M</span><span>Mute</span><span>Ctrl + F</span><span>Search</span>
         <span>I</span><span>Flip album art (song info)</span><span>Backspace</span><span>Back</span><span>Alt + 0…5</span><span>Rate track</span>
-      </div>
-      <div class="about">YouSic 1.0 · A music player for Windows</div>`,
+      </div>`}
+      <div class="about">YouSic 1.0 · A music player for ${ANDROID ? 'Android' : 'Windows'}</div>`,
     });
     body.addEventListener('change', (e) => {
       const k = e.target.dataset.k;

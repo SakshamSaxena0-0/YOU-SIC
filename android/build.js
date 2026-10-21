@@ -18,6 +18,7 @@ const JAR = path.join(SDK, 'platforms', 'android-34', 'android.jar');
 const JDK = process.env.JAVA_HOME || 'C:/Program Files/Eclipse Adoptium/jdk-21.0.12.101-hotspot';
 const exe = (dir, name) => path.join(dir, process.platform === 'win32' ? name + '.exe' : name);
 const JAVA = exe(path.join(JDK, 'bin'), 'java'), JAVAC = exe(path.join(JDK, 'bin'), 'javac'), KEYTOOL = exe(path.join(JDK, 'bin'), 'keytool');
+const JARTOOL = exe(path.join(JDK, 'bin'), 'jar');
 const VERSION = require(path.join(ROOT, 'package.json')).version;
 
 const step = (s) => console.log('\n== ' + s);
@@ -42,6 +43,21 @@ function files(dir, ext, out = []) {
   return out;
 }
 
+/** Fails the build if any entry name in the zip has a backslash (Android would not find that file). */
+function checkNames(zip) {
+  const d = fs.readFileSync(zip);
+  const eocd = d.lastIndexOf(Buffer.from([0x50, 0x4b, 0x05, 0x06]));
+  let n = d.readUInt16LE(eocd + 10), p = d.readUInt32LE(eocd + 16), bad = [], total = n;
+  for (; n > 0; n--) {
+    const len = d.readUInt16LE(p + 28), extra = d.readUInt16LE(p + 30), comment = d.readUInt16LE(p + 32);
+    const name = d.toString('utf8', p + 46, p + 46 + len);
+    if (name.includes('\\')) bad.push(name);
+    p += 46 + len + extra + comment;
+  }
+  if (bad.length) throw new Error(`${bad.length} APK entries have backslashes, e.g. ${bad[0]}`);
+  console.log(`${total} entries, names OK`);
+}
+
 for (const [what, p] of [['build-tools 35.0.0', BT], ['platforms;android-34', JAR], ['a JDK', JAVAC]]) {
   if (!fs.existsSync(p)) { console.error(`Missing ${what}: ${p}`); process.exit(1); }
 }
@@ -50,7 +66,9 @@ fs.rmSync(OUT, { recursive: true, force: true });
 fs.mkdirSync(OUT, { recursive: true });
 
 step('assets: the page');
-const www = path.join(OUT, 'assets', 'www');
+// laid out as they go into the APK: <apk>/assets/www/...
+const apkRoot = path.join(OUT, 'apk');
+const www = path.join(apkRoot, 'assets', 'www');
 copyDir(path.join(ROOT, 'renderer'), path.join(www, 'renderer'));
 copyDir(path.join(ROOT, 'node_modules', 'butterchurn', 'lib'), path.join(www, 'node_modules', 'butterchurn', 'lib'));
 copyDir(path.join(ROOT, 'node_modules', 'butterchurn-presets', 'lib'), path.join(www, 'node_modules', 'butterchurn-presets', 'lib'));
@@ -73,7 +91,7 @@ const unsigned = path.join(OUT, 'app.unaligned.apk');
 // versionCode: minutes since 2024, so every build installs over the last one
 const versionCode = Math.floor((Date.now() - Date.UTC(2024, 0, 1)) / 60000);
 run(exe(BT, 'aapt2'), ['link', '-o', unsigned, '-I', JAR, '--manifest', path.join(A, 'AndroidManifest.xml'),
-  '--java', path.join(OUT, 'gen'), '-A', path.join(OUT, 'assets'), '--min-sdk-version', '26', '--target-sdk-version', '34',
+  '--java', path.join(OUT, 'gen'), '--min-sdk-version', '26', '--target-sdk-version', '34',
   '--version-code', String(versionCode), '--version-name', VERSION, resZip]);
 
 step('javac');
@@ -90,8 +108,11 @@ const dex = path.join(OUT, 'dex');
 fs.mkdirSync(dex, { recursive: true });
 run(JAVA, ['-cp', path.join(BT, 'lib', 'd8.jar'), 'com.android.tools.r8.D8', '--release', '--min-api', '26',
   '--lib', JAR, '--output', dex, ...files(classes, '.class')]);
-// add classes.dex at the root of the APK
-execFileSync(exe(BT, 'aapt'), ['add', unsigned, 'classes.dex'], { cwd: dex, stdio: 'inherit' });
+// classes.dex and the page go in with the JDK's jar tool. Not aapt2 -A or aapt add: on Windows those store
+// asset names with backslashes ("assets/www\renderer\index.html"), which Android can't find (the first
+// APKs opened to "Web page not available"). M: no jar manifest.
+run(JARTOOL, ['uMf', unsigned, '-C', dex, 'classes.dex', '-C', apkRoot, 'assets']);
+checkNames(unsigned);
 
 step('zipalign + sign');
 const aligned = path.join(OUT, 'app.aligned.apk');

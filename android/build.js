@@ -20,6 +20,9 @@ const exe = (dir, name) => path.join(dir, process.platform === 'win32' ? name + 
 const JAVA = exe(path.join(JDK, 'bin'), 'java'), JAVAC = exe(path.join(JDK, 'bin'), 'javac'), KEYTOOL = exe(path.join(JDK, 'bin'), 'keytool');
 const JARTOOL = exe(path.join(JDK, 'bin'), 'jar');
 const VERSION = require(path.join(ROOT, 'package.json')).version;
+// --debug: a debuggable build (dist-android/YouSic-debug.apk) for testing on a phone over USB: adb can read
+// the app's files (run-as) and Chrome's DevTools can attach to its page (chrome://inspect)
+const DEBUG = process.argv.includes('--debug');
 
 const step = (s) => console.log('\n== ' + s);
 const run = (cmd, args) => execFileSync(cmd, args, { stdio: 'inherit', env: { ...process.env, JAVA_HOME: JDK } });
@@ -92,7 +95,7 @@ const unsigned = path.join(OUT, 'app.unaligned.apk');
 const versionCode = Math.floor((Date.now() - Date.UTC(2024, 0, 1)) / 60000);
 run(exe(BT, 'aapt2'), ['link', '-o', unsigned, '-I', JAR, '--manifest', path.join(A, 'AndroidManifest.xml'),
   '--java', path.join(OUT, 'gen'), '--min-sdk-version', '26', '--target-sdk-version', '34',
-  '--version-code', String(versionCode), '--version-name', VERSION, resZip]);
+  '--version-code', String(versionCode), '--version-name', VERSION, ...(DEBUG ? ['--debug-mode'] : []), resZip]);
 
 step('javac');
 const classes = path.join(OUT, 'classes');
@@ -128,7 +131,7 @@ if (!fs.existsSync(ks)) {
 }
 const pass = /storePassword=(.*)/.exec(fs.readFileSync(ksProps, 'utf8'))[1].trim();
 fs.mkdirSync(DIST, { recursive: true });
-const apk = path.join(DIST, 'YouSic.apk');
+const apk = path.join(DIST, DEBUG ? 'YouSic-debug.apk' : 'YouSic.apk');
 const signer = path.join(BT, 'lib', 'apksigner.jar');
 run(JAVA, ['-jar', signer, 'sign', '--v4-signing-enabled', 'false', '--ks', ks, '--ks-key-alias', 'yousic', '--ks-pass', 'pass:' + pass, '--key-pass', 'pass:' + pass,
   '--out', apk, aligned]);

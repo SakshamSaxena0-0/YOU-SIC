@@ -130,7 +130,7 @@ export class Waveform {
     if (name === 'vector-surrealism') {
       const cs = getComputedStyle(document.documentElement);
       const v = (k) => cs.getPropertyValue(k).trim();
-      this.vs = { coral: v('--vs-coral'), blush: v('--vs-blush'), lav: v('--vs-lavender'), cream: v('--vs-cream'), teal: v('--vs-teal'), ink: v('--vs-ink'), shade: v('--vs-shade') };
+      this.vs = { ember: v('--vs-ember'), blood: v('--vs-blood'), mist: v('--vs-mist'), bone: v('--vs-bone'), gold: v('--vs-gold'), ink: v('--vs-ink'), shade: v('--vs-shade') };
     }
     // and the Liminal theme
     if (name === 'liminal') {
@@ -230,8 +230,8 @@ export class Waveform {
   }
 
   // Vector Surrealism theme: the waveform as a river. A flat ribbon meanders along the bar; its width
-  // follows the loudness. The played stretch is coral-to-blush, the rest lavender; a hard offset
-  // "long shadow" sits under it; the playhead is a small floating eye.
+  // follows the loudness. The played stretch is ember-to-blood, the rest mist; a hard offset
+  // "long shadow" sits under it; the playhead is a small floating dragon's eye.
   _drawVs(g, w, h, prog) {
     const c = this.vs;
     // a river has smooth banks: average the bars down to a few dozen points
@@ -258,22 +258,22 @@ export class Waveform {
     river.closePath();
     const px = prog * w;
     g.save(); g.translate(3, 3); g.fillStyle = c.shade; g.fill(river); g.restore();
-    g.fillStyle = c.lav; g.globalAlpha = 0.42; g.fill(river); g.globalAlpha = 1;
+    g.fillStyle = c.mist; g.globalAlpha = 0.42; g.fill(river); g.globalAlpha = 1;
     g.save();
     g.beginPath(); g.rect(0, 0, px, h); g.clip();
     const pg = g.createLinearGradient(0, 0, Math.max(px, 1), 0);
-    pg.addColorStop(0, c.coral); pg.addColorStop(1, c.blush);
+    pg.addColorStop(0, c.ember); pg.addColorStop(1, c.blood);
     g.fillStyle = pg; g.fill(river);
     g.restore();
-    if (this.hover >= 0 && !this.dragging) { g.fillStyle = c.cream; g.globalAlpha = 0.55; g.fillRect(this.hover * w - 0.5, 2, 1, h - 4); g.globalAlpha = 1; }
-    // the playhead: an almond eye with a teal iris, floating on the river
+    if (this.hover >= 0 && !this.dragging) { g.fillStyle = c.bone; g.globalAlpha = 0.55; g.fillRect(this.hover * w - 0.5, 2, 1, h - 4); g.globalAlpha = 1; }
+    // the playhead: a gold almond eye with an ember iris and a slit pupil, floating on the river
     const ex = Math.min(Math.max(px, 11), w - 11), ey = cy(prog), r = this.dragging ? 12 : 10;
     const eye = new Path2D();
     eye.moveTo(ex - r, ey); eye.quadraticCurveTo(ex, ey - r * 1.15, ex + r, ey); eye.quadraticCurveTo(ex, ey + r * 1.15, ex - r, ey); eye.closePath();
     g.save(); g.translate(2, 2); g.fillStyle = c.shade; g.fill(eye); g.restore();
-    g.fillStyle = c.cream; g.fill(eye);
-    g.beginPath(); g.arc(ex, ey, r * 0.42, 0, Math.PI * 2); g.fillStyle = c.teal; g.fill();
-    g.beginPath(); g.arc(ex, ey, r * 0.18, 0, Math.PI * 2); g.fillStyle = c.ink; g.fill();
+    g.fillStyle = c.gold; g.fill(eye);
+    g.beginPath(); g.arc(ex, ey, r * 0.44, 0, Math.PI * 2); g.fillStyle = c.ember; g.fill();
+    g.beginPath(); g.ellipse(ex, ey, r * 0.11, r * 0.4, 0, 0, Math.PI * 2); g.fillStyle = c.ink; g.fill();
   }
 
   // Liminal theme: the waveform as late sun glittering on water. Soft bars rise from a waterline and are

@@ -1,50 +1,56 @@
 /* ==========================================================================
    Vector Surrealism theme (html.theme-vector-surrealism): design tokens
-   Every colour, shadow, radius, font and asset the theme uses is defined here;
-   css/vector-surrealism.css (the component rules) only reads these tokens
-   (`npm run check` fails on a literal colour there). See THEME_VECTOR_SURREALISM.md.
+   Dark fantasy in flat vector: a night of crags and a blood moon, candle-ember and old gold,
+   a spectral wisp green, bone and crimson. Every colour, shadow, radius, font and asset the
+   theme uses is defined here; css/vector-surrealism.css (the component rules) only reads these
+   tokens (`npm run check` fails on a literal colour there). See THEME_VECTOR_SURREALISM.md.
    ========================================================================== */
 
-/* fonts, bundled in renderer/fonts with their SIL OFL licences (JetBrains Mono is loaded by app.css) */
+/* fonts, bundled in renderer/fonts with their SIL OFL licences */
 @font-face {
-  font-family: 'Fraunces'; src: url('../fonts/fraunces-latin-full-normal.woff2') format('woff2');
-  font-weight: 100 900; font-display: swap;
+  font-family: 'Cinzel'; src: url('../fonts/cinzel-latin-wght-normal.woff2') format('woff2');
+  font-weight: 400 900; font-display: swap;
 }
+@font-face { font-family: 'Alegreya Sans'; src: url('../fonts/alegreya-sans-latin-400-normal.woff2') format('woff2'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Alegreya Sans'; src: url('../fonts/alegreya-sans-latin-500-normal.woff2') format('woff2'); font-weight: 500; font-display: swap; }
+@font-face { font-family: 'Alegreya Sans'; src: url('../fonts/alegreya-sans-latin-700-normal.woff2') format('woff2'); font-weight: 600 700; font-display: swap; }
+@font-face { font-family: 'Alegreya Sans'; src: url('../fonts/alegreya-sans-latin-800-normal.woff2') format('woff2'); font-weight: 800 900; font-display: swap; }
+/* (the same file the Liminal theme declares; declared here too so this theme stands on its own) */
 @font-face {
-  font-family: 'Space Grotesk'; src: url('../fonts/space-grotesk-latin-wght-normal.woff2') format('woff2');
+  font-family: 'Cormorant Garamond'; src: url('../fonts/cormorant-garamond-latin-wght-normal.woff2') format('woff2');
   font-weight: 300 700; font-display: swap;
 }
 
 html.theme-vector-surrealism {
-  /* ---- palette (the brief's eight colours) ---- */
-  --vs-indigo: #1B1340;   /* night: the base background */
-  --vs-ink: #0F0A2B;      /* deep ink: the top of the sky, glyphs on light fills */
-  --vs-coral: #FF8A5B;    /* coral-peach: horizon glow, primary accent */
-  --vs-lavender: #B8A1FF; /* secondary surfaces, secondary text */
-  --vs-teal: #2EC4B6;     /* active / selected */
-  --vs-sun: #FFC93C;      /* highlights, focus */
-  --vs-blush: #FF5FA2;    /* alerts, favourites */
-  --vs-cream: #FFF1DC;    /* text on dark, light surfaces */
+  /* ---- palette ---- */
+  --vs-night: #160E20;    /* the base background: a violet-black night */
+  --vs-ink: #0A0610;      /* the top of the sky, glyphs on light fills */
+  --vs-ember: #EF7D45;    /* candle ember: the primary accent, the play orb */
+  --vs-mist: #A79BC2;     /* grave mist: secondary surfaces, secondary text */
+  --vs-wisp: #5ED6A8;     /* will-o'-wisp green: active / selected */
+  --vs-gold: #E8BF5F;     /* old gold: highlights, focus, runes */
+  --vs-blood: #EE5D72;    /* blood moon: alerts, favourites */
+  --vs-bone: #EEE2CB;     /* bone: text on dark, light surfaces */
 
-  /* ---- derived surfaces (flat fills between indigo and lavender) ---- */
-  --vs-dusk: #2A1F5C;     /* raised surface: cards, rows, the dock */
-  --vs-dusk-hi: #3A2C78;  /* a step higher: buttons, hover */
-  --vs-shade: #07041A;    /* the long-shadow tint: darker than ink, never blurred */
-  /* where the sky glows: 26% coral is as warm as it can get while every text colour still meets AA on it */
-  --vs-horizon: color-mix(in srgb, var(--vs-coral) 26%, var(--vs-indigo));
+  /* ---- derived surfaces (flat fills between night and mist) ---- */
+  --vs-dusk: #241933;     /* raised surface: cards, rows, the dock */
+  --vs-dusk-hi: #33234A;  /* a step higher: buttons, hover */
+  --vs-shade: #040208;    /* the long-shadow tint: darker than ink, never blurred */
+  /* where the sky glows: a low blood-moon red. At 24% every text colour still meets AA on it */
+  --vs-horizon: color-mix(in srgb, var(--vs-blood) 24%, var(--vs-night));
 
   /* ---- text (all measured against the darkest surface they sit on) ---- */
-  --vs-text: var(--vs-cream);        /* 15.6:1 on indigo, 10.4:1 on dusk-hi */
-  --vs-text-dim: var(--vs-lavender); /* 7.9:1 on indigo, 5.3:1 on dusk-hi */
-  --vs-text-on-light: var(--vs-ink); /* on coral 8.3:1, teal 8.9:1, sun 12:1, blush 6.8:1, lavender 8.7:1, cream 17:1 */
-  --vs-line: color-mix(in srgb, var(--vs-lavender) 32%, transparent);
+  --vs-text: var(--vs-bone);     /* 14.7:1 on night, 11.1:1 on dusk-hi */
+  --vs-text-dim: var(--vs-mist); /* 7.3:1 on night, 5.5:1 on dusk-hi */
+  --vs-text-on-light: var(--vs-ink); /* on ember 7.3:1, wisp 11.1:1, gold 11.5:1, blood 6.2:1, mist 7.8:1, bone 15.6:1 */
+  --vs-line: color-mix(in srgb, var(--vs-mist) 30%, transparent);
 
   /* ---- skies: the only smooth gradients in the theme ---- */
-  --vs-sky: linear-gradient(180deg, var(--vs-ink) 0%, var(--vs-indigo) 55%, var(--vs-horizon) 100%);
-  --vs-sky-window: linear-gradient(180deg, var(--vs-ink) 0%, var(--vs-indigo) 62%, color-mix(in srgb, var(--vs-coral) 22%, var(--vs-indigo)) 100%);
-  /* the one sanctioned ribbon fill: played / filled progress */
-  --vs-flow: linear-gradient(90deg, var(--vs-coral), var(--vs-blush));
-  --vs-flow-v: linear-gradient(0deg, var(--vs-coral), var(--vs-blush));
+  --vs-sky: linear-gradient(180deg, var(--vs-ink) 0%, var(--vs-night) 55%, var(--vs-horizon) 100%);
+  --vs-sky-window: linear-gradient(180deg, var(--vs-ink) 0%, var(--vs-night) 62%, color-mix(in srgb, var(--vs-blood) 18%, var(--vs-night)) 100%);
+  /* the one sanctioned ribbon fill: played / filled progress, ember into blood */
+  --vs-flow: linear-gradient(90deg, var(--vs-ember), var(--vs-blood));
+  --vs-flow-v: linear-gradient(0deg, var(--vs-ember), var(--vs-blood));
 
   /* ---- hard offset "long shadows" (no blur, ever) ---- */
   --vs-long-sm: 3px 3px 0 var(--vs-shade);
@@ -56,14 +62,20 @@ html.theme-vector-surrealism {
   --vs-long-lg-up: 12px 16px 0 var(--vs-shade);
   --vs-long-none: 0 0 0 var(--vs-shade);
 
-  /* ---- shape language ---- */
+  /* ---- shape language: gothic arches, scooped plaques, a few soft blobs ---- */
   --vs-r-blob: 48px 12px 48px 12px;    /* big panels and windows */
   --vs-r-card: 30px 10px 30px 10px;    /* cards and the dock */
   --vs-r-stone: 22px 8px 22px 8px;     /* list rows (stepping stones) */
   --vs-r-pill: 999px;
-  --vs-r-arch: 999px 999px 12px 12px;  /* small doorways: header buttons, the active tab */
-  --vs-r-door: 50% 50% 16px 16px / 34% 34% 16px 16px; /* the album cover and its back */
-  --vs-r-window: 140px 140px 20px 20px / 56px 56px 20px 20px; /* dialogs */
+  /* a pointed (lancet) arch: half-width radii across the top, drawn with corner-shape so the two
+     curves meet in a point. Pair each --vs-r-* arch with its --vs-cs-* corner shape. */
+  --vs-r-arch: 50% 50% 10px 10px / 46% 46% 10px 10px;  /* small doorways: header buttons, prev / next, tabs */
+  --vs-r-door: 50% 50% 16px 16px / 40% 40% 16px 16px;  /* the album cover, its back, the visualizer */
+  --vs-r-window: 50% 50% 22px 22px / 64px 64px 22px 22px; /* dialogs */
+  --vs-cs-arch: superellipse(0.7) superellipse(0.7) round round;
+  /* plaques: the big corners scooped inward, like a reliquary label */
+  --vs-r-plaque: 18px;
+  --vs-cs-plaque: scoop;
   --vs-step: 18px;                     /* how far alternate rows step sideways */
 
   /* ---- motion: 200-350ms with a soft overshoot ---- */
@@ -72,33 +84,34 @@ html.theme-vector-surrealism {
   --vs-t: 280ms;
 
   /* ---- type ---- */
-  --vs-display: 'Fraunces', Georgia, 'Times New Roman', serif;
-  --vs-ui: 'Space Grotesk', 'Segoe UI', sans-serif;
-  --vs-num: 'JetBrains Mono', 'Cascadia Mono', Consolas, monospace;
-  --vs-wonk: 'SOFT' 100, 'WONK' 1, 'opsz' 72; /* Fraunces at its softest and wonkiest */
+  --vs-display: 'Cinzel', 'Trajan Pro', Georgia, 'Times New Roman', serif; /* carved Roman capitals */
+  --vs-ui: 'Alegreya Sans', 'Segoe UI', sans-serif;
+  --vs-lyric: 'Cormorant Garamond', Garamond, Georgia, serif;
+  --vs-num: 'Alegreya Sans', 'Segoe UI', sans-serif; /* with tabular lining figures (set on body), so times don't jitter */
 
   /* ---- decorative assets (absolute paths, so they resolve the same from any stylesheet) ---- */
-  --vs-a-moon: url('/renderer/assets/vector-surrealism/moon.svg');
-  --vs-a-hills: url('/renderer/assets/vector-surrealism/hills.svg');
-  --vs-a-door: url('/renderer/assets/vector-surrealism/door.svg');
-  --vs-a-eye: url('/renderer/assets/vector-surrealism/eye-cloud.svg');
+  --vs-a-moon: url('/renderer/assets/vector-surrealism/blood-moon.svg');
+  --vs-a-crags: url('/renderer/assets/vector-surrealism/crags.svg');
+  --vs-a-door: url('/renderer/assets/vector-surrealism/gothic-door.svg');
+  --vs-a-eye: url('/renderer/assets/vector-surrealism/storm-eye.svg');
   --vs-a-lid: url('/renderer/assets/vector-surrealism/eyelid.svg');
-  --vs-a-hand: url('/renderer/assets/vector-surrealism/hand-moon.svg');
-  --vs-a-clock: url('/renderer/assets/vector-surrealism/clock-melt.svg');
-  --vs-a-ribbon: url('/renderer/assets/vector-surrealism/ribbon.svg');
+  --vs-a-hand: url('/renderer/assets/vector-surrealism/bone-hand.svg');
+  --vs-a-candles: url('/renderer/assets/vector-surrealism/candles.svg');
+  --vs-a-serpent: url('/renderer/assets/vector-surrealism/serpent.svg');
   --vs-a-floaters: url('/renderer/assets/vector-surrealism/floaters.svg');
+  --vs-a-star: url('/renderer/assets/vector-surrealism/star.svg');
   --vs-a-drip: url('/renderer/assets/vector-surrealism/drip.svg');
   --vs-a-grain: url('/renderer/assets/vector-surrealism/grain.svg');
 
   /* ---- the shared app variables, mapped onto the tokens ---- */
-  --bg: var(--vs-indigo);
+  --bg: var(--vs-night);
   --text: var(--vs-text);
   --dim: var(--vs-text-dim);
   --dimmer: var(--vs-text-dim);
   --line: var(--vs-line);
   --mono: var(--vs-num);
-  --acc-light: var(--vs-sun);
-  --acc-deep: var(--vs-coral);
+  --acc-light: var(--vs-gold);
+  --acc-deep: var(--vs-ember);
   background: var(--vs-ink);
   color-scheme: dark;
 }

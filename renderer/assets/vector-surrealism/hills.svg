@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 360" preserveAspectRatio="xMidYMax slice">
-  <!-- Vector Surrealism: three bands of distant flat hills at dusk (original artwork) -->
-  <path fill="#3A2C78" d="M0 170 C140 110 260 120 380 150 C500 180 600 90 760 100 C900 110 980 170 1120 150 C1260 130 1360 70 1480 90 C1540 100 1580 120 1600 130 V360 H0Z"/>
-  <path fill="#2A1F5C" d="M0 230 C120 190 240 200 360 220 C520 248 640 170 820 178 C980 186 1060 240 1220 226 C1360 214 1460 170 1600 186 V360 H0Z"/>
-  <!-- a hill that melts over a ledge -->
-  <path fill="#1B1340" d="M0 286 C160 250 300 262 420 280 C520 296 560 280 600 280 L600 318 a10 10 0 0 0 20 0 V286 C700 276 820 250 980 262 C1120 272 1240 300 1380 282 C1480 270 1560 256 1600 258 V360 H0Z"/>
-  <path fill="#0F0A2B" d="M0 330 C300 312 520 340 800 328 C1080 316 1300 336 1600 322 V360 H0Z"/>
-</svg>

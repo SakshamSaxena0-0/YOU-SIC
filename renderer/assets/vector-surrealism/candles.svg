@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 280">
+<!-- Vector Surrealism (dark fantasy): three candles on a stone ledge, their wax pooling and running over the edge in
+       long soft drips (original artwork) -->
+  <!-- the ledge and its long shadow -->
+  <path fill="#040208" opacity="0.5" d="M178 150l40 26v16h-40Z"/>
+  <path fill="#3D2E57" d="M0 144h182v10H0Z"/>
+  <path fill="#2C2140" d="M0 154h182v24H0Z"/>
+  <!-- long shadows of the candles -->
+  <g fill="#040208" opacity="0.45">
+    <path d="M40 54h28v90h-28Z M84 92h22v52h-22Z M120 72h26v72h-26Z" transform="translate(9 0)"/>
+  </g>
+  <!-- the candles -->
+  <g fill="#EEE2CB">
+    <path d="M30 56a4 4 0 0 1 4-4h20a4 4 0 0 1 4 4v88H30Z"/>
+    <path d="M74 94a4 4 0 0 1 4-4h14a4 4 0 0 1 4 4v50H74Z"/>
+    <path d="M110 74a4 4 0 0 1 4-4h18a4 4 0 0 1 4 4v70H110Z"/>
+    <!-- wax pooled along the ledge, running over its end in long drips -->
+    <path d="M22 144C22 138 30 138 40 140H150C176 140 184 142 186 150C188 160 188 170 188 196a7 7 0 0 1-14 0V178C174 170 170 168 166 172V226a8 8 0 0 1-16 0V160H22Z"/>
+    <path d="M58 64h6v24a3 3 0 0 1-6 0Z M30 70h5v40a2.5 2.5 0 0 1-5 0Z M130 84h6v30a3 3 0 0 1-6 0Z M92 100h4v16a2 2 0 0 1-4 0Z"/>
+  </g>
+  <!-- the shaded side of each candle -->
+  <g fill="#CDBE9F">
+    <path d="M50 52h4a4 4 0 0 1 4 4v88h-8Z M90 90h2a4 4 0 0 1 4 4v50h-6Z M128 70h4a4 4 0 0 1 4 4v70h-8Z M174 178v18a7 7 0 0 0 14 0V170c-2 4-8 6-14 8Z"/>
+  </g>
+  <!-- wicks and flames -->
+  <g fill="#0A0610"><path d="M43 42h2v10h-2Z M84 80h2v10h-2Z M122 60h2v10h-2Z"/></g>
+  <g fill="#EF7D45">
+    <path d="M44 14c6 8 9 14 9 19a9 9 0 0 1-18 0c0-5 3-11 9-19Z"/>
+    <path d="M85 54c5 6 7 11 7 15a7 7 0 0 1-14 0c0-4 2-9 7-15Z"/>
+    <path d="M123 32c6 7 8 12 8 17a8 8 0 0 1-16 0c0-5 2-10 8-17Z"/>
+  </g>
+  <g fill="#E8BF5F">
+    <path d="M44 26c3 4 4 7 4 9a4 4 0 0 1-8 0c0-2 1-5 4-9Z"/>
+    <path d="M85 63c2 3 3 5 3 7a3 3 0 0 1-6 0c0-2 1-4 3-7Z"/>
+    <path d="M123 42c3 3 4 6 4 8a4 4 0 0 1-8 0c0-2 1-5 4-8Z"/>
+  </g>
+</svg>

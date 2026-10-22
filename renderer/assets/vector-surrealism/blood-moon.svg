@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 440">
+<!-- Vector Surrealism (dark fantasy): a giant blood moon that is slowly melting, two ravens crossing it (original artwork) -->
+  <defs>
+    <mask id="lit"><circle cx="200" cy="200" r="168" fill="#fff"/><circle cx="226" cy="222" r="166" fill="#000"/></mask>
+  </defs>
+  <circle cx="200" cy="200" r="198" fill="#EE5D72" opacity="0.07"/>
+  <circle cx="200" cy="200" r="184" fill="#EE5D72" opacity="0.1"/>
+  <!-- hard offset long shadow -->
+  <circle cx="214" cy="214" r="168" fill="#040208" opacity="0.5"/>
+  <!-- the moon and its drips -->
+  <path fill="#B8394F" d="M200 32a168 168 0 1 1-0.1 0Z
+    M262 340h26v52a13 13 0 0 1-26 0Z
+    M300 312h18v34a9 9 0 0 1-18 0Z
+    M150 356h20v62a10 10 0 0 1-20 0Z"/>
+  <!-- the lit rim, a flat crescent on the upper left -->
+  <circle cx="200" cy="200" r="168" fill="#EE5D72" mask="url(#lit)"/>
+  <!-- craters: flat discs, darker, with a lit lip -->
+  <g fill="#8E2740">
+    <circle cx="140" cy="140" r="34"/>
+    <circle cx="258" cy="118" r="20"/>
+    <circle cx="236" cy="236" r="44"/>
+    <circle cx="120" cy="262" r="16"/>
+    <circle cx="302" cy="214" r="12"/>
+  </g>
+  <g fill="#B8394F">
+    <circle cx="146" cy="146" r="24"/>
+    <circle cx="244" cy="244" r="32"/>
+  </g>
+  <!-- ravens -->
+  <g fill="#0A0610">
+    <path transform="translate(96 168) scale(1.15)" d="M0 0C10-10 22-14 34-8C40-4 44 2 46 6C48 2 52-4 58-8C70-14 82-10 92 0C84-4 76-4 70-2L74 4L66 2L64 8L58 4C54 8 50 12 46 15C42 12 38 8 34 4L28 8L26 2L18 4L22-2C16-4 8-4 0 0Z"/>
+    <path transform="translate(236 92) scale(0.62) rotate(-8)" d="M0 0C10-10 22-14 34-8C40-4 44 2 46 6C48 2 52-4 58-8C70-14 82-10 92 0C84-4 76-4 70-2L74 4L66 2L64 8L58 4C54 8 50 12 46 15C42 12 38 8 34 4L28 8L26 2L18 4L22-2C16-4 8-4 0 0Z"/>
+  </g>
+</svg>

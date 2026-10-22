@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 260">
+<!-- Vector Surrealism (dark fantasy): a flat storm cloud with a dragon's eye open in it, and a bolt falling from
+       it (original artwork). The eye spans x 140-260, y 108-172; eyelid.svg is laid over exactly that box to blink. -->
+  <path fill="#040208" opacity="0.5" transform="translate(12 12)" d="M70 200a50 50 0 0 1 20-96a66 66 0 0 1 120-38a58 58 0 0 1 104 34a48 48 0 0 1 16 100Z"/>
+  <path fill="#3A2B52" d="M70 200a50 50 0 0 1 20-96a66 66 0 0 1 120-38a58 58 0 0 1 104 34a48 48 0 0 1 16 100Z"/>
+  <!-- the lit tops of the billows -->
+  <path fill="#4A3866" d="M90 104a66 66 0 0 1 120-38a58 58 0 0 1 104 34a50 50 0 0 0-104-20a62 62 0 0 0-120 24Z"/>
+  <!-- a bolt -->
+  <path fill="#E8BF5F" d="M292 196l-16 30h13l-11 28 28-38h-13l11-20Z"/>
+  <!-- the eye: amber, with a slit pupil -->
+  <path fill="#E8BF5F" d="M140 140Q200 92 260 140Q200 188 140 140Z"/>
+  <circle cx="200" cy="140" r="23" fill="#EF7D45"/>
+  <ellipse cx="200" cy="140" rx="5" ry="21" fill="#0A0610"/>
+  <circle cx="209" cy="130" r="3.5" fill="#EEE2CB"/>
+</svg>

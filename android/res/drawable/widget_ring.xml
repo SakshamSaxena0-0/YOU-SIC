@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The widget's progress around the cover: a ring arc from 12 o'clock, as long as the progress (level).
+     NowPlayingWidget sizes the view 399 x 399 (scaled), for a ring of radius 196 and 5 thick:
+     inner radius 399 / 2.062 = 193.5, thickness 399 / 79.8 = 5. -->
+<rotate xmlns:android="http://schemas.android.com/apk/res/android"
+    android:fromDegrees="270"
+    android:pivotX="50%"
+    android:pivotY="50%"
+    android:toDegrees="270">
+    <shape
+        android:innerRadiusRatio="2.062"
+        android:shape="ring"
+        android:thicknessRatio="79.8"
+        android:useLevel="true">
+        <solid android:color="#FF8CB5D3" />
+    </shape>
+</rotate>

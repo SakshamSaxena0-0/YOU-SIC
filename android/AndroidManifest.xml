@@ -42,5 +42,18 @@
             android:name=".PlaybackService"
             android:exported="false"
             android:foregroundServiceType="mediaPlayback" />
+
+        <!-- the home-screen widget: what is playing, with prev / play / next -->
+        <receiver
+            android:name=".NowPlayingWidget"
+            android:exported="true"
+            android:label="@string/widget_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_player" />
+        </receiver>
     </application>
 </manifest>

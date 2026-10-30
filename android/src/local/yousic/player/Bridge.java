@@ -140,6 +140,27 @@ final class Bridge {
         });
     }
 
+    // ---------- buttons outside the page: notification, lock screen, headset, home-screen widget ----------
+
+    private final java.util.ArrayList<String> waiting = new java.util.ArrayList<>();
+    private boolean listening;
+
+    /** A button for the page (main thread). Kept until the page listens: a widget button may have started it. */
+    void command(String c) {
+        if (listening) emit("cmd", JSONObject.quote(c));
+        else waiting.add(c);
+    }
+
+    /** From the page: it is listening for commands now. */
+    @JavascriptInterface
+    public void commandsReady() {
+        main.post(() -> {
+            listening = true;
+            for (String c : waiting) emit("cmd", JSONObject.quote(c));
+            waiting.clear();
+        });
+    }
+
     /** An event for the page: "progress" (library scan) or "cmd" (prev, next, toggle, play, pause, seek:N). */
     void emit(String type, String json) {
         final String js = "window.__paEmit&&window.__paEmit(" + JSONObject.quote(type) + "," + JSONObject.quote(json) + ")";

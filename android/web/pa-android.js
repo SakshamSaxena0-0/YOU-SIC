@@ -75,7 +75,8 @@
     setGlass: no, glassSupported: no,
     setTitle: noop, setProgress: noop, showInFolder: noop, setThumbar: noop, setWallpaperMode: noop,
     onProgress: function (cb) { listeners.progress.push(cb); },
-    onCommand: function (cb) { listeners.cmd.push(cb); },
+    // the app is listening: buttons pressed while the page was starting (the widget, with the app closed) run now
+    onCommand: function (cb) { listeners.cmd.push(cb); if (N.commandsReady) N.commandsReady(); },
     onWinState: noop, onWallpaper: noop, onGeom: noop,
     // the playback notification, lock screen and headset buttons (PlaybackService.java)
     nowPlaying: function (info) { N.nowPlaying(info ? JSON.stringify(info) : ''); },

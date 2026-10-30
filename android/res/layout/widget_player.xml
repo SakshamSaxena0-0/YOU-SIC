@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The home-screen widget. NowPlayingWidget draws the pictures and places the views for the widget's size;
+     the positions here are for 5 x 3 cells on a phone about 1080 px wide (older Android keeps these). -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- no card: the moon (cover) and its orbit, the text, the buttons and the dark range, on the wallpaper -->
+    <ImageView
+        android:id="@+id/bg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:contentDescription="@null"
+        android:scaleType="fitXY" />
+
+    <!-- the lit part of the range: as wide as what has played -->
+    <FrameLayout
+        android:id="@+id/lit_clip"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|left">
+
+        <ImageView
+            android:id="@+id/lit"
+            android:layout_width="353dp"
+            android:layout_height="wrap_content"
+            android:contentDescription="@null"
+            android:scaleType="matrix" />
+    </FrameLayout>
+
+    <!-- the orbit: progress around the moon -->
+    <ProgressBar
+        android:id="@+id/ring"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="142dp"
+        android:layout_height="142dp"
+        android:layout_gravity="top|left"
+        android:layout_marginLeft="13dp"
+        android:layout_marginTop="22dp"
+        android:indeterminate="false"
+        android:max="1000"
+        android:maxWidth="2000dp"
+        android:maxHeight="2000dp"
+        android:minWidth="0dp"
+        android:minHeight="0dp"
+        android:progress="0"
+        android:progressDrawable="@drawable/widget_ring" />
+
+    <ImageView
+        android:id="@+id/ring_star"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|left"
+        android:contentDescription="@null" />
+
+    <!-- the playhead on the range -->
+    <ImageView
+        android:id="@+id/head"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="top|left"
+        android:contentDescription="@null"
+        android:scaleType="matrix" />
+
+    <Chronometer
+        android:id="@+id/elapsed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|left"
+        android:layout_marginLeft="23dp"
+        android:layout_marginTop="173dp"
+        android:fontFamily="@font/manrope_semibold"
+        android:fontFeatureSettings="tnum"
+        android:includeFontPadding="false"
+        android:textColor="#FFA3A8BC"
+        android:textSize="11sp" />
+
+    <Chronometer
+        android:id="@+id/remain"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|right"
+        android:layout_marginTop="173dp"
+        android:layout_marginRight="23dp"
+        android:fontFamily="@font/manrope_semibold"
+        android:fontFeatureSettings="tnum"
+        android:includeFontPadding="false"
+        android:textColor="#FFA3A8BC"
+        android:textSize="11sp" />
+
+    <!-- what the buttons drawn on the card answer to -->
+    <FrameLayout
+        android:id="@+id/hit_prev"
+        android:layout_width="43dp"
+        android:layout_height="43dp"
+        android:layout_gravity="top|left"
+        android:layout_marginLeft="172dp"
+        android:layout_marginTop="125dp"
+        android:background="@drawable/widget_hit"
+        android:contentDescription="@string/widget_prev" />
+
+    <FrameLayout
+        android:id="@+id/hit_play"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_gravity="top|left"
+        android:layout_marginLeft="208dp"
+        android:layout_marginTop="115dp"
+        android:background="@drawable/widget_hit"
+        android:contentDescription="@string/widget_play" />
+
+    <FrameLayout
+        android:id="@+id/hit_next"
+        android:layout_width="43dp"
+        android:layout_height="43dp"
+        android:layout_gravity="top|left"
+        android:layout_marginLeft="266dp"
+        android:layout_marginTop="125dp"
+        android:background="@drawable/widget_hit"
+        android:contentDescription="@string/widget_next" />
+</FrameLayout>

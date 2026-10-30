@@ -108,7 +108,11 @@ export class Waveform {
     const id = track.id;
     setTimeout(() => {
       if (this.trackId !== id) return;
-      computePeaks(track).then((p) => { if (this.trackId === id) { this.target = p; this.invalidate(); } }).catch(() => {
+      computePeaks(track).then((p) => {
+        if (this.trackId !== id) return;
+        this.target = p; this.peaksId = id; this.invalidate();
+        if (this.onPeaks) this.onPeaks(); // Android's home-screen widget draws them too
+      }).catch(() => {
         if (this.trackId === id) { this.target = fakePeaks(id); this.invalidate(); }
       });
     }, 350);

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_label">Moon Player</string>
+    <string name="widget_desc">The song playing in YouSic, under a starry sky</string>
+    <string name="widget_prev">Previous</string>
+    <string name="widget_play">Play or pause</string>
+    <string name="widget_next">Next</string>
+</resources>

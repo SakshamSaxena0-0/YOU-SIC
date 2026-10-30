@@ -49,17 +49,8 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle state) {
         super.onCreate(state);
         current = this;
-        boolean fresh = web == null;
-        if (fresh) {
-            Context app = getApplicationContext();
-            Library library = new Library(app);
-            server = new Server(app, library);
-            bridge = new Bridge(app, library);
-            triedFallback = false;
-            webCtx = new MutableContextWrapper(this);
-            web = new WebView(webCtx);
-            setup(web, server);
-        } else {
+        boolean fresh = createPage(this);
+        if (!fresh) {
             webCtx.setBaseContext(this);
             ViewGroup parent = (ViewGroup) web.getParent();
             if (parent != null) parent.removeView(web);
@@ -72,7 +63,34 @@ public class MainActivity extends Activity {
         }
     }
 
-    private void load() {
+    /** Creates the page (WebView, server, bridge) unless it exists. True if it was created now. Main thread. */
+    private static boolean createPage(Context base) {
+        if (web != null) return false;
+        Context app = base.getApplicationContext();
+        Library library = new Library(app);
+        server = new Server(app, library);
+        bridge = new Bridge(app, library);
+        triedFallback = false;
+        webCtx = new MutableContextWrapper(base);
+        web = new WebView(webCtx);
+        setup(web, server);
+        return true;
+    }
+
+    /**
+     * Starts the page without opening the app (a widget button pressed while the app was closed): the music
+     * plays in it. The activity adopts it when the app is opened. False if it can't start (no permission
+     * to read music yet: the app has to be opened once).
+     */
+    static boolean startPageInBackground(Context c) {
+        if (web != null) return true;
+        if (!canReadMusic(c)) return false;
+        createPage(c.getApplicationContext());
+        load();
+        return true;
+    }
+
+    private static void load() {
         web.loadUrl(ORIGIN + "renderer/index.html");
     }
 

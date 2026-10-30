@@ -76,6 +76,7 @@ public class PlaybackService extends Service {
             playing = next != null && next.optBoolean("playing");
             if (inst != null) inst.apply();
             else if (playing) start(c);
+            NowPlayingWidget.onNowPlaying(c, next, playing);
         });
     }
 
@@ -130,6 +131,20 @@ public class PlaybackService extends Service {
         if (a == null) {
             // started by update() with startForegroundService(): a foreground notification is due right away
             if (!foreground) goForeground(build());
+        } else if (a.startsWith(NowPlayingWidget.ACTION)) {
+            // a home-screen widget button, sent with startForegroundService(): foreground right away, then
+            // start the page if the app was closed (the button waits until it listens)
+            goForeground(build());
+            if (!MainActivity.startPageInBackground(this)) {
+                // never opened, so it may not read music yet: nothing can play
+                stopForeground(STOP_FOREGROUND_REMOVE);
+                foreground = false;
+                stopSelf();
+                return START_NOT_STICKY;
+            }
+            command(a.substring(NowPlayingWidget.ACTION.length()));
+            if (!playing) main.postDelayed(leaveForeground, LEAVE_FOREGROUND_MS);
+            return START_NOT_STICKY;
         } else if ("dismiss".equals(a)) {
             if (!playing) { stopSelf(); return START_NOT_STICKY; }
         } else {
@@ -139,10 +154,10 @@ public class PlaybackService extends Service {
         return START_NOT_STICKY;
     }
 
-    /** A button (notification, lock screen, headset): tell the page. */
+    /** A button (notification, lock screen, headset, widget): tell the page. */
     private void command(String c) {
         Bridge b = MainActivity.bridge;
-        if (b != null) b.emit("cmd", JSONObject.quote(c));
+        if (b != null) b.command(c);
     }
 
     private void apply() {
@@ -195,6 +210,13 @@ public class PlaybackService extends Service {
     /** Paused for a while: the notification can be swiped away and the phone may sleep. */
     private void leaveForeground() {
         if (playing || !foreground) return;
+        if (info == null) { // a widget button that didn't start anything: no notification to keep
+            stopForeground(STOP_FOREGROUND_REMOVE);
+            foreground = false;
+            if (wake.isHeld()) wake.release();
+            stopSelf();
+            return;
+        }
         stopForeground(STOP_FOREGROUND_DETACH);
         foreground = false;
         if (wake.isHeld()) wake.release();

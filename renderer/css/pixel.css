@@ -230,7 +230,7 @@ html.theme-pixel .row:hover { scale: 1; background: var(--px-lav); box-shadow: i
 html.theme-pixel .row:hover :is(.r-title, .r-sub, .r-dur, .t-num, .r-chev) { color: var(--px-ink); text-shadow: none; }
 html.theme-pixel .row::after { display: none; }
 html.theme-pixel .row:hover .it-art { scale: 1; }
-html.theme-pixel .screen :has(> .row:hover) > .row:not(:hover) { opacity: 0.85; }
+@media (hover: hover) { html.theme-pixel .screen :has(> .row:hover) > .row:not(:hover) { opacity: 0.85; } }
 html.theme-pixel .it-art { border-radius: 4px; background-color: var(--px-lav); box-shadow: 0 0 0 2px var(--px-ink), 3px 3px 0 2px var(--px-ink); }
 html.theme-pixel .it-art.round { border-radius: 50%; }
 html.theme-pixel .it-art.ph { background: var(--px-lav); color: var(--px-violet); }

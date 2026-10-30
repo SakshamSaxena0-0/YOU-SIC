@@ -54,7 +54,7 @@ html.theme-liminal .lm-world {
      whenever the layout changes; these are the fallbacks) */
   --vx: 50vw; --vy: 30vh;
 }
-html.theme-liminal:has(.app.wide) .lm-world { --vx: calc(var(--pw) / 2); }
+html.theme-liminal.app-wide .lm-world { --vx: calc(var(--pw) / 2); }
 html.theme-liminal .lm-world :where(i) { position: absolute; display: block; background: center / 100% 100% no-repeat; }
 /* the dream: one soft gradient, dusk periwinkle at the top melting through mauve into dusty rose, with
    a warm sunset glow behind the cover and soft blooms of colour in the corners (static) */
@@ -304,7 +304,7 @@ html.theme-liminal .item-list { display: flex; flex-direction: column; gap: 4px;
 html.theme-liminal .row { gap: 12px; padding: 0 12px 0 10px; border-radius: var(--lm-r); background: transparent; color: var(--lm-text); transition: background-color 400ms, box-shadow 400ms; }
 html.theme-liminal .row:hover { scale: 1; background: linear-gradient(90deg, color-mix(in srgb, var(--lm-peach) 16%, var(--lm-dusk)), color-mix(in srgb, var(--lm-dusk) 80%, transparent)); box-shadow: var(--lm-edge); }
 html.theme-liminal .row::after { display: none; }
-html.theme-liminal .screen :has(> .row:hover) > .row:not(:hover) { opacity: 1; }
+@media (hover: hover) { html.theme-liminal .screen :has(> .row:hover) > .row:not(:hover) { opacity: 1; } }
 html.theme-liminal .r-title { color: var(--lm-text); font-weight: 500; }
 html.theme-liminal .row:hover .r-title { color: var(--lm-text); }
 html.theme-liminal .r-sub { color: var(--lm-text-dim); }
@@ -331,7 +331,7 @@ html.theme-liminal .eqbars i { background: var(--lm-gold); box-shadow: none; bor
 html.theme-liminal .gcell .it-art { border-radius: var(--lm-r); box-shadow: 0 0 0 1px var(--lm-line), 0 18px 30px -18px var(--lm-ink); transition: translate 500ms var(--lm-ease), box-shadow 500ms var(--lm-ease); }
 html.theme-liminal .gcell .it-art::after { display: none; }
 html.theme-liminal .gcell:hover .it-art { transform: none; scale: 1; translate: 0 -3px; box-shadow: 0 0 0 1px color-mix(in srgb, var(--lm-gold) 50%, transparent), 0 22px 34px -18px var(--lm-ink), 0 0 36px -6px color-mix(in srgb, var(--lm-gold) 55%, transparent); }
-html.theme-liminal .screen :has(> .gcell:hover) > .gcell:not(:hover) { opacity: 1; }
+@media (hover: hover) { html.theme-liminal .screen :has(> .gcell:hover) > .gcell:not(:hover) { opacity: 1; } }
 html.theme-liminal .g-title { color: var(--lm-text); font-weight: 500; margin-top: 10px; }
 html.theme-liminal .g-sub { color: var(--lm-text-dim); }
 /* album / artist header */
@@ -465,7 +465,7 @@ html.theme-liminal .switch:focus-visible { outline-offset: 4px; }
 html.theme-liminal.idle :is(.lm-world i, .eqbars i) { animation-play-state: paused !important; }
 /* Reduce effects (which follows Windows' reduced motion until chosen) and the Reduce motion switch:
    the grain stops jumping; the picture stays */
-html.theme-liminal.fx-lite .lm-world i, html.theme-liminal:has(.app.reduce-motion) .lm-world i { animation: none !important; translate: none; transition: none; }
+html.theme-liminal.fx-lite .lm-world i, html.theme-liminal.app-reduce-motion .lm-world i { animation: none !important; translate: none; transition: none; }
 @media (prefers-reduced-motion: reduce) {
   html.theme-liminal .lm-world i { animation: none !important; translate: none; transition: none; }
 }

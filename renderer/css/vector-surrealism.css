@@ -90,7 +90,7 @@ html.theme-vector-surrealism .vs-candles { left: -6px; top: 26vh; width: clamp(1
    window by 24px, hence the + 24px. Under the library, on the crags: a gothic doorway to nowhere with
    a wisp in it (--vs-lpane is the library's width, app.css --lw). */
 html.theme-vector-surrealism :is(.vs-moon, .vs-door, .vs-hand, .vs-serpent) { display: none; }
-html.theme-vector-surrealism:has(.app.wide.side-on) :is(.vs-moon, .vs-hand, .vs-serpent), html.theme-vector-surrealism:has(.app.wide:not([data-screen='eq'])) .vs-door { display: block; }
+html.theme-vector-surrealism.app-wide.app-side-on :is(.vs-moon, .vs-hand, .vs-serpent), html.theme-vector-surrealism.app-wide:not([data-screen='eq']) .vs-door { display: block; }
 html.theme-vector-surrealism .vs-world { --vs-pane: clamp(280px, 25vw, 440px); --vs-lpane: clamp(320px, 27vw, 460px); }
 html.theme-vector-surrealism .vs-moon { right: calc(var(--vs-pane) / 2 - clamp(150px, 14vw, 250px) / 2 + 24px); bottom: 6vh; width: clamp(150px, 14vw, 250px); aspect-ratio: 400 / 440; background-image: var(--vs-a-moon); animation: vs-bob 20s steps(40) infinite alternate; }
 html.theme-vector-surrealism .vs-serpent { right: -2vw; bottom: 58vh; width: clamp(220px, 22vw, 360px); aspect-ratio: 640 / 200; opacity: 0.8; background-image: var(--vs-a-serpent); animation: vs-drift 12s steps(24) infinite alternate; }
@@ -374,7 +374,7 @@ html.theme-vector-surrealism .row.track.static { left: auto; right: auto; width:
 html.theme-vector-surrealism .row.track.static:nth-child(even) { margin-inline: var(--vs-step) 0; }
 html.theme-vector-surrealism .row:hover { scale: 1; background: var(--vs-dusk-hi); translate: 0 -4px; box-shadow: var(--vs-long-sm-up); }
 html.theme-vector-surrealism .row::after { display: none; }
-html.theme-vector-surrealism .screen :has(> .row:hover) > .row:not(:hover) { opacity: 1; }
+@media (hover: hover) { html.theme-vector-surrealism .screen :has(> .row:hover) > .row:not(:hover) { opacity: 1; } }
 html.theme-vector-surrealism .r-title { color: var(--vs-text); font-weight: 600; }
 html.theme-vector-surrealism .row:hover .r-title { color: var(--vs-text); }
 html.theme-vector-surrealism .r-sub { color: var(--vs-text-dim); }
@@ -399,7 +399,7 @@ html.theme-vector-surrealism .eqbars i { background: var(--vs-gold); box-shadow:
 html.theme-vector-surrealism .gcell .it-art { border-radius: var(--vs-r-door); corner-shape: var(--vs-cs-arch); box-shadow: var(--vs-long); transition: translate var(--vs-t) var(--vs-ease), box-shadow var(--vs-t) var(--vs-ease); }
 html.theme-vector-surrealism .gcell .it-art::after { display: none; }
 html.theme-vector-surrealism .gcell:hover .it-art { transform: none; scale: 1; translate: 0 -4px; box-shadow: var(--vs-long-up); }
-html.theme-vector-surrealism .screen :has(> .gcell:hover) > .gcell:not(:hover) { opacity: 1; }
+@media (hover: hover) { html.theme-vector-surrealism .screen :has(> .gcell:hover) > .gcell:not(:hover) { opacity: 1; } }
 html.theme-vector-surrealism .g-title { color: var(--vs-text); font-weight: 600; margin-top: 12px; }
 html.theme-vector-surrealism .g-sub { color: var(--vs-text-dim); }
 /* album / artist header */
@@ -568,8 +568,8 @@ html.theme-vector-surrealism.idle .play-wrap::before { animation-play-state: pau
 /* Reduce effects (which follows Windows' reduced motion until chosen) and the Reduce motion switch:
    the world stands still and stops following the mouse; the art stays */
 html.theme-vector-surrealism.fx-lite :is(.vs-world i, .vs-lid), html.theme-vector-surrealism.fx-lite .play-wrap::before,
-html.theme-vector-surrealism:has(.app.reduce-motion) :is(.vs-world i, .vs-lid), html.theme-vector-surrealism:has(.app.reduce-motion) .play-wrap::before { animation: none !important; }
-html.theme-vector-surrealism.fx-lite .vs-layer, html.theme-vector-surrealism:has(.app.reduce-motion) .vs-layer { translate: none; transition: none; }
+html.theme-vector-surrealism.app-reduce-motion :is(.vs-world i, .vs-lid), html.theme-vector-surrealism.app-reduce-motion .play-wrap::before { animation: none !important; }
+html.theme-vector-surrealism.fx-lite .vs-layer, html.theme-vector-surrealism.app-reduce-motion .vs-layer { translate: none; transition: none; }
 @media (prefers-reduced-motion: reduce) {
   html.theme-vector-surrealism :is(.vs-world i, .vs-lid), html.theme-vector-surrealism .play-wrap::before { animation: none !important; }
   html.theme-vector-surrealism .vs-layer { translate: none; transition: none; }

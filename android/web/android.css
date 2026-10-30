@@ -37,7 +37,7 @@ html.android .app:not(.wide):not([data-screen='eq']) #eq {
 
 /* 2. So is the theme's backdrop while the library or the equalizer covers the screen: their backgrounds
       let a tenth of it through at most. (Pixel's library is see-through, so its backdrop stays.) */
-html.android:not(.theme-pixel):has(.app:not(.wide):is([data-screen='library'], [data-screen='eq'])) :is(#wall, #fx, #vsWorld, #lmWorld, #mnWorld) {
+html.android:not(.theme-pixel):not(.app-wide):is([data-screen='library'], [data-screen='eq']) :is(#wall, #fx, #vsWorld, #lmWorld, #mnWorld) {
   visibility: hidden; transition: visibility 0s linear 0.55s;
 }
 

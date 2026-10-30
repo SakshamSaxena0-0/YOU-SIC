@@ -1227,9 +1227,9 @@ html.glass-window, html.glass-window body { background: transparent; }
 .row .it-art { transition: scale 0.45s var(--spring), box-shadow 0.3s; }
 .row:hover .it-art { scale: 1.08; box-shadow: 0 10px 20px -8px rgba(0, 0, 0, 0.75); }
 .row:hover .r-title { color: #fff; }
-.screen :has(> .row:hover) > .row:not(:hover) { opacity: 0.5; }
+@media (hover: hover) { .screen :has(> .row:hover) > .row:not(:hover) { opacity: 0.5; } }
 .gcell { transition: opacity 0.3s; }
-.screen :has(> .gcell:hover) > .gcell:not(:hover) { opacity: 0.55; }
+@media (hover: hover) { .screen :has(> .gcell:hover) > .gcell:not(:hover) { opacity: 0.55; } }
 .gcell:hover .it-art { scale: 1.04; }
 
 /* ==========================================================================

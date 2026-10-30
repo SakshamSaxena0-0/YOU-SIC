@@ -370,7 +370,7 @@ html.theme-subway .fx-aurora i:nth-child(3) { left: 20vw; bottom: -30vmax; backg
 html.theme-subway .grain { display: block; opacity: 0.03; }
 /* a faint perspective grid floor under the right-hand panel only */
 html.theme-subway .fx-grid { display: none; }
-html:has(.app.wide).theme-subway .fx-grid {
+html.app-wide.theme-subway .fx-grid {
   display: block; position: absolute; left: auto; right: 0; width: clamp(280px, 25vw, 440px); bottom: 0; height: 34vh; transform-origin: 50% 100%;
   transform: perspective(320px) rotateX(58deg) scale(1.6);
   background:
@@ -601,7 +601,7 @@ html.theme-subway .nav-btn:not(.on):hover .ico { filter: var(--neon); }
 html.theme-subway .nav-ink { top: 6px; bottom: 6px; border-radius: 10px; box-shadow: var(--gel-shadow-hover); }
 /* hover magnifies the icon and, a little, its neighbours */
 html.theme-subway .pl-nav .nav-btn:hover .ico { scale: 1.18; }
-html.theme-subway .pl-nav .nav-btn:hover + .nav-btn .ico, html.theme-subway .pl-nav .nav-btn:has(+ .nav-btn:hover) .ico { scale: 1.08; }
+@media (hover: hover) { html.theme-subway .pl-nav .nav-btn:hover + .nav-btn .ico, html.theme-subway .pl-nav .nav-btn:has(+ .nav-btn:hover) .ico { scale: 1.08; } }
 html.theme-subway .nav-btn:active { transform: none; }
 
 /* ---------- §10 right pane: header ---------- */
@@ -684,7 +684,7 @@ html.theme-subway .row.item { height: 56px; }
 html.theme-subway .row { gap: 12px; padding: 0 12px 0 6px; transition: translate var(--t-fast), box-shadow var(--t-fast), background var(--t-fast); }
 /* hover nudges the row right and raises its glow; the others stay fully readable */
 html.theme-subway .row:hover { translate: 4px 0; scale: 1; }
-html.theme-subway .screen :has(> .row:hover) > .row:not(:hover) { opacity: 1; }
+@media (hover: hover) { html.theme-subway .screen :has(> .row:hover) > .row:not(:hover) { opacity: 1; } }
 /* thumbnails: 44px, 10px radius, a fine white inner stroke and gloss on the top half */
 html.theme-subway .row .it-art, html.theme-subway .row.item .it-art {
   width: 44px; height: 44px; border-radius: 10px; overflow: hidden;

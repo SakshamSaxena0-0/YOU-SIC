@@ -16,6 +16,18 @@ class App {
   constructor() {
     this.store = new Store();
     this.root = $('#app');
+    // Themes style things outside #app by the app's state (wide layout, side panel, reduced motion, the
+    // screen). Matched with html:has(.app...), every change on the page would re-check every style (about
+    // 50 ms on a phone, once a second as the time ticks), so the state is mirrored onto <html> instead.
+    const mirror = () => {
+      const a = this.root, h = document.documentElement;
+      h.classList.toggle('app-wide', a.classList.contains('wide'));
+      h.classList.toggle('app-side-on', a.classList.contains('side-on'));
+      h.classList.toggle('app-reduce-motion', a.classList.contains('reduce-motion'));
+      if (a.dataset.screen) h.dataset.screen = a.dataset.screen; else delete h.dataset.screen;
+    };
+    new MutationObserver(mirror).observe(this.root, { attributes: true, attributeFilter: ['class', 'data-screen'] });
+    mirror();
     this.screen = 'player';
     this.visOpen = false;
   }

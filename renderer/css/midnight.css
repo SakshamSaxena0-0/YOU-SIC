@@ -302,7 +302,7 @@ html.theme-midnight .item-list { display: flex; flex-direction: column; gap: 3px
 html.theme-midnight .row { gap: 12px; padding: 0 12px 0 10px; border-radius: var(--mn-r); background: transparent; color: var(--mn-text); transition: background-color 200ms, box-shadow 200ms; }
 html.theme-midnight .row:hover { scale: 1; background: var(--mn-gloss-soft), color-mix(in srgb, var(--mn-steel-7) 85%, transparent); box-shadow: var(--mn-edge); }
 html.theme-midnight .row::after { display: none; }
-html.theme-midnight .screen :has(> .row:hover) > .row:not(:hover) { opacity: 1; }
+@media (hover: hover) { html.theme-midnight .screen :has(> .row:hover) > .row:not(:hover) { opacity: 1; } }
 html.theme-midnight .r-title { color: var(--mn-text); font-weight: 500; }
 html.theme-midnight .row:hover .r-title { color: var(--mn-white); }
 html.theme-midnight .r-sub { color: var(--mn-text-dim); }
@@ -329,7 +329,7 @@ html.theme-midnight .eqbars i { background: var(--mn-cyan); box-shadow: 0 0 4px 
 html.theme-midnight .gcell .it-art { border-radius: var(--mn-r); box-shadow: 0 0 0 1px var(--mn-void), 0 0 0 2px color-mix(in srgb, var(--mn-chrome) 12%, transparent), 0 18px 30px -16px var(--mn-void); transition: translate var(--mn-t) var(--mn-ease), box-shadow var(--mn-t) var(--mn-ease); }
 html.theme-midnight .gcell .it-art::after { display: none; }
 html.theme-midnight .gcell:hover .it-art { transform: none; scale: 1; translate: 0 -3px; box-shadow: 0 0 0 1px var(--mn-void), 0 0 0 2px color-mix(in srgb, var(--mn-cyan) 55%, transparent), 0 22px 34px -16px var(--mn-void), var(--mn-glow); }
-html.theme-midnight .screen :has(> .gcell:hover) > .gcell:not(:hover) { opacity: 1; }
+@media (hover: hover) { html.theme-midnight .screen :has(> .gcell:hover) > .gcell:not(:hover) { opacity: 1; } }
 html.theme-midnight .g-title { color: var(--mn-text); font-weight: 500; margin-top: 10px; }
 html.theme-midnight .g-sub { color: var(--mn-text-dim); }
 /* album / artist header */
@@ -459,7 +459,7 @@ html.theme-midnight .swipe-hint { border-radius: var(--mn-r); background: var(--
 html.theme-midnight :focus-visible { outline: 2px solid var(--mn-cyan); outline-offset: 3px; }
 html.theme-midnight .nav-btn:focus-visible { box-shadow: none; }
 html.theme-midnight .switch:focus-visible { outline-offset: 4px; }
-html.theme-midnight.fx-lite :is(.pl-info > *), html.theme-midnight:has(.app.reduce-motion) :is(.pl-info > *) { animation: none !important; }
+html.theme-midnight.fx-lite :is(.pl-info > *), html.theme-midnight.app-reduce-motion :is(.pl-info > *) { animation: none !important; }
 @media (prefers-reduced-motion: reduce) {
   html.theme-midnight .pl-info > * { animation: none !important; }
 }

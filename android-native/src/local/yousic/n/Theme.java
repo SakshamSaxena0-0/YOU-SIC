@@ -28,7 +28,10 @@ public abstract class Theme {
     /** a glow round the play / pause glyph (0: none) */
     protected int playGlyphGlow;
 
-    protected Theme(Context c) { dp = c.getResources().getDisplayMetrics().density; }
+    /** the interface's scale: every size in the app is in these "dp" (Android's, a little smaller) */
+    public static final float UI_SCALE = 0.9f;
+
+    protected Theme(Context c) { dp = c.getResources().getDisplayMetrics().density * UI_SCALE; }
 
     public float px(float dps) { return dps * dp; }
 

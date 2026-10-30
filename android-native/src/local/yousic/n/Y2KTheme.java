@@ -48,7 +48,8 @@ public final class Y2KTheme extends Theme {
         uiBold = c.getResources().getFont(R.font.manrope_bold);
         numFace = c.getResources().getFont(R.font.share_tech_mono);
         stampFace = numFace;
-        titleSize = 26; headerSize = 20; artistSize = 15; timeSize = 12; coverRadius = 12;
+        // Michroma is very wide: its sizes stay well under the other skins'
+        titleSize = 22; headerSize = 17; artistSize = 14; timeSize = 11; coverRadius = 12;
         titleCaps = true;
         titleGlow = alpha(TEAL, 0.5f);
         playGlyphGlow = alpha(AQUA, 0.9f);

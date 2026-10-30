@@ -67,18 +67,19 @@ public final class PlayerScreen extends ViewGroup implements Engine.Listener {
         listBtn = new Ui.Btn(c, Icons.LIST, Ui.Btn.ROUND);
         moreBtn = new Ui.Btn(c, Icons.MORE, Ui.Btn.ROUND);
         admireBtn = new Ui.Btn(c, Icons.EXPAND, Ui.Btn.ROUND);
-        for (Ui.Btn b : new Ui.Btn[]{ like, dislike, listBtn, moreBtn, admireBtn }) b.iconDp = 20;
+        for (Ui.Btn b : new Ui.Btn[]{ like, dislike, listBtn, moreBtn, admireBtn }) b.iconDp = 17;
         titleChip = new Ui.TextChip(c);
-        titleChip.tp.setTypeface(th.titleFace); titleChip.tp.setTextSize(th.px(th.titleSize * 0.72f)); titleChip.tp.setColor(th.text);
+        titleChip.tp.setTypeface(th.titleFace); titleChip.tp.setTextSize(th.px(th.titleSize * 0.64f)); titleChip.tp.setColor(th.text);
         if (th.titleGlow != 0) titleChip.tp.setShadowLayer(th.px(10), 0, 0, th.titleGlow);
         artistChip = new Ui.TextChip(c);
-        artistChip.tp.setTypeface(th.uiMedium); artistChip.tp.setTextSize(th.px(15)); artistChip.tp.setColor(th.accent);
+        artistChip.tp.setTypeface(th.uiMedium); artistChip.tp.setTextSize(th.px(th.artistSize - 1)); artistChip.tp.setColor(th.accent);
         String saved = stage.prefs().getString("slots", S_VIS + "," + S_TIMER + "," + S_REPEAT + "," + S_SHUFFLE);
         String[] parts = saved.split(",");
         for (int i = 0; i < 4; i++) {
             final int k = i;
             try { slotType[i] = Integer.parseInt(parts[i]); } catch (Exception ex) { slotType[i] = S_NONE; }
             slots[i] = new Ui.Btn(c, 0, Ui.Btn.CHIP);
+            slots[i].iconDp = 19;
             slots[i].click(() -> slotClick(slotType[k])).longClick(() -> slotLong(slotType[k]));
         }
         slotGap = new View(c);
@@ -88,7 +89,7 @@ public final class PlayerScreen extends ViewGroup implements Engine.Listener {
         next = new Ui.Btn(c, Icons.NEXT, Ui.Btn.ROUND);
         nextCat = new Ui.Btn(c, Icons.NEXT_CAT, Ui.Btn.ROUND_SMALL);
         prevCat.dim = true; nextCat.dim = true;
-        prev.iconDp = 30; next.iconDp = 30; prevCat.iconDp = 24; nextCat.iconDp = 24;
+        prev.iconDp = 25; next.iconDp = 25; prevCat.iconDp = 19; nextCat.iconDp = 19;
         play = new PlayView(c);
         seek = new SeekView(c);
         meta = new MetaView(c);
@@ -344,33 +345,37 @@ public final class PlayerScreen extends ViewGroup implements Engine.Listener {
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         int w = r - l, h = b - t;
         int bottom = h - reserveBottom - dp(2);
-        int metaTop = bottom - dp(26);
-        int seekTop = metaTop - dp(46);
-        int transH = dp(104), transTop = seekTop - dp(4) - transH;
-        int btnH = dp(44), btnTop = transTop - dp(2) - btnH;
+        int titleH = dp(40), artistH = dp(30), btnH = dp(40), transH = dp(92), seekH = dp(40), metaH = dp(24);
         int artTop = insetTop + dp(8);
-        int artSize = Math.min(w - dp(24), btnTop - dp(14) - dp(34) - dp(6) - dp(44) - dp(14) - artTop);
-        // the song right under the art; any room to spare goes between it and the buttons
-        int titleTop = artTop + artSize + dp(14), artistTop = titleTop + dp(44) + dp(6);
+        // the least room everything under the art needs
+        int stack = dp(12) + titleH + dp(6) + artistH + dp(14) + btnH + dp(8) + transH + dp(6) + seekH + metaH;
+        int artSize = Math.min(w - dp(24), bottom - artTop - stack);
+        // any room to spare is shared between the gaps, so nothing piles up in one place
+        int spare = Math.max(0, bottom - artTop - artSize - stack);
+        int titleTop = artTop + artSize + dp(12) + spare * 15 / 100, artistTop = titleTop + titleH + dp(6);
+        int btnTop = artistTop + artistH + dp(14) + spare * 35 / 100;
+        int transTop = btnTop + btnH + dp(8) + spare * 25 / 100;
+        int seekTop = transTop + transH + dp(6) + spare * 25 / 100;
+        int metaTop = seekTop + seekH;
         int artLeft = (w - artSize) / 2;
         artRect.set(artLeft, artTop, artLeft + artSize, artTop + artSize);
         Ui.place(pager, 0, artTop - dp(40), w, artSize + dp(80));
         pager.setCard(artLeft, dp(40), artSize);
         int pad = artLeft;
         // opposite the title and artist: rating and admire on the title's row, the queue and the menu on the artist's
-        int ab = dp(40), ag = dp(6), right = w - pad;
-        int likeW = like.label != null ? dp(56) : ab;
+        int ab = dp(34), ag = dp(6), right = w - pad;
+        int likeW = like.label != null ? dp(50) : ab;
         int x1 = right - ab;
-        Ui.place(admireBtn, x1, titleTop + (dp(44) - ab) / 2, ab, ab);
-        if (dislike.getVisibility() != GONE) { x1 -= ab + ag; Ui.place(dislike, x1, titleTop + (dp(44) - ab) / 2, ab, ab); }
-        if (like.getVisibility() != GONE) { x1 -= likeW + ag; Ui.place(like, x1, titleTop + (dp(44) - ab) / 2, likeW, ab); }
-        int y2 = artistTop + (dp(34) - ab) / 2;
+        Ui.place(admireBtn, x1, titleTop + (titleH - ab) / 2, ab, ab);
+        if (dislike.getVisibility() != GONE) { x1 -= ab + ag; Ui.place(dislike, x1, titleTop + (titleH - ab) / 2, ab, ab); }
+        if (like.getVisibility() != GONE) { x1 -= likeW + ag; Ui.place(like, x1, titleTop + (titleH - ab) / 2, likeW, ab); }
+        int y2 = artistTop + (artistH - ab) / 2;
         Ui.place(moreBtn, right - ab, y2, ab, ab);
         Ui.place(listBtn, right - 2 * ab - ag, y2, ab, ab);
         int textRight = Math.min(x1, right - 2 * ab - ag) - dp(8);
-        Ui.place(titleChip, pad, titleTop, textRight - pad, dp(44));
-        Ui.place(artistChip, pad, artistTop, textRight - pad, dp(34));
-        int bw = dp(76), gap = dp(8);
+        Ui.place(titleChip, pad, titleTop, textRight - pad, titleH);
+        Ui.place(artistChip, pad, artistTop, textRight - pad, artistH);
+        int bw = dp(66), gap = dp(8);
         Ui.place(slots[0], pad, btnTop, bw, btnH);
         Ui.place(slots[1], pad + bw + gap, btnTop, slots[1].label != null ? bw + dp(14) : bw, btnH);
         Ui.place(slots[3], w - pad - bw, btnTop, bw, btnH);
@@ -378,17 +383,17 @@ public final class PlayerScreen extends ViewGroup implements Engine.Listener {
         // between the two pairs: long press to edit the buttons
         Ui.place(slotGap, slots[1].getRight(), btnTop, Math.max(0, slots[2].getLeft() - slots[1].getRight()), btnH);
         int cy = transTop + transH / 2, cx = w / 2;
-        int ps = dp(100), ns = dp(64), cs = dp(50);
+        int ps = dp(88), ns = dp(56), cs = dp(44);
         Ui.place(play, cx - ps / 2, cy - ps / 2, ps, ps);
-        int off = Math.min(dp(92), (w / 2 - pad) * 92 / 168);
+        int off = Math.min(dp(84), (w / 2 - pad) * 84 / 168);
         Ui.place(prev, cx - off - ns / 2, cy - ns / 2, ns, ns);
         Ui.place(next, cx + off - ns / 2, cy - ns / 2, ns, ns);
-        int offc = Math.min(dp(154), w / 2 - pad - cs / 2);
+        int offc = Math.min(dp(146), w / 2 - pad - cs / 2);
         Ui.place(prevCat, cx - offc - cs / 2, cy - cs / 2, cs, cs);
         Ui.place(nextCat, cx + offc - cs / 2, cy - cs / 2, cs, cs);
         Ui.place(vis, pad, transTop - dp(30), w - 2 * pad, seekTop - transTop + dp(34));
-        Ui.place(seek, pad - dp(4), seekTop, w - 2 * pad + dp(8), dp(46));
-        Ui.place(meta, pad, metaTop, w - 2 * pad, dp(26));
+        Ui.place(seek, pad - dp(4), seekTop, w - 2 * pad + dp(8), seekH);
+        Ui.place(meta, pad, metaTop, w - 2 * pad, metaH);
     }
 
     // =====================================================================================================
@@ -939,7 +944,7 @@ public final class PlayerScreen extends ViewGroup implements Engine.Listener {
 
         SeekView(Context c) {
             super(c);
-            times.setTypeface(th.stampFace); times.setTextSize(th.px(th.timeSize + 1)); times.setColor(th.stamp);
+            times.setTypeface(th.stampFace); times.setTextSize(th.px(th.timeSize)); times.setColor(th.stamp);
             times.setTextAlign(Paint.Align.CENTER);
             times.setLetterSpacing(0.04f);
         }
@@ -967,7 +972,7 @@ public final class PlayerScreen extends ViewGroup implements Engine.Listener {
         @Override protected void onAttachedToWindow() { super.onAttachedToWindow(); ticking(engine.isPlaying()); }
         @Override protected void onDetachedFromWindow() { Choreographer.getInstance().removeFrameCallback(this); super.onDetachedFromWindow(); }
 
-        private float pillW() { return th.px(58); }
+        private float pillW() { return th.px(52); }
 
         /** Redraws only when something visible moved: the playhead by a pixel, or the time by a second. */
         void update(boolean force) {
@@ -987,7 +992,7 @@ public final class PlayerScreen extends ViewGroup implements Engine.Listener {
             bar.set(pw + th.px(8), th.px(2), getWidth() - pw - th.px(8), h - th.px(2));
             float p = dragProgress >= 0 ? dragProgress : progress;
             th.drawSeek(c, bar, peaks, p, dragProgress >= 0);
-            float ph = th.px(26), y = h / 2;
+            float ph = th.px(23), y = h / 2;
             pill.set(0, y - ph / 2, pw, y + ph / 2);
             th.drawChip(c, pill, ph / 2, false, false);
             c.drawText(dragProgress >= 0 ? fmt((long) (dragProgress * engine.durationMs())) : el, pill.centerX(), y - (times.ascent() + times.descent()) / 2, times);
@@ -1035,7 +1040,7 @@ public final class PlayerScreen extends ViewGroup implements Engine.Listener {
         MetaView(Context c) {
             super(c);
             setClickable(true); setLongClickable(true);
-            tp.setTypeface(th.uiMedium); tp.setTextSize(th.px(11.5f)); tp.setLetterSpacing(0.12f); tp.setColor(th.textDim);
+            tp.setTypeface(th.uiMedium); tp.setTextSize(th.px(10.5f)); tp.setLetterSpacing(0.12f); tp.setColor(th.textDim);
             tp.setTextAlign(Paint.Align.CENTER);
         }
 
@@ -1114,7 +1119,7 @@ public final class PlayerScreen extends ViewGroup implements Engine.Listener {
         }
 
         @Override protected void onDraw(Canvas c) {
-            float size = th.px(70) * Math.min(1f, getWidth() / th.px(100));
+            float size = getWidth() * 0.7f;
             float press = isPressed() ? th.px(1) : 0;
             th.drawPlay(c, getWidth() / 2f, getHeight() / 2f + press, size, morph, playing, progress);
         }

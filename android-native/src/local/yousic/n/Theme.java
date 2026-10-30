@@ -53,6 +53,68 @@ public abstract class Theme {
     /** Behind the title block, so text reads over the glow. */
     public void drawInfoShade(Canvas c, RectF r) {}
 
+    // ---------- controls: chips, round buttons, the bar at the bottom, popups, the visualizer ----------
+
+    protected final Paint ctl = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final RectF tmp = new RectF();
+
+    /** A pill behind a button or a label (on: the button is switched on). */
+    public void drawChip(Canvas c, RectF r, float radius, boolean pressed, boolean on) {
+        ctl.setStyle(Paint.Style.FILL);
+        ctl.setColor(on ? alpha(accent, pressed ? 0.36f : 0.24f) : alpha(ink, pressed ? 0.74f : 0.5f));
+        c.drawRoundRect(r, radius, radius, ctl);
+    }
+
+    /** A round transport button; small: the category steps. */
+    public void drawRound(Canvas c, float cx, float cy, float r, boolean pressed, boolean small) {
+        ctl.setStyle(Paint.Style.FILL);
+        ctl.setColor(alpha(ink, small ? (pressed ? 0.55f : 0.32f) : (pressed ? 0.85f : 0.62f)));
+        c.drawCircle(cx, cy, r, ctl);
+    }
+
+    /** Icon colour: on (switched on), dim (secondary). */
+    public int icon(boolean on, boolean dim) { return on ? accentHi : dim ? alpha(text, 0.55f) : text; }
+
+    /** The navigation bar at the bottom. */
+    public void drawNavBar(Canvas c, RectF r, float radius) {
+        ctl.setStyle(Paint.Style.FILL);
+        ctl.setColor(alpha(ink, 0.86f));
+        c.drawRoundRect(r, radius, radius, ctl);
+    }
+
+    /** A popup menu or dialog. */
+    public void drawSheet(Canvas c, RectF r, float radius) {
+        ctl.setStyle(Paint.Style.FILL);
+        ctl.setColor(panelHi);
+        c.drawRoundRect(r, radius, radius, ctl);
+    }
+
+    /** Behind a popup: the screen dims (a = 0..1). */
+    public void drawScrim(Canvas c, int w, int h, float a) { c.drawColor(alpha(0xFF000000, 0.5f * a)); }
+
+    /** The visualizer: n bands 0..1, bars rising from the bottom of r. */
+    public void drawVis(Canvas c, RectF r, float[] v, int n, float alpha) {
+        ctl.setStyle(Paint.Style.FILL);
+        ctl.setColor(alpha(accent, 0.35f * alpha));
+        float step = r.width() / n, bw = step * 0.62f;
+        for (int i = 0; i < n; i++) {
+            float x = r.left + i * step + (step - bw) / 2, h = Math.max(bw, v[i] * r.height());
+            tmp.set(x, r.bottom - h, x + bw, r.bottom);
+            c.drawRoundRect(tmp, bw / 2, bw / 2, ctl);
+        }
+    }
+
+    /** A switch (for menus and dialogs). */
+    public void drawSwitch(Canvas c, float cx, float cy, float on) {
+        float w = px(36), h = px(20);
+        ctl.setStyle(Paint.Style.FILL);
+        ctl.setColor(mix(accent, alpha(text, 0.25f), on));
+        tmp.set(cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2);
+        c.drawRoundRect(tmp, h / 2, h / 2, ctl);
+        ctl.setColor(on > 0.5f ? ink : text);
+        c.drawCircle(cx - w / 2 + h / 2 + (w - h) * on, cy, h / 2 - px(3), ctl);
+    }
+
     private final Paint glyphPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final android.graphics.Path glyph = new android.graphics.Path();
 
@@ -87,6 +149,15 @@ public abstract class Theme {
 
     /** color-mix(in srgb, c p%, transparent) */
     public static int alpha(int c, float p) { return (Math.round(255 * p) << 24) | (c & 0xFFFFFF); }
+
+    /** YouSic's skins, in its order. */
+    public static final String[] NAMES = { "Liquid Glass", "Cyberpunk", "Y2K Subway", "Pixel", "Vector Surrealism", "Liminal", "Midnight" };
+
+    /** This skin's name. */
+    public abstract String name();
+
+    /** whether a skin has been ported to the native app yet */
+    public static boolean ready(String name) { return name.equals("Liminal"); }
 
     private static Theme current;
 

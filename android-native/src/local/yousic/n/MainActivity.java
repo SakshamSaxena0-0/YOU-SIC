@@ -49,6 +49,7 @@ public final class MainActivity extends Activity implements Lib.Listener {
 
     @Override
     public void onRequestPermissionsResult(int req, String[] perms, int[] results) {
+        if (req == Stage.REQ_VIS) { stage.onPermission(req, results.length > 0 && results[0] == PackageManager.PERMISSION_GRANTED); return; }
         start();
     }
 
@@ -65,6 +66,7 @@ public final class MainActivity extends Activity implements Lib.Listener {
         app.lib.unlisten(stage.library);
         app.engine.unlisten(stage.player);
         app.engine.unlisten(stage.library);
+        if (stage.lyrics != null) stage.lyrics.close();
         super.onDestroy();
     }
 

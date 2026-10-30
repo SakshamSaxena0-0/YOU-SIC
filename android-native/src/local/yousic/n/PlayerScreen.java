@@ -6,7 +6,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.Path;
 import android.graphics.RectF;
 import android.text.TextPaint;
 import android.text.TextUtils;
@@ -16,152 +15,352 @@ import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
-import android.view.animation.PathInterpolator;
+
+import java.util.Locale;
 
 /**
- * The player: the album art (swipe it for the previous / next song), the song, the seek bar and the
- * controls. Every part is its own view, so a change redraws only that part; the art moves by translation
- * alone (its picture is recorded once).
+ * The player: the album art across the top (its buttons on it: like, dislike, the queue,
+ * the song's menu), the title and artist on chips, a row of buttons (visualization, sleep timer, repeat, shuffle),
+ * the transport (previous / next category, previous / next song, play), the seek bar with the times, and the
+ * format line. The art: swipe sideways for the previous / next song, further for the previous / next category,
+ * down (or tap) for the list the song plays from, up for the lyrics.
  */
 @SuppressLint("ViewConstructor")
 public final class PlayerScreen extends ViewGroup implements Engine.Listener {
     final Theme th;
     final Engine engine;
+    final Stage stage;
+    final VisView vis;
     final ArtPager pager;
-    final InfoView info;
-    final SeekView seek;
+    final Ui.Btn like, dislike, listBtn, moreBtn;
+    final Ui.TextChip titleChip, artistChip;
+    /** the row of four buttons (long press between them to choose them) */
+    final Ui.Btn[] slots = new Ui.Btn[4];
+    final int[] slotType = new int[4];
+    private final View slotGap;
+    static final int S_NONE = 0, S_VIS = 1, S_TIMER = 2, S_REPEAT = 3, S_SHUFFLE = 4, S_LYRICS = 5, S_EQ = 6, S_QUEUE = 7, S_SEARCH = 8, S_INFO = 9;
+    static final String[] SLOT_NAMES = { "Empty", "Visualization", "Sleep timer", "Repeat", "Shuffle", "Lyrics", "Equalizer", "Queue", "Search", "Audio info" };
+    static final int[] SLOT_ICONS = { 0, Icons.VIS, Icons.TIMER, Icons.REPEAT, Icons.SHUFFLE, Icons.LYRICS, Icons.EQ, Icons.QUEUE, Icons.SEARCH, Icons.INFO };
+    final Ui.Btn prevCat, prev, next, nextCat;
     final PlayView play;
-    final GlyphButton prev, next, shuffle, repeat, libraryBtn, menuBtn;
-    final SourceView sourceView;
-    int insetTop, insetBottom;
+    final SeekView seek;
+    final MetaView meta;
+    int insetTop, reserveBottom;
     /** the art's rectangle in this view (for the library transition) */
     final RectF artRect = new RectF();
-    Runnable onOpenLibrary;
 
-    PlayerScreen(Context c, Engine e) {
+    PlayerScreen(Context c, Engine e, Stage s) {
         super(c);
-        setClipChildren(false); // the cover's glow reaches past the pager
+        setClipChildren(false); // the cover's glow and the play button's halo reach past their views
         th = Theme.get(c);
         engine = e;
+        stage = s;
+        vis = new VisView(c);
         pager = new ArtPager(c);
-        info = new InfoView(c);
-        seek = new SeekView(c);
+        like = new Ui.Btn(c, Icons.THUMB_UP, Ui.Btn.ROUND);
+        dislike = new Ui.Btn(c, Icons.THUMB_DOWN, Ui.Btn.ROUND);
+        listBtn = new Ui.Btn(c, Icons.LIST, Ui.Btn.ROUND);
+        moreBtn = new Ui.Btn(c, Icons.MORE, Ui.Btn.ROUND);
+        titleChip = new Ui.TextChip(c);
+        titleChip.tp.setTypeface(th.titleFace); titleChip.tp.setTextSize(th.px(th.titleSize * 0.72f)); titleChip.tp.setColor(th.text);
+        artistChip = new Ui.TextChip(c);
+        artistChip.tp.setTypeface(th.uiMedium); artistChip.tp.setTextSize(th.px(15)); artistChip.tp.setColor(th.accent);
+        String saved = stage.prefs().getString("slots", S_VIS + "," + S_TIMER + "," + S_REPEAT + "," + S_SHUFFLE);
+        String[] parts = saved.split(",");
+        for (int i = 0; i < 4; i++) {
+            final int k = i;
+            try { slotType[i] = Integer.parseInt(parts[i]); } catch (Exception ex) { slotType[i] = S_NONE; }
+            slots[i] = new Ui.Btn(c, 0, Ui.Btn.CHIP);
+            slots[i].click(() -> slotClick(slotType[k])).longClick(() -> slotLong(slotType[k]));
+        }
+        slotGap = new View(c);
+        slotGap.setOnLongClickListener(v -> { editButtons(); return true; });
+        prevCat = new Ui.Btn(c, Icons.PREV_CAT, Ui.Btn.ROUND_SMALL);
+        prev = new Ui.Btn(c, Icons.PREV, Ui.Btn.ROUND);
+        next = new Ui.Btn(c, Icons.NEXT, Ui.Btn.ROUND);
+        nextCat = new Ui.Btn(c, Icons.NEXT_CAT, Ui.Btn.ROUND_SMALL);
+        prevCat.dim = true; nextCat.dim = true;
+        prev.iconDp = 30; next.iconDp = 30; prevCat.iconDp = 24; nextCat.iconDp = 24;
         play = new PlayView(c);
-        prev = new GlyphButton(c, GlyphButton.PREV, false); next = new GlyphButton(c, GlyphButton.NEXT, false);
-        shuffle = new GlyphButton(c, GlyphButton.SHUFFLE, true); repeat = new GlyphButton(c, GlyphButton.REPEAT, true);
-        libraryBtn = new GlyphButton(c, GlyphButton.LIBRARY, false); menuBtn = new GlyphButton(c, GlyphButton.MENU, false);
-        sourceView = new SourceView(c);
-        for (View v : new View[]{ pager, info, seek, play, prev, next, shuffle, repeat, libraryBtn, sourceView, menuBtn }) addView(v);
+        seek = new SeekView(c);
+        meta = new MetaView(c);
+        for (View v : new View[]{ vis, pager, like, dislike, listBtn, moreBtn, titleChip, artistChip, slotGap, slots[0], slots[1], slots[2], slots[3],
+                prevCat, prev, next, nextCat, play, seek, meta }) addView(v);
+
         play.setOnClickListener(v -> engine.toggle());
-        prev.setOnClickListener(v -> pager.animateStep(-1));
-        next.setOnClickListener(v -> pager.animateStep(1));
-        shuffle.setOnClickListener(v -> engine.setShuffle(!engine.shuffle));
-        repeat.setOnClickListener(v -> engine.cycleRepeat());
-        libraryBtn.setOnClickListener(v -> { if (onOpenLibrary != null) onOpenLibrary.run(); });
+        prev.click(() -> pager.animateStep(-1));
+        next.click(() -> pager.animateStep(1));
+        prevCat.click(() -> pager.animateCategory(-1));
+        nextCat.click(() -> pager.animateCategory(1));
+        like.click(() -> rate(1));
+        dislike.click(() -> rate(-1));
+        listBtn.click(stage::openQueue);
+        moreBtn.click(() -> stage.trackMenu(engine.track()));
+        titleChip.setOnClickListener(v -> stage.openSource());
+        titleChip.setOnLongClickListener(v -> { stage.trackMenu(engine.track()); return true; });
+        artistChip.setOnClickListener(v -> stage.openArtist(engine.track()));
+        artistChip.setOnLongClickListener(v -> { stage.trackMenu(engine.track()); return true; });
+        meta.setOnClickListener(v -> meta.cycle());
+        meta.setOnLongClickListener(v -> { stage.audioInfo(engine.track()); return true; });
+
         engine.listen(this);
         onTrack(engine.track());
         onModes();
+        onExtras();
         play.setPlaying(engine.isPlaying(), false);
+    }
+
+    /** like / dislike: the same again clears it; in stars mode the stars sheet */
+    private void rate(int dir) {
+        Lib.Track t = engine.track();
+        if (t == null) return;
+        if (stage.ratingMode() == Stage.RATE_STARS) { stage.starsSheet(t); return; }
+        int cur = engine.rating(t);
+        int want = dir > 0 ? 5 : -1;
+        engine.setRating(t, cur == want ? 0 : want);
+        Ui.tick(dir > 0 ? like : dislike);
+    }
+
+    // ---------- the row of buttons ----------
+
+    private void slotClick(int type) {
+        switch (type) {
+            case S_VIS: stage.toggleVis(); break;
+            case S_TIMER: stage.sleepTimer(); break;
+            case S_REPEAT: engine.cycleRepeat(); break;
+            case S_SHUFFLE: engine.setShuffle(!engine.shuffle); break;
+            case S_LYRICS: stage.openLyrics(); break;
+            case S_EQ: stage.toggleEq(); break;
+            case S_QUEUE: stage.openQueue(); break;
+            case S_SEARCH: stage.openSearch(); break;
+            case S_INFO: stage.audioInfo(engine.track()); break;
+            default: editButtons();
+        }
+    }
+
+    private void slotLong(int type) {
+        switch (type) {
+            case S_VIS: stage.visMenu(); break;
+            case S_TIMER: stage.sleepTimer(); break;
+            case S_REPEAT: stage.repeatMenu(); break;
+            case S_SHUFFLE: stage.shuffleMenu(); break;
+            case S_EQ: stage.eqMenu(); break;
+            default: editButtons();
+        }
+    }
+
+    /** Long press between the buttons to edit them. */
+    void editButtons() {
+        Sheet s = new Sheet(getContext(), "Buttons");
+        String[] where = { "First on the left", "Second on the left", "Second on the right", "First on the right" };
+        for (int i = 0; i < 4; i++) {
+            final int k = i;
+            s.add(new Sheet.Item(SLOT_ICONS[slotType[i]] == 0 ? Icons.CLOSE : SLOT_ICONS[slotType[i]], where[i], () -> pickButton(k)).value(SLOT_NAMES[slotType[i]]));
+        }
+        s.add(new Sheet.Item(Icons.SCAN, "Back to the usual four", () -> {
+            int[] d = { S_VIS, S_TIMER, S_REPEAT, S_SHUFFLE };
+            System.arraycopy(d, 0, slotType, 0, 4);
+            saveSlots();
+        }));
+        stage.showSheet(s);
+    }
+
+    private void pickButton(int k) {
+        Sheet s = new Sheet(getContext(), "Button");
+        for (int t = 0; t < SLOT_NAMES.length; t++) {
+            final int type = t;
+            s.add(new Sheet.Item(SLOT_ICONS[t] == 0 ? Icons.CLOSE : SLOT_ICONS[t], SLOT_NAMES[t], () -> { slotType[k] = type; saveSlots(); }).radio(slotType[k] == t));
+        }
+        stage.showSheet(s);
+    }
+
+    private void saveSlots() {
+        stage.prefs().edit().putString("slots", slotType[0] + "," + slotType[1] + "," + slotType[2] + "," + slotType[3]).apply();
+        refreshSlots();
+        requestLayout();
+    }
+
+    /** icons, on / off and labels for whatever the four buttons are */
+    void refreshSlots() {
+        for (int i = 0; i < 4; i++) {
+            Ui.Btn b = slots[i];
+            int t = slotType[i];
+            b.setVisibility(t == S_NONE ? INVISIBLE : VISIBLE);
+            int icon = SLOT_ICONS[t];
+            boolean on = false;
+            String label = null;
+            switch (t) {
+                case S_VIS: on = stage.visOn(); break;
+                case S_TIMER: {
+                    on = engine.sleepOn();
+                    long left = engine.sleepRemainingMs();
+                    label = engine.sleepingAfterSong() ? "end" : left > 0 ? (left + 59_999) / 60_000 + "m" : null;
+                    break;
+                }
+                case S_REPEAT:
+                    on = engine.repeat != Engine.REPEAT_OFF;
+                    icon = engine.repeat == Engine.REPEAT_ONE ? Icons.REPEAT_ONE : engine.repeat == Engine.REPEAT_ADVANCE ? Icons.REPEAT_ADVANCE : Icons.REPEAT;
+                    break;
+                case S_SHUFFLE: on = engine.shuffle; break;
+                case S_EQ: on = stage.fx.eqOn || stage.fx.toneOn; break;
+                default: break;
+            }
+            b.setIcon(icon);
+            b.set(on);
+            if ((b.label == null) != (label == null)) requestLayout();
+            b.label(label);
+        }
     }
 
     @Override public void onTrack(Lib.Track t) {
         pager.bind(false);
-        info.set(t, true);
+        boolean changed = titleChip.getTag() != t;
+        titleChip.setTag(t);
+        titleChip.setText(t == null ? "YouSic" : t.title);
+        artistChip.setText(t == null ? "Tap play to start" : t.artist.isEmpty() ? "Unknown artist" : t.artist);
+        if (changed && t != null && Motion.speed != Motion.SPEED_OFF) {
+            for (View v : new View[]{ titleChip, artistChip }) {
+                v.setAlpha(0); v.setTranslationY(th.px(8));
+                v.animate().alpha(1).translationY(0).setDuration(Motion.ms(Motion.STATE)).setInterpolator(Motion.EASE_OUT).start();
+            }
+        }
         seek.setTrack(t);
-        sourceView.invalidate();
+        meta.update();
+        onExtras();
     }
 
     @Override public void onState(boolean playing) {
         play.setPlaying(playing, true);
         seek.ticking(playing);
+        vis.playing(playing);
     }
 
     @Override public void onModes() {
-        shuffle.on = engine.shuffle; shuffle.invalidate();
-        repeat.on = engine.repeat != Engine.REPEAT_OFF; repeat.mode = engine.repeat; repeat.invalidate();
+        refreshSlots();
         pager.bind(false);
-        sourceView.invalidate();
+        meta.update();
     }
 
-    // ---------- layout (phone, portrait): top bar, art, song, seek, controls ----------
+    private final Runnable timerTick = this::onExtras;
 
-    @Override
-    protected void onMeasure(int ws, int hs) {
-        setMeasuredDimension(MeasureSpec.getSize(ws), MeasureSpec.getSize(hs));
+    @Override public void onExtras() {
+        String likeLabel0 = like.label;
+        int likeVis0 = like.getVisibility(), dislikeVis0 = dislike.getVisibility();
+        Lib.Track t = engine.track();
+        int mode = stage.ratingMode();
+        int r = engine.rating(t);
+        like.setVisibility(mode == Stage.RATE_OFF ? GONE : VISIBLE);
+        dislike.setVisibility(mode == Stage.RATE_THUMBS ? VISIBLE : GONE);
+        if (mode == Stage.RATE_STARS) {
+            like.setIcon(r > 0 ? Icons.STAR_FILLED : Icons.STAR);
+            like.label = r > 0 ? String.valueOf(r) : null;
+            like.set(r > 0);
+        } else {
+            like.setIcon(Icons.THUMB_UP);
+            like.label = null;
+            like.set(r > 0);
+            dislike.set(r < 0);
+        }
+        like.invalidate();
+        refreshSlots();
+        long left = engine.sleepRemainingMs();
+        removeCallbacks(timerTick);
+        if (left > 0) postDelayed(timerTick, Math.min(30_000, left % 60_000 + 50));
+        // only a label coming or going changes a button's width
+        if ((likeLabel0 == null) != (like.label == null) || likeVis0 != like.getVisibility() || dislikeVis0 != dislike.getVisibility()) requestLayout();
     }
+
+    /** The player is shown again (it stops its clocks while covered). */
+    void onShown() {
+        seek.ticking(engine.isPlaying());
+        vis.kick();
+    }
+
+    // ---------- layout (phone, portrait) ----------
+
+    @Override protected void onMeasure(int ws, int hs) { setMeasuredDimension(MeasureSpec.getSize(ws), MeasureSpec.getSize(hs)); }
+
+    private int dp(float v) { return Math.round(v * th.dp); }
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         int w = r - l, h = b - t;
-        float dp = th.dp;
-        int pad = Math.round(28 * dp);
-        int top = insetTop + Math.round(6 * dp);
-        int bar = Math.round(48 * dp);
-        place(libraryBtn, Math.round(12 * dp), top, bar, bar);
-        place(menuBtn, w - Math.round(12 * dp) - bar, top, bar, bar);
-        place(sourceView, Math.round(12 * dp) + bar, top, w - 2 * (Math.round(12 * dp) + bar), bar);
-        int controlsH = Math.round(112 * dp);
-        int bottom = h - insetBottom - Math.round(18 * dp);
-        int controlsTop = bottom - controlsH;
-        int seekH = Math.round(76 * dp);
-        int seekTop = controlsTop - seekH - Math.round(4 * dp);
-        int infoH = Math.round(96 * dp);
-        int infoTop = seekTop - infoH;
-        int artTop = top + bar + Math.round(14 * dp);
-        int artSize = Math.min(w - 2 * pad, infoTop - artTop - Math.round(14 * dp));
+        int bottom = h - reserveBottom - dp(2);
+        int metaTop = bottom - dp(26);
+        int seekTop = metaTop - dp(46);
+        int transH = dp(104), transTop = seekTop - dp(4) - transH;
+        int btnH = dp(44), btnTop = transTop - dp(2) - btnH;
+        int artTop = insetTop + dp(8);
+        int artSize = Math.min(w - dp(24), btnTop - dp(14) - dp(34) - dp(6) - dp(44) - dp(14) - artTop);
+        // the song right under the art; any room to spare goes between it and the buttons
+        int titleTop = artTop + artSize + dp(14), artistTop = titleTop + dp(44) + dp(6);
         int artLeft = (w - artSize) / 2;
         artRect.set(artLeft, artTop, artLeft + artSize, artTop + artSize);
-        place(pager, 0, artTop - Math.round(30 * dp), w, artSize + Math.round(60 * dp));
-        pager.setCard(artLeft, Math.round(30 * dp), artSize);
-        place(info, pad, infoTop, w - 2 * pad, infoH);
-        place(seek, pad - Math.round(6 * dp), seekTop, w - 2 * pad + Math.round(12 * dp), seekH);
-        int cy = controlsTop + controlsH / 2;
-        int ps = Math.round(112 * dp), sb = Math.round(56 * dp), tb = Math.round(48 * dp);
-        place(play, w / 2 - ps / 2, cy - ps / 2, ps, ps);
-        int gap = Math.round(74 * dp);
-        place(prev, w / 2 - gap - sb / 2 - Math.round(12 * dp), cy - sb / 2, sb, sb);
-        place(next, w / 2 + gap - sb / 2 + Math.round(12 * dp), cy - sb / 2, sb, sb);
-        place(shuffle, pad - Math.round(10 * dp), cy - tb / 2, tb, tb);
-        place(repeat, w - pad + Math.round(10 * dp) - tb, cy - tb / 2, tb, tb);
-    }
-
-    private static void place(View v, int x, int y, int w, int h) {
-        v.measure(MeasureSpec.makeMeasureSpec(w, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(h, MeasureSpec.EXACTLY));
-        v.layout(x, y, x + w, y + h);
-    }
-
-    @Override
-    protected void dispatchDraw(Canvas c) {
-        // the dimmer air behind the song and the seek bar keeps their text readable over the glow
-        th.drawInfoShade(c, new RectF(0, info.getTop() - 44 * th.dp, getWidth(), seek.getBottom() + 20 * th.dp));
-        super.dispatchDraw(c);
+        Ui.place(pager, 0, artTop - dp(40), w, artSize + dp(80));
+        pager.setCard(artLeft, dp(40), artSize);
+        // on the art: like / dislike at its left foot, the queue and the menu at its right
+        int ab = dp(44), am = dp(12), ay = artTop + artSize - am - ab;
+        Ui.place(like, artLeft + am, ay, like.label != null ? dp(64) : ab, ab);
+        Ui.place(dislike, artLeft + am + (like.label != null ? dp(64) : ab) + dp(8), ay, ab, ab);
+        Ui.place(moreBtn, artLeft + artSize - am - ab, ay, ab, ab);
+        Ui.place(listBtn, artLeft + artSize - am - 2 * ab - dp(8), ay, ab, ab);
+        int pad = artLeft;
+        Ui.place(titleChip, pad, titleTop, w - 2 * pad, dp(44));
+        Ui.place(artistChip, pad, artistTop, w - 2 * pad, dp(34));
+        int bw = dp(76), gap = dp(8);
+        Ui.place(slots[0], pad, btnTop, bw, btnH);
+        Ui.place(slots[1], pad + bw + gap, btnTop, slots[1].label != null ? bw + dp(14) : bw, btnH);
+        Ui.place(slots[3], w - pad - bw, btnTop, bw, btnH);
+        Ui.place(slots[2], w - pad - 2 * bw - gap, btnTop, bw, btnH);
+        // between the two pairs: long press to edit the buttons
+        Ui.place(slotGap, slots[1].getRight(), btnTop, Math.max(0, slots[2].getLeft() - slots[1].getRight()), btnH);
+        int cy = transTop + transH / 2, cx = w / 2;
+        int ps = dp(100), ns = dp(64), cs = dp(50);
+        Ui.place(play, cx - ps / 2, cy - ps / 2, ps, ps);
+        int off = Math.min(dp(92), (w / 2 - pad) * 92 / 168);
+        Ui.place(prev, cx - off - ns / 2, cy - ns / 2, ns, ns);
+        Ui.place(next, cx + off - ns / 2, cy - ns / 2, ns, ns);
+        int offc = Math.min(dp(154), w / 2 - pad - cs / 2);
+        Ui.place(prevCat, cx - offc - cs / 2, cy - cs / 2, cs, cs);
+        Ui.place(nextCat, cx + offc - cs / 2, cy - cs / 2, cs, cs);
+        Ui.place(vis, pad, transTop - dp(30), w - 2 * pad, seekTop - transTop + dp(34));
+        Ui.place(seek, pad - dp(4), seekTop, w - 2 * pad + dp(8), dp(46));
+        Ui.place(meta, pad, metaTop, w - 2 * pad, dp(26));
     }
 
     // =====================================================================================================
-    /** The album art: the current cover with the previous and next on either side; drag to change song. */
+    /** The album art: the current cover with the previous and next on either side. */
     final class ArtPager extends ViewGroup {
         final CoverCard[] cards = { new CoverCard(getContext()), new CoverCard(getContext()), new CoverCard(getContext()) };
         int cardLeft, cardTop, cardSize, spacing;
         float offset; // px the cards are dragged by (negative: towards the next song)
         private VelocityTracker vt;
         private float downX, downY, lastX;
-        private boolean dragging;
+        private boolean dragging, vertical, moved;
         private final int slop;
         private ValueAnimator anim;
         private Choreographer.FrameCallback linear;
         private int pendingDelta;
+        /** dragged far enough to change category: 1 = next, -1 = previous, 0 = a song */
+        private int catMode;
+        private Lib.Group catGroup;
+        private final TextPaint hint1 = new TextPaint(Paint.ANTI_ALIAS_FLAG), hint2 = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+        private final RectF hintR = new RectF();
 
         ArtPager(Context c) {
             super(c);
             for (CoverCard k : cards) addView(k);
             slop = ViewConfiguration.get(c).getScaledTouchSlop();
             setClipChildren(false);
+            setWillNotDraw(false);
+            hint1.setTypeface(th.uiMedium); hint1.setTextSize(th.px(11)); hint1.setLetterSpacing(0.16f); hint1.setColor(th.accent); hint1.setTextAlign(Paint.Align.CENTER);
+            hint2.setTypeface(th.titleFace); hint2.setTextSize(th.px(22)); hint2.setColor(th.text); hint2.setTextAlign(Paint.Align.CENTER);
         }
 
         void setCard(int left, int top, int size) {
             cardLeft = left; cardTop = top; cardSize = size;
-            spacing = size + Math.round(24 * th.dp);
-            for (int i = 0; i < 3; i++) place(cards[i], left, top, size, size);
+            spacing = size + dp(24);
+            for (int i = 0; i < 3; i++) Ui.place(cards[i], left, top, size, size);
             apply();
         }
 
@@ -176,6 +375,7 @@ public final class PlayerScreen extends ViewGroup implements Engine.Listener {
             cards[2].set(engine.peek(1));
             cards[1].playing = engine.isPlaying() ? 1 : 0;
             offset = 0;
+            catMode = 0;
             apply();
         }
 
@@ -189,6 +389,9 @@ public final class PlayerScreen extends ViewGroup implements Engine.Listener {
                 cards[i].setScaleX(s); cards[i].setScaleY(s);
                 cards[i].setAlpha(1 - 0.35f * d);
             }
+            float fade = 1 - Math.min(1, Math.abs(offset) / (spacing * 0.3f));
+            for (View v : new View[]{ like, dislike, listBtn, moreBtn }) v.setAlpha(fade);
+            invalidate();
         }
 
         @SuppressLint("ClickableViewAccessibility")
@@ -198,34 +401,66 @@ public final class PlayerScreen extends ViewGroup implements Engine.Listener {
             vt.addMovement(e);
             switch (e.getActionMasked()) {
                 case MotionEvent.ACTION_DOWN:
-                    downX = lastX = e.getX(); downY = e.getY();
-                    if (anim != null || linear != null) { stopSettle(); dragging = true; getParent().requestDisallowInterceptTouchEvent(true); }
+                    // only the art itself
+                    if (e.getY() < cardTop || e.getY() > cardTop + cardSize) { vt.recycle(); vt = null; return false; }
+                    downX = lastX = e.getX(); downY = e.getY(); moved = false; vertical = false;
+                    if (anim != null || linear != null) { stopSettle(); dragging = true; moved = true; getParent().requestDisallowInterceptTouchEvent(true); }
                     return true;
-                case MotionEvent.ACTION_MOVE:
-                    float dx = e.getX() - downX;
-                    if (!dragging && Math.abs(dx) > slop && Math.abs(dx) > Math.abs(e.getY() - downY)) {
-                        dragging = true;
+                case MotionEvent.ACTION_MOVE: {
+                    float dx = e.getX() - downX, dy = e.getY() - downY;
+                    if (!dragging && !vertical && (Math.abs(dx) > slop || Math.abs(dy) > slop)) {
+                        moved = true;
+                        if (Math.abs(dx) > Math.abs(dy)) dragging = true; else vertical = true;
                         getParent().requestDisallowInterceptTouchEvent(true);
                     }
                     if (dragging) {
                         offset += e.getX() - lastX;
                         // no neighbour that way: resist
                         if ((offset > 0 && engine.peek(-1) == null) || (offset < 0 && engine.peek(1) == null)) offset *= 0.92f;
+                        updateCategoryMode();
                         apply();
+                    } else if (vertical) {
+                        // the cover follows the finger a little; let go past the line to act
+                        cards[1].setTranslationY(dy * 0.28f);
                     }
                     lastX = e.getX();
                     return true;
+                }
                 case MotionEvent.ACTION_UP:
-                case MotionEvent.ACTION_CANCEL:
-                    if (dragging) {
-                        vt.computeCurrentVelocity(1000);
-                        release(vt.getXVelocity());
+                case MotionEvent.ACTION_CANCEL: {
+                    vt.computeCurrentVelocity(1000);
+                    boolean up = e.getActionMasked() == MotionEvent.ACTION_UP;
+                    if (dragging) release(vt.getXVelocity());
+                    else if (vertical) {
+                        float dy = e.getY() - downY, vdy = vt.getYVelocity() / th.dp;
+                        cards[1].animate().translationY(0).setDuration(Motion.ms(Motion.STATE)).setInterpolator(Motion.EASE_OUT).start();
+                        if (up && (dy > th.px(56) || (vdy > Motion.FLING_DP_S && dy > 0))) stage.openSource();
+                        else if (up && (dy < -th.px(56) || (vdy < -Motion.FLING_DP_S && dy < 0))) stage.openLyrics();
+                    } else if (up && !moved) {
+                        stage.openSource();
                     }
-                    dragging = false;
+                    dragging = false; vertical = false;
                     vt.recycle(); vt = null;
                     return true;
+                }
                 default:
                     return true;
+            }
+        }
+
+        /** Dragged three quarters of the way: the next / previous category instead of the song. */
+        private void updateCategoryMode() {
+            int want = Math.abs(offset) > spacing * 0.75f ? (offset < 0 ? 1 : -1) : 0;
+            if (want == catMode) return;
+            catMode = want;
+            Ui.tick(this);
+            if (want != 0) {
+                catGroup = engine.peekCategory(want);
+                if (catGroup == null) { catMode = 0; return; }
+                cards[want > 0 ? 2 : 0].set(catGroup.tracks.isEmpty() ? null : catGroup.tracks.get(0));
+            } else {
+                cards[0].set(engine.peek(-1));
+                cards[2].set(engine.peek(1));
             }
         }
 
@@ -235,17 +470,30 @@ public final class PlayerScreen extends ViewGroup implements Engine.Listener {
             int dir = offset < 0 ? 1 : -1; // 1 = next song
             float vdp = vx / th.dp;
             boolean commit;
-            if (Math.abs(vdp) >= Motion.FLING_DP_S) commit = (vx < 0 && dir == 1) || (vx > 0 && dir == -1);
+            if (catMode != 0) commit = !(Math.abs(vdp) >= Motion.FLING_DP_S && ((vx > 0 && dir == 1) || (vx < 0 && dir == -1)));
+            else if (Math.abs(vdp) >= Motion.FLING_DP_S) commit = (vx < 0 && dir == 1) || (vx > 0 && dir == -1);
             else commit = progress > Motion.COMMIT_FRACTION;
-            if (engine.peek(dir) == null) commit = false;
+            if (catMode == 0 && engine.peek(dir) == null) commit = false;
             boolean useVelocity = commit ? progress <= 1 - Motion.SETTLE_NEAR_END : progress >= Motion.SETTLE_NEAR_END;
             if (commit) {
                 pendingDelta = dir;
-                engine.step(dir, true);
+                if (catMode != 0) {
+                    if (!engine.stepCategory(dir)) pendingDelta = 0;
+                    else stage.toast(catLabel(dir) + ": " + catGroup.title);
+                }
+                else engine.step(dir, true);
+            } else if (catMode != 0) {
+                catMode = 0;
+                cards[0].set(engine.peek(-1)); cards[2].set(engine.peek(1));
             }
             float target = commit ? -dir * spacing : 0;
             if (useVelocity && Math.abs(vdp) >= Motion.FLING_DP_S) settleLinear(target, vx);
             else settleTimed(target);
+        }
+
+        String catLabel(int dir) {
+            String k = engine.categoryKind();
+            return (dir > 0 ? "Next " : "Previous ") + k;
         }
 
         /** Carries on at the finger's speed (linear), kept between one transition per duration and 8 a second. */
@@ -290,6 +538,7 @@ public final class PlayerScreen extends ViewGroup implements Engine.Listener {
                 // the song already changed: the dragged cards now belong one place over
                 offset += pendingDelta * spacing;
                 pendingDelta = 0;
+                catMode = 0;
                 cards[0].set(engine.peek(-1)); cards[1].set(engine.track()); cards[2].set(engine.peek(1));
                 apply();
             }
@@ -297,6 +546,7 @@ public final class PlayerScreen extends ViewGroup implements Engine.Listener {
 
         private void finishSettle() {
             pendingDelta = 0;
+            catMode = 0;
             bind(true);
         }
 
@@ -308,6 +558,33 @@ public final class PlayerScreen extends ViewGroup implements Engine.Listener {
             engine.step(dir, true);
             settleTimed(-dir * spacing);
         }
+
+        /** The category buttons: the next category's first cover slides in. */
+        void animateCategory(int dir) {
+            Lib.Group g = engine.peekCategory(dir);
+            if (g == null) { stage.toast("No other " + engine.categoryKind()); return; }
+            stopSettle();
+            cards[dir > 0 ? 2 : 0].set(g.tracks.isEmpty() ? null : g.tracks.get(0));
+            pendingDelta = dir;
+            String label = catLabel(dir);
+            engine.stepCategory(dir);
+            stage.toast(label + ": " + g.title);
+            settleTimed(-dir * spacing);
+        }
+
+        @Override protected void dispatchDraw(Canvas c) {
+            super.dispatchDraw(c);
+            if (catMode == 0 || catGroup == null) return;
+            // over the incoming cover: what letting go here will play
+            float cx = cardLeft + cardSize / 2f, cy = cardTop + cardSize / 2f;
+            String l1 = catLabel(catMode).toUpperCase(Locale.ROOT);
+            CharSequence l2 = TextUtils.ellipsize(catGroup.title, hint2, cardSize * 0.8f, TextUtils.TruncateAt.END);
+            float w = Math.max(hint1.measureText(l1), hint2.measureText(l2, 0, l2.length())) + th.px(40);
+            hintR.set(cx - w / 2, cy - th.px(38), cx + w / 2, cy + th.px(38));
+            th.drawChip(c, hintR, th.px(22), false, true);
+            c.drawText(l1, cx, cy - th.px(10), hint1);
+            c.drawText(l2, 0, l2.length(), cx, cy + th.px(20), hint2);
+        }
     }
 
     // =====================================================================================================
@@ -317,7 +594,7 @@ public final class PlayerScreen extends ViewGroup implements Engine.Listener {
         Bitmap art;
         float playing;
 
-        CoverCard(Context c) { super(c); setLayerType(LAYER_TYPE_NONE, null); }
+        CoverCard(Context c) { super(c); }
 
         void set(Lib.Track t) {
             if (t == track) return;
@@ -327,7 +604,7 @@ public final class PlayerScreen extends ViewGroup implements Engine.Listener {
                 final Lib.Track want = t;
                 art = Covers.get(t.cover, false, b -> { if (track == want) { art = b; invalidate(); } });
             }
-            setVisibility(t == null ? INVISIBLE : VISIBLE);
+            setVisibility(t == null && this != pager.cards[1] ? INVISIBLE : VISIBLE);
             invalidate();
         }
 
@@ -340,68 +617,20 @@ public final class PlayerScreen extends ViewGroup implements Engine.Listener {
     }
 
     // =====================================================================================================
-    /** The song: title, artist, album. A new song drifts up out of the haze. */
-    final class InfoView extends View {
-        private final TextPaint title = new TextPaint(Paint.ANTI_ALIAS_FLAG), artist = new TextPaint(Paint.ANTI_ALIAS_FLAG), album = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-        private CharSequence t1 = "", t2 = "", t3 = "";
-        private Lib.Track track;
-
-        InfoView(Context c) {
-            super(c);
-            title.setTypeface(th.titleFace); title.setTextSize(th.px(th.titleSize)); title.setColor(th.text);
-            title.setShadowLayer(th.px(14), 0, 0, Theme.alpha(th.accent, 0.55f));
-            artist.setTypeface(th.uiMedium); artist.setTextSize(th.px(th.artistSize)); artist.setColor(th.accent);
-            artist.setLetterSpacing(0.02f);
-            album.setTypeface(th.uiFace); album.setTextSize(th.px(th.albumSize)); album.setColor(th.textDim);
-        }
-
-        void set(Lib.Track t, boolean animate) {
-            boolean changed = t != track;
-            track = t;
-            layoutText();
-            invalidate();
-            if (changed && animate && t != null && Motion.speed != Motion.SPEED_OFF) {
-                setAlpha(0); setTranslationY(th.px(8));
-                animate().alpha(1).translationY(0).setDuration(Motion.ms(800)).setInterpolator(new PathInterpolator(0.25f, 0.8f, 0.3f, 1f)).start();
-            }
-        }
-
-        private void layoutText() {
-            int w = getWidth();
-            if (w == 0) return;
-            if (track == null) { t1 = "YouSic"; t2 = "Tap play to start"; t3 = ""; return; }
-            t1 = TextUtils.ellipsize(track.title, title, w, TextUtils.TruncateAt.END);
-            t2 = TextUtils.ellipsize(track.artist.isEmpty() ? "Unknown artist" : track.artist, artist, w, TextUtils.TruncateAt.END);
-            t3 = TextUtils.ellipsize(track.album, album, w, TextUtils.TruncateAt.END);
-        }
-
-        @Override protected void onSizeChanged(int w, int h, int ow, int oh) { layoutText(); }
-
-        @Override protected void onDraw(Canvas c) {
-            float y = -title.ascent() + th.px(4);
-            c.drawText(t1, 0, t1.length(), 0, y, title);
-            y += title.descent() + th.px(6) - artist.ascent();
-            c.drawText(t2, 0, t2.length(), 0, y, artist);
-            y += artist.descent() + th.px(3) - album.ascent();
-            c.drawText(t3, 0, t3.length(), 0, y, album);
-        }
-    }
-
-    // =====================================================================================================
-    /** The seek bar with the times. Redrawn only when the playhead has moved a pixel; drag to seek. */
+    /** The seek bar between the two times. Redrawn only when the playhead has moved a pixel; drag to seek. */
     final class SeekView extends View implements Choreographer.FrameCallback {
-        private float[] peaks = new float[72];
+        private final float[] peaks = new float[64];
         private float progress, dragProgress = -1;
         private final TextPaint times = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-        private final RectF bar = new RectF();
-        private boolean ticking;
+        private final RectF bar = new RectF(), pill = new RectF();
+        private boolean ticking, remaining;
         private long lastDrawnPx = -1;
-        private String el = "0:00", rem = "-0:00";
+        private String el = "0:00", tot = "0:00";
 
         SeekView(Context c) {
             super(c);
-            times.setTypeface(th.stampFace); times.setTextSize(th.px(th.timeSize)); times.setColor(th.stamp);
-            times.setShadowLayer(th.px(5), 0, 0, th.ink);
+            times.setTypeface(th.stampFace); times.setTextSize(th.px(th.timeSize + 1)); times.setColor(th.stamp);
+            times.setTextAlign(Paint.Align.CENTER);
             times.setLetterSpacing(0.04f);
         }
 
@@ -422,37 +651,52 @@ public final class PlayerScreen extends ViewGroup implements Engine.Listener {
 
         @Override public void doFrame(long now) {
             update(false);
-            if (ticking && isAttachedToWindow() && getVisibility() == VISIBLE) Choreographer.getInstance().postFrameCallback(this);
+            if (ticking && isAttachedToWindow() && PlayerScreen.this.getVisibility() == VISIBLE) Choreographer.getInstance().postFrameCallback(this);
         }
 
         @Override protected void onAttachedToWindow() { super.onAttachedToWindow(); ticking(engine.isPlaying()); }
         @Override protected void onDetachedFromWindow() { Choreographer.getInstance().removeFrameCallback(this); super.onDetachedFromWindow(); }
 
+        private float pillW() { return th.px(58); }
+
         /** Redraws only when something visible moved: the playhead by a pixel, or the time by a second. */
         void update(boolean force) {
             long dur = engine.durationMs(), pos = engine.positionMs();
             progress = dur > 0 ? Math.min(1f, pos / (float) dur) : 0;
-            long px = Math.round(progress * getWidth());
-            String e = fmt(pos), r = "-" + fmt(Math.max(0, dur - pos));
-            if (force || px != lastDrawnPx || !e.equals(el)) {
-                lastDrawnPx = px; el = e; rem = r;
+            long px = Math.round(progress * (getWidth() - 2 * pillW()));
+            String e = fmt(pos), t = remaining ? "-" + fmt(Math.max(0, dur - pos)) : fmt(dur);
+            if (force || px != lastDrawnPx || !e.equals(el) || !t.equals(tot)) {
+                lastDrawnPx = px; el = e; tot = t;
                 invalidate();
                 play.setProgress(progress);
             }
         }
 
         @Override protected void onDraw(Canvas c) {
-            bar.set(th.px(6), 0, getWidth() - th.px(6), getHeight() - th.px(22));
+            float h = getHeight(), pw = pillW();
+            bar.set(pw + th.px(8), th.px(2), getWidth() - pw - th.px(8), h - th.px(2));
             float p = dragProgress >= 0 ? dragProgress : progress;
             th.drawSeek(c, bar, peaks, p, dragProgress >= 0);
-            float y = getHeight() - th.px(6);
-            c.drawText(el, th.px(6), y, times);
-            c.drawText(rem, getWidth() - th.px(6) - times.measureText(rem), y, times);
+            float ph = th.px(26), y = h / 2;
+            pill.set(0, y - ph / 2, pw, y + ph / 2);
+            th.drawChip(c, pill, ph / 2, false, false);
+            c.drawText(dragProgress >= 0 ? fmt((long) (dragProgress * engine.durationMs())) : el, pill.centerX(), y - (times.ascent() + times.descent()) / 2, times);
+            pill.set(getWidth() - pw, y - ph / 2, getWidth(), y + ph / 2);
+            th.drawChip(c, pill, ph / 2, false, false);
+            c.drawText(tot, pill.centerX(), y - (times.ascent() + times.descent()) / 2, times);
         }
 
         @SuppressLint("ClickableViewAccessibility")
         @Override public boolean onTouchEvent(MotionEvent e) {
-            float p = Math.max(0, Math.min(1, (e.getX() - th.px(6)) / (getWidth() - th.px(12))));
+            float pw = pillW();
+            if (e.getActionMasked() == MotionEvent.ACTION_DOWN && e.getX() > getWidth() - pw) {
+                // the total time: tap for the time left
+                remaining = !remaining;
+                update(true);
+                return false;
+            }
+            float l = pw + th.px(8), r = getWidth() - pw - th.px(8);
+            float p = Math.max(0, Math.min(1, (e.getX() - l) / (r - l)));
             switch (e.getActionMasked()) {
                 case MotionEvent.ACTION_DOWN: getParent().requestDisallowInterceptTouchEvent(true); dragProgress = p; invalidate(); return true;
                 case MotionEvent.ACTION_MOVE: dragProgress = p; invalidate(); return true;
@@ -467,7 +711,66 @@ public final class PlayerScreen extends ViewGroup implements Engine.Listener {
 
     static String fmt(long ms) {
         long s = ms / 1000;
+        if (s >= 3600) return s / 3600 + ":" + ((s / 60) % 60 < 10 ? "0" : "") + (s / 60) % 60 + ":" + (s % 60 < 10 ? "0" : "") + s % 60;
         return s / 60 + ":" + (s % 60 < 10 ? "0" : "") + s % 60;
+    }
+
+    // =====================================================================================================
+    /** The format line: tap for the album, the list, the file; long press for the audio info. */
+    final class MetaView extends View {
+        private final TextPaint tp = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+        private int mode;
+        private CharSequence text = "";
+
+        MetaView(Context c) {
+            super(c);
+            setClickable(true); setLongClickable(true);
+            tp.setTypeface(th.uiMedium); tp.setTextSize(th.px(11.5f)); tp.setLetterSpacing(0.12f); tp.setColor(th.textDim);
+            tp.setTextAlign(Paint.Align.CENTER);
+        }
+
+        void cycle() {
+            mode = (mode + 1) % 4;
+            update();
+            setAlpha(0.2f);
+            animate().alpha(1).setDuration(Motion.ms(Motion.STATE)).start();
+        }
+
+        void update() {
+            Lib.Track t = engine.track();
+            String s;
+            if (t == null) s = "";
+            else switch (mode) {
+                case 1: s = (t.album.isEmpty() ? "No album" : t.album) + (t.year > 0 ? "  ·  " + t.year : ""); break;
+                case 2: s = (engine.source().isEmpty() ? "Library" : engine.source()) + "  ·  " + (engine.index() + 1) + " / " + engine.size(); break;
+                case 3: s = t.path.substring(t.path.lastIndexOf('/') + 1); break;
+                default: s = format(t);
+            }
+            text = s;
+            requestLayout();
+            invalidate();
+        }
+
+        @Override protected void onDraw(Canvas c) {
+            String s = mode == 0 ? text.toString().toUpperCase(Locale.ROOT) : text.toString();
+            CharSequence e = TextUtils.ellipsize(s, tp, getWidth() - th.px(8), mode == 3 ? TextUtils.TruncateAt.MIDDLE : TextUtils.TruncateAt.END);
+            c.drawText(e, 0, e.length(), getWidth() / 2f, getHeight() / 2f - (tp.ascent() + tp.descent()) / 2, tp);
+        }
+    }
+
+    /** "24 bit · 96 kHz · 2304 kbps · FLAC" */
+    static String format(Lib.Track t) {
+        StringBuilder b = new StringBuilder();
+        if (t.bits > 0) b.append(t.bits).append(" bit");
+        if (t.sampleRate > 0) {
+            if (b.length() > 0) b.append("  ·  ");
+            float k = t.sampleRate / 1000f;
+            b.append(k == Math.round(k) ? String.valueOf(Math.round(k)) : String.format(Locale.ROOT, "%.1f", k)).append(" kHz");
+        }
+        if (t.bitrate > 0) { if (b.length() > 0) b.append("  ·  "); b.append(t.bitrate).append(" kbps"); }
+        String codec = t.codec == null || t.codec.isEmpty() ? t.container : t.codec;
+        if (codec != null && !codec.isEmpty()) { if (b.length() > 0) b.append("  ·  "); b.append(codec); }
+        return b.toString();
     }
 
     // =====================================================================================================
@@ -501,7 +804,7 @@ public final class PlayerScreen extends ViewGroup implements Engine.Listener {
         }
 
         @Override protected void onDraw(Canvas c) {
-            float size = th.px(74) * Math.min(1f, getWidth() / th.px(112));
+            float size = th.px(70) * Math.min(1f, getWidth() / th.px(100));
             float press = isPressed() ? th.px(1) : 0;
             th.drawPlay(c, getWidth() / 2f, getHeight() / 2f + press, size, morph, playing, progress);
         }
@@ -510,123 +813,47 @@ public final class PlayerScreen extends ViewGroup implements Engine.Listener {
     }
 
     // =====================================================================================================
-    /** A small button drawn as a line glyph. */
-    static final class GlyphButton extends View {
-        static final int PREV = 0, NEXT = 1, SHUFFLE = 2, REPEAT = 3, LIBRARY = 4, MENU = 5, BACK = 6;
-        final int kind;
-        final boolean toggle;
-        boolean on;
-        int mode;
-        private final Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
-        private final Path path = new Path();
-        private final Theme th;
+    /** The visualizer behind the transport: the spectrum, eased towards each capture every frame. */
+    final class VisView extends View implements Choreographer.FrameCallback {
+        private final float[] v = new float[Vis.N];
+        private final RectF r = new RectF();
+        private boolean running;
+        private float alpha;
 
-        GlyphButton(Context c, int kind, boolean toggle) {
-            super(c);
-            this.kind = kind; this.toggle = toggle;
-            th = Theme.get(c);
-            setClickable(true);
-            p.setStrokeCap(Paint.Cap.ROUND); p.setStrokeJoin(Paint.Join.ROUND);
+        VisView(Context c) { super(c); }
+
+        void playing(boolean p) { kick(); }
+
+        void kick() {
+            if (!running && isAttachedToWindow()) { running = true; Choreographer.getInstance().postFrameCallback(this); }
         }
 
-        @Override protected void drawableStateChanged() { super.drawableStateChanged(); invalidate(); }
+        @Override protected void onAttachedToWindow() { super.onAttachedToWindow(); kick(); }
+        @Override protected void onDetachedFromWindow() { Choreographer.getInstance().removeFrameCallback(this); running = false; super.onDetachedFromWindow(); }
 
-        @Override protected void onDraw(Canvas c) {
-            float cx = getWidth() / 2f, cy = getHeight() / 2f, s = th.px(kind == PREV || kind == NEXT ? 26 : 22);
-            int col = toggle && !on ? Theme.alpha(th.text, 0.6f) : toggle ? th.accentHi : th.text;
-            if (isPressed()) col = th.accentHi;
-            p.setColor(col);
-            path.reset();
-            switch (kind) {
-                case PREV: case NEXT: {
-                    float d = kind == NEXT ? 1 : -1;
-                    p.setStyle(Paint.Style.FILL);
-                    float h = s * 0.62f, w = s * 0.5f;
-                    path.moveTo(cx - d * w * 0.45f, cy - h / 2); path.lineTo(cx + d * w * 0.55f, cy); path.lineTo(cx - d * w * 0.45f, cy + h / 2); path.close();
-                    c.drawPath(path, p);
-                    p.setStyle(Paint.Style.STROKE); p.setStrokeWidth(th.px(2.4f));
-                    c.drawLine(cx + d * w * 0.7f, cy - h / 2, cx + d * w * 0.7f, cy + h / 2, p);
-                    break;
-                }
-                case SHUFFLE: {
-                    p.setStyle(Paint.Style.STROKE); p.setStrokeWidth(th.px(1.8f));
-                    float a = s * 0.42f;
-                    path.moveTo(cx - a, cy - a * 0.6f); path.cubicTo(cx, cy - a * 0.6f, cx, cy + a * 0.6f, cx + a, cy + a * 0.6f);
-                    path.moveTo(cx - a, cy + a * 0.6f); path.cubicTo(cx, cy + a * 0.6f, cx, cy - a * 0.6f, cx + a, cy - a * 0.6f);
-                    path.moveTo(cx + a * 0.62f, cy - a * 0.95f); path.lineTo(cx + a, cy - a * 0.6f); path.lineTo(cx + a * 0.62f, cy - a * 0.25f);
-                    path.moveTo(cx + a * 0.62f, cy + a * 0.25f); path.lineTo(cx + a, cy + a * 0.6f); path.lineTo(cx + a * 0.62f, cy + a * 0.95f);
-                    c.drawPath(path, p);
-                    dot(c, cx, cy + s * 0.75f);
-                    break;
-                }
-                case REPEAT: {
-                    p.setStyle(Paint.Style.STROKE); p.setStrokeWidth(th.px(1.8f));
-                    float a = s * 0.42f, r = a * 0.4f;
-                    RectF box = new RectF(cx - a, cy - a * 0.55f, cx + a, cy + a * 0.55f);
-                    c.drawRoundRect(box, r, r, p);
-                    p.setStyle(Paint.Style.FILL);
-                    path.moveTo(cx + a * 0.05f, cy - a * 0.95f); path.lineTo(cx + a * 0.45f, cy - a * 0.55f); path.lineTo(cx + a * 0.05f, cy - a * 0.15f); path.close();
-                    c.drawPath(path, p);
-                    if (mode == Engine.REPEAT_ONE) {
-                        p.setTextSize(th.px(9)); p.setTypeface(th.uiBold); p.setTextAlign(Paint.Align.CENTER);
-                        c.drawText("1", cx, cy + th.px(3.2f), p);
-                    }
-                    dot(c, cx, cy + s * 0.75f);
-                    break;
-                }
-                case LIBRARY: {
-                    p.setStyle(Paint.Style.STROKE); p.setStrokeWidth(th.px(2));
-                    float a = s * 0.42f;
-                    for (int i = -1; i <= 1; i++) c.drawLine(cx - a, cy + i * a * 0.55f, cx + a * (i == 1 ? 0.2f : 1), cy + i * a * 0.55f, p);
-                    p.setStyle(Paint.Style.FILL);
-                    c.drawCircle(cx + a * 0.75f, cy + a * 0.62f, a * 0.28f, p);
-                    break;
-                }
-                case MENU: {
-                    p.setStyle(Paint.Style.FILL);
-                    for (int i = -1; i <= 1; i++) c.drawCircle(cx, cy + i * s * 0.3f, th.px(2.2f), p);
-                    break;
-                }
-                case BACK: {
-                    p.setStyle(Paint.Style.STROKE); p.setStrokeWidth(th.px(2.2f));
-                    float a = s * 0.3f;
-                    path.moveTo(cx + a * 0.5f, cy - a); path.lineTo(cx - a * 0.5f, cy); path.lineTo(cx + a * 0.5f, cy + a);
-                    c.drawPath(path, p);
-                    break;
-                }
-                default: break;
+        @Override public void doFrame(long now) {
+            Vis src = stage.vis;
+            boolean on = stage.visOn() && src.running();
+            float[] t = src.target;
+            boolean moving = false;
+            float targetAlpha = on && engine.isPlaying() ? 1 : 0;
+            alpha += (targetAlpha - alpha) * 0.12f;
+            for (int i = 0; i < v.length; i++) {
+                float want = on && engine.isPlaying() ? t[i] : 0;
+                v[i] += (want - v[i]) * (want > v[i] ? 0.45f : 0.12f);
+                if (Math.abs(want - v[i]) > 0.002f) moving = true;
             }
-        }
-
-        /** "on": a small glowing dot under the glyph */
-        private void dot(Canvas c, float x, float y) {
-            if (!on) return;
-            p.setStyle(Paint.Style.FILL);
-            p.setColor(th.accentHi);
-            p.setShadowLayer(th.px(6), 0, 0, th.accentHi);
-            c.drawCircle(x, y, th.px(2.5f), p);
-            p.clearShadowLayer();
-        }
-    }
-
-    // =====================================================================================================
-    /** "Playing from": where the song came from, and its place there. */
-    final class SourceView extends View {
-        private final TextPaint label = new TextPaint(Paint.ANTI_ALIAS_FLAG), name = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-
-        SourceView(Context c) {
-            super(c);
-            label.setTypeface(th.uiMedium); label.setTextSize(th.px(10)); label.setLetterSpacing(0.22f); label.setColor(th.textDim); label.setTextAlign(Paint.Align.CENTER);
-            name.setTypeface(th.uiMedium); name.setTextSize(th.px(14)); name.setColor(th.text); name.setTextAlign(Paint.Align.CENTER);
+            if (Math.abs(targetAlpha - alpha) > 0.01f) moving = true;
+            invalidate();
+            if ((moving || (on && engine.isPlaying())) && isAttachedToWindow() && PlayerScreen.this.getVisibility() == VISIBLE)
+                Choreographer.getInstance().postFrameCallback(this);
+            else running = false;
         }
 
         @Override protected void onDraw(Canvas c) {
-            float cx = getWidth() / 2f;
-            c.drawText("PLAYING FROM", cx, getHeight() / 2f - th.px(4), label);
-            String src = engine.source().isEmpty() ? "Library" : engine.source();
-            if (engine.size() > 0) src += "  ·  " + (engine.index() + 1) + " / " + engine.size();
-            CharSequence s = TextUtils.ellipsize(src, name, getWidth(), TextUtils.TruncateAt.END);
-            c.drawText(s, 0, s.length(), cx, getHeight() / 2f + th.px(14), name);
+            if (alpha < 0.01f) return;
+            r.set(0, 0, getWidth(), getHeight());
+            th.drawVis(c, r, v, v.length, alpha);
         }
     }
 }

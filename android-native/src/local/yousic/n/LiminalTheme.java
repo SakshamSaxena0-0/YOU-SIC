@@ -40,6 +40,8 @@ public final class LiminalTheme extends Theme {
     // grain jumps between four places, like real film (YouSic: steps(4) a second)
     private static final float[][] JUMP = { {0, 0}, {-37, 23}, {51, -12}, {-18, -44} };
 
+    @Override public String name() { return "Liminal"; }
+
     LiminalTheme(Context c) {
         super(c);
         bg = INK; ink = INK; text = CREAM; textDim = HAZE; accent = PEACH; accentHi = GOLD; accent2 = ROSE;
@@ -317,6 +319,85 @@ public final class LiminalTheme extends Theme {
         bar.setShader(new RadialGradient(pxp, line, pr, new int[]{ CREAM, GOLD, PEACH }, new float[]{ 0, 0.6f, 1 }, Shader.TileMode.CLAMP));
         c.drawCircle(pxp, line, pr, bar);
         bar.setShader(null);
+    }
+
+    // ---------- controls: dusk glass with a hairline of cream ----------
+
+    @Override
+    public void drawChip(Canvas c, RectF r, float radius, boolean pressed, boolean on) {
+        fill.setStyle(Paint.Style.FILL);
+        fill.setColor(on ? alpha(mix(PEACH, DUSK, 0.32f), pressed ? 0.62f : 0.48f) : alpha(INK, pressed ? 0.66f : 0.42f));
+        c.drawRoundRect(r, radius, radius, fill);
+        fill.setStyle(Paint.Style.STROKE);
+        fill.setStrokeWidth(px(1));
+        fill.setColor(alpha(on ? GOLD : CREAM, on ? 0.42f : 0.12f));
+        c.drawRoundRect(r.left + px(0.5f), r.top + px(0.5f), r.right - px(0.5f), r.bottom - px(0.5f), radius, radius, fill);
+        fill.setStyle(Paint.Style.FILL);
+    }
+
+    @Override
+    public void drawRound(Canvas c, float cx, float cy, float r, boolean pressed, boolean small) {
+        fill.setStyle(Paint.Style.FILL);
+        fill.setColor(alpha(small ? INK : mix(DUSK, INK, 0.5f), small ? (pressed ? 0.6f : 0.36f) : (pressed ? 0.9f : 0.7f)));
+        c.drawCircle(cx, cy, r, fill);
+        fill.setStyle(Paint.Style.STROKE);
+        fill.setStrokeWidth(px(1));
+        fill.setColor(alpha(CREAM, small ? 0.1f : 0.16f));
+        c.drawCircle(cx, cy, r - px(0.5f), fill);
+        fill.setStyle(Paint.Style.FILL);
+    }
+
+    @Override
+    public void drawNavBar(Canvas c, RectF r, float radius) {
+        fill.setStyle(Paint.Style.FILL);
+        fill.setColor(alpha(mix(DUSK, INK, 0.55f), 0.94f));
+        c.drawRoundRect(r, radius, radius, fill);
+        fill.setStyle(Paint.Style.STROKE);
+        fill.setStrokeWidth(px(1));
+        fill.setColor(alpha(CREAM, 0.1f));
+        c.drawRoundRect(r.left + px(0.5f), r.top + px(0.5f), r.right - px(0.5f), r.bottom - px(0.5f), radius, radius, fill);
+        fill.setStyle(Paint.Style.FILL);
+    }
+
+    private final Paint sheetPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private float sheetTop = -1, sheetBottom = -1;
+
+    @Override
+    public void drawSheet(Canvas c, RectF r, float radius) {
+        if (r.top != sheetTop || r.bottom != sheetBottom) {
+            sheetTop = r.top; sheetBottom = r.bottom;
+            sheetPaint.setShader(new LinearGradient(0, r.top, 0, r.bottom, DUSK_HI, mix(DUSK, INK, 0.7f), Shader.TileMode.CLAMP));
+        }
+        c.drawRoundRect(r, radius, radius, sheetPaint);
+        fill.setStyle(Paint.Style.STROKE);
+        fill.setStrokeWidth(px(1));
+        fill.setColor(alpha(CREAM, 0.14f));
+        c.drawRoundRect(r.left + px(0.5f), r.top + px(0.5f), r.right - px(0.5f), r.bottom - px(0.5f), radius, radius, fill);
+        fill.setStyle(Paint.Style.FILL);
+    }
+
+    @Override
+    public void drawScrim(Canvas c, int w, int h, float a) { c.drawColor(alpha(INK, 0.62f * a)); }
+
+    private final Paint visPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private float visTop = -1, visBottom = -1;
+    private final RectF vb = new RectF();
+
+    /** sunset light rising: rose at the foot, gold at the top */
+    @Override
+    public void drawVis(Canvas c, RectF r, float[] v, int n, float a) {
+        if (r.top != visTop || r.bottom != visBottom) {
+            visTop = r.top; visBottom = r.bottom;
+            visPaint.setShader(new LinearGradient(0, r.bottom, 0, r.top, new int[]{ alpha(ROSE, 0.05f), alpha(PEACH, 0.4f), alpha(GOLD, 0.6f) },
+                    new float[]{ 0, 0.55f, 1 }, Shader.TileMode.CLAMP));
+        }
+        visPaint.setAlpha(Math.round(255 * a));
+        float step = r.width() / n, bw = step * 0.58f;
+        for (int i = 0; i < n; i++) {
+            float x = r.left + i * step + (step - bw) / 2, h = Math.max(bw, v[i] * r.height());
+            vb.set(x, r.bottom - h, x + bw, r.bottom);
+            c.drawRoundRect(vb, bw / 2, bw / 2, visPaint);
+        }
     }
 
     @Override

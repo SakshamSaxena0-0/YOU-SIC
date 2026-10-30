@@ -10,7 +10,13 @@ public final class App extends Application {
 
     public Lib lib;
     public Engine engine;
+    public Effects fx;
+    public Vis vis;
     public SharedPreferences prefs;
+
+    public String version() {
+        try { return getPackageManager().getPackageInfo(getPackageName(), 0).versionName; } catch (Exception e) { return ""; }
+    }
 
     public static App get() { return inst; }
 
@@ -22,5 +28,7 @@ public final class App extends Application {
         Motion.speed = prefs.getInt("animSpeed", Motion.SPEED_NORMAL);
         lib = new Lib(this);
         engine = new Engine(this, lib);
+        fx = new Effects(this, engine.session);
+        vis = new Vis(engine.session);
     }
 }

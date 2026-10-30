@@ -11,10 +11,12 @@ import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.PowerManager;
+import android.os.SystemClock;
 import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -23,12 +25,13 @@ import java.util.concurrent.Executors;
 
 /**
  * Playback: Android's MediaPlayer, gapless (the next song is prepared while one plays and handed over with
- * setNextMediaPlayer), with the queue, shuffle, repeat, audio focus and the saved session. Called on the main
+ * setNextMediaPlayer), with the list it plays from, its categories (the next / previous album, folder...),
+ * the queue, shuffle, repeat, likes, the sleep timer, audio focus and the saved session. Called on the main
  * thread; opening and releasing players (calls into the media server that can take tens of ms) run on `io`, so a
- * song change never stalls a frame.
+ * song change never stalls a frame. Every player joins one audio session, so the effects stay attached.
  */
 public final class Engine {
-    public static final int REPEAT_OFF = 0, REPEAT_ALL = 1, REPEAT_ONE = 2;
+    public static final int REPEAT_OFF = 0, REPEAT_ALL = 1, REPEAT_ONE = 2, REPEAT_ADVANCE = 3;
 
     public interface Listener {
         /** a new song (or the same one again from the start) */
@@ -37,6 +40,8 @@ public final class Engine {
         default void onState(boolean playing) {}
         /** shuffle / repeat / the list changed */
         default void onModes() {}
+        /** likes, the queue, the sleep timer */
+        default void onExtras() {}
     }
 
     private final Context ctx;
@@ -47,7 +52,9 @@ public final class Engine {
     /** bumped by every load / prepareNext, so a player opened for a song since replaced is dropped */
     private int gen, nextGen;
     private final List<Listener> listeners = new CopyOnWriteArrayList<>();
-    private final SharedPreferences prefs;
+    private final SharedPreferences prefs, ratings;
+    /** the audio session every player joins (the equalizer and visualizer attach to it) */
+    public final int session;
 
     private List<Lib.Track> list = new ArrayList<>();
     private int[] order = new int[0];
@@ -55,9 +62,13 @@ public final class Engine {
     private String source = "", sourceKey = "";
     public boolean shuffle;
     public int repeat = REPEAT_ALL;
+    /** songs to play next, before the list carries on */
+    private final List<Lib.Track> queue = new ArrayList<>();
+    private final LinkedList<String> recent = new LinkedList<>();
 
     private MediaPlayer cur, next;
     private int nextPos = -1;
+    private boolean nextFromQueue;
     /** the next song is prepared and handed to MediaPlayer, which will start it itself */
     private boolean nextLinked;
     private boolean prepared, wantPlay, playing;
@@ -66,14 +77,21 @@ public final class Engine {
 
     private AudioFocusRequest focus;
     private boolean resumeOnGain;
+    private float duck = 1f, fade = 1f;
+
+    private long sleepAt;
+    private boolean sleepEndOfSong;
 
     Engine(Context c, Lib lib) {
         ctx = c.getApplicationContext();
         this.lib = lib;
         audio = ctx.getSystemService(AudioManager.class);
+        session = audio.generateAudioSessionId();
         prefs = ctx.getSharedPreferences("engine", Context.MODE_PRIVATE);
+        ratings = ctx.getSharedPreferences("ratings", Context.MODE_PRIVATE);
         shuffle = prefs.getBoolean("shuffle", false);
         repeat = prefs.getInt("repeat", REPEAT_ALL);
+        for (String id : prefs.getString("recent", "").split(",")) if (!id.isEmpty()) recent.add(id);
     }
 
     public void listen(Listener l) { listeners.add(l); }
@@ -85,6 +103,7 @@ public final class Engine {
     public String sourceKey() { return sourceKey; }
     public int index() { return pos; }
     public int size() { return list.size(); }
+    public List<Lib.Track> list() { return list; }
 
     public long positionMs() {
         if (cur != null && prepared) try { return cur.getCurrentPosition(); } catch (Exception ignored) { }
@@ -96,28 +115,46 @@ public final class Engine {
         return track == null ? 0 : (long) (track.duration * 1000);
     }
 
-    /** The song before / after the current one in play order (for the album art pager), or null. */
+    /** The song before / after the current one (queue first), or null. */
     public Lib.Track peek(int delta) {
+        if (delta == 1 && !queue.isEmpty()) return queue.get(0);
         if (list.isEmpty() || pos < 0) return null;
         int p = pos + delta;
         if (p < 0 || p >= order.length) {
+            if (repeat == REPEAT_ADVANCE) {
+                Lib.Group g = peekCategory(delta > 0 ? 1 : -1);
+                if (g != null && !g.tracks.isEmpty()) return g.tracks.get(0);
+            }
             if (repeat != REPEAT_ALL) return null;
             p = (p + order.length) % order.length;
         }
         return list.get(order[p]);
     }
 
-    // ---------- the queue ----------
+    /** The queue, then the list in play order from the current song on. */
+    public List<Lib.Track> upcoming() {
+        List<Lib.Track> out = new ArrayList<>(queue);
+        for (int i = Math.max(0, pos); i < order.length; i++) out.add(list.get(order[i]));
+        return out;
+    }
 
-    /** Plays a list from one of its songs (index -1 with shuffle: a random one). */
+    // ---------- the list ----------
+
+    /** Plays a list from one of its songs (index -1: the first, or with shuffle a random one). */
     public void playList(List<Lib.Track> tracks, int index, String title, String key) {
         if (tracks.isEmpty()) return;
         list = new ArrayList<>(tracks);
         source = title; sourceKey = key;
-        if (shuffle && index < 0) index = new Random().nextInt(list.size());
-        buildOrder(Math.max(0, index));
-        load(0, true);
+        if (index < 0) index = shuffle ? new Random().nextInt(list.size()) : 0;
+        buildOrder(Math.min(index, list.size() - 1));
+        load(list.get(order[pos]), 0, true);
         for (Listener l : listeners) l.onModes();
+    }
+
+    /** Every song, shuffled. */
+    public void shuffleAll() {
+        if (!shuffle) { shuffle = true; prefs.edit().putBoolean("shuffle", true).apply(); }
+        playList(lib.tracks, -1, "All songs", "all");
     }
 
     private void buildOrder(int first) {
@@ -141,19 +178,153 @@ public final class Engine {
         shuffle = on;
         prefs.edit().putBoolean("shuffle", on).apply();
         if (!list.isEmpty() && pos >= 0) {
-            int curIdx = order[pos];
-            buildOrder(curIdx);
+            buildOrder(order[pos]);
             prepareNext();
         }
         for (Listener l : listeners) l.onModes();
         save();
     }
 
-    public void cycleRepeat() {
-        repeat = (repeat + 1) % 3;
+    public void setRepeat(int r) {
+        repeat = r;
         prefs.edit().putInt("repeat", repeat).apply();
         prepareNext();
         for (Listener l : listeners) l.onModes();
+    }
+
+    /** The repeat button: off, the list, the song. */
+    public void cycleRepeat() { setRepeat(repeat == REPEAT_OFF ? REPEAT_ALL : repeat == REPEAT_ALL || repeat == REPEAT_ADVANCE ? REPEAT_ONE : REPEAT_OFF); }
+
+    // ---------- categories: the album, folder, artist or genre the list is ----------
+
+    /** "album", "artist", "folder", "genre", or "" for a list that is not one category. */
+    public String kind() {
+        int i = sourceKey.indexOf(':');
+        return i > 0 ? sourceKey.substring(0, i) : "";
+    }
+
+    List<Lib.Group> groupsOf(String kind) {
+        switch (kind) {
+            case "album": return lib.albums;
+            case "artist": return lib.artists;
+            case "folder": return lib.folders;
+            case "genre": return lib.genres;
+            default: return null;
+        }
+    }
+
+    /** The category after / before this one (for a list that is not a category: the albums, from this song's). */
+    public Lib.Group peekCategory(int dir) {
+        String k = kind();
+        List<Lib.Group> gs = groupsOf(k);
+        String key = gs == null ? null : sourceKey.substring(k.length() + 1);
+        if (gs == null) { gs = lib.albums; key = track == null ? null : track.albumKey; }
+        if (gs == null || gs.isEmpty() || key == null) return null;
+        int i = -1;
+        for (int j = 0; j < gs.size(); j++) if (gs.get(j).key.equals(key)) { i = j; break; }
+        if (i < 0) return null;
+        return gs.get((i + dir + gs.size()) % gs.size());
+    }
+
+    /** What the category steps go through: "album", "folder"... */
+    public String categoryKind() { return groupsOf(kind()) == null ? "album" : kind(); }
+
+    /** Plays the next / previous category from its start; false if there is none. */
+    public boolean stepCategory(int dir) {
+        Lib.Group g = peekCategory(dir);
+        if (g == null) return false;
+        playList(g.tracks, -1, g.title, categoryKind() + ":" + g.key);
+        return true;
+    }
+
+    // ---------- the queue ----------
+
+    public void playNext(List<Lib.Track> ts) { queue.addAll(0, ts); prepareNext(); extras(); }
+    public void enqueue(List<Lib.Track> ts) { queue.addAll(ts); prepareNext(); extras(); }
+    public int queued() { return queue.size(); }
+    public void clearQueue() { queue.clear(); prepareNext(); extras(); }
+
+    /** Plays a song from the queue or the list (the queue page). */
+    public void jump(Lib.Track t) {
+        int qi = queue.indexOf(t);
+        if (qi >= 0) { queue.remove(qi); load(t, 0, true); extras(); return; }
+        for (int i = 0; i < order.length; i++) if (list.get(order[i]) == t) { pos = i; load(t, 0, true); return; }
+    }
+
+    // ---------- likes ----------
+
+    public int rating(Lib.Track t) { return t == null ? 0 : ratings.getInt(t.id, 0); }
+
+    public void setRating(Lib.Track t, int r) {
+        if (t == null) return;
+        if (r == 0) ratings.edit().remove(t.id).apply(); else ratings.edit().putInt(t.id, r).apply();
+        extras();
+    }
+
+    public List<Lib.Track> liked() {
+        List<Lib.Track> out = new ArrayList<>();
+        for (Lib.Track t : lib.tracks) if (ratings.getInt(t.id, 0) > 0) out.add(t);
+        return out;
+    }
+
+    public List<Lib.Track> recent() {
+        List<Lib.Track> out = new ArrayList<>();
+        for (String id : recent) { Lib.Track t = lib.byId.get(id); if (t != null) out.add(t); }
+        return out;
+    }
+
+    private void extras() { for (Listener l : listeners) l.onExtras(); }
+
+    // ---------- the sleep timer ----------
+
+    /** Pauses after this many minutes (0: off). The last 8 s fade out. */
+    public void setSleep(int minutes) {
+        main.removeCallbacks(sleepFade);
+        sleepEndOfSong = false;
+        sleepAt = minutes > 0 ? SystemClock.elapsedRealtime() + minutes * 60_000L : 0;
+        fade = 1f;
+        volume();
+        if (sleepAt > 0) main.postDelayed(sleepFade, Math.max(0, sleepAt - 8000 - SystemClock.elapsedRealtime()));
+        prepareNext();
+        extras();
+    }
+
+    /** Pauses when this song ends. */
+    public void sleepAfterSong() {
+        main.removeCallbacks(sleepFade);
+        sleepAt = 0;
+        fade = 1f;
+        volume();
+        sleepEndOfSong = true;
+        prepareNext();
+        extras();
+    }
+
+    public long sleepRemainingMs() { return sleepAt > 0 ? Math.max(0, sleepAt - SystemClock.elapsedRealtime()) : 0; }
+    public boolean sleepingAfterSong() { return sleepEndOfSong; }
+    public boolean sleepOn() { return sleepAt > 0 || sleepEndOfSong; }
+
+    private final Runnable sleepFade = new Runnable() {
+        @Override public void run() {
+            if (sleepAt == 0) return;
+            long left = sleepAt - SystemClock.elapsedRealtime();
+            if (left <= 0) {
+                sleepAt = 0;
+                pause();
+                fade = 1f;
+                volume();
+                extras();
+                return;
+            }
+            fade = Math.min(1f, left / 8000f);
+            volume();
+            main.postDelayed(this, 100);
+        }
+    };
+
+    private void volume() {
+        float v = duck * fade;
+        if (cur != null) try { cur.setVolume(v, v); } catch (Exception ignored) { }
     }
 
     // ---------- transport ----------
@@ -162,7 +333,7 @@ public final class Engine {
 
     public void play() {
         if (track == null) {
-            if (!restore() && !lib.tracks.isEmpty()) playList(lib.tracks, shuffle ? -1 : 0, "All songs", "all");
+            if (!restore() && !lib.tracks.isEmpty()) playList(lib.tracks, -1, "All songs", "all");
             if (track == null) return;
         }
         wantPlay = true;
@@ -200,26 +371,34 @@ public final class Engine {
 
     /** Plays the song this many places along the play order (the album art pager uses +-1). */
     public void step(int delta, boolean user) {
+        if (delta == 1 && !queue.isEmpty()) {
+            load(queue.remove(0), 0, wantPlay || user);
+            extras();
+            return;
+        }
         if (list.isEmpty()) return;
         int p = pos + delta;
         if (p >= order.length || p < 0) {
+            if (repeat == REPEAT_ADVANCE && stepCategory(delta > 0 ? 1 : -1)) return;
             if (repeat == REPEAT_ALL || user) p = (p + order.length) % order.length;
             else { pause(); seekTo(0); return; }
         }
         pos = p;
-        load(0, wantPlay || user);
+        load(list.get(order[pos]), 0, wantPlay || user);
     }
 
     // ---------- MediaPlayer ----------
 
-    private void load(int atMs, boolean play) {
+    private void load(Lib.Track t, int atMs, boolean play) {
         release();
-        track = list.get(order[pos]);
+        track = t;
         pendingSeek = atMs;
         wantPlay = play;
         prepared = false;
+        recent.remove(t.id);
+        recent.addFirst(t.id);
+        while (recent.size() > 100) recent.removeLast();
         final int g = ++gen;
-        final Lib.Track t = track;
         io.execute(() -> {
             final MediaPlayer mp = create(t);
             main.post(() -> start(g, mp));
@@ -233,6 +412,7 @@ public final class Engine {
         if (g != gen) { if (mp != null) io.execute(mp::release); return; }
         if (mp == null) { skipSoon(); return; }
         cur = mp;
+        volume();
         mp.setOnPreparedListener(p -> {
             if (p != cur) return;
             prepared = true;
@@ -261,6 +441,7 @@ public final class Engine {
         try {
             mp.setAudioAttributes(new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_MEDIA)
                     .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build());
+            mp.setAudioSessionId(session);
             mp.setWakeMode(ctx, PowerManager.PARTIAL_WAKE_LOCK);
             if (uri != null) mp.setDataSource(ctx, uri); else mp.setDataSource(t.path);
             return mp;
@@ -280,11 +461,17 @@ public final class Engine {
             io.execute(next::release);
             next = null;
         }
-        if (cur == null || !prepared) return;
-        int p = repeat == REPEAT_ONE ? pos : pos + 1;
-        if (p >= order.length) { if (repeat == REPEAT_ALL) p = 0; else return; }
-        final Lib.Track t = list.get(order[p]);
-        final int np = p;
+        if (cur == null || !prepared || sleepEndOfSong) return;
+        final Lib.Track t;
+        final int np;
+        final boolean fromQueue;
+        if (repeat == REPEAT_ONE) { t = track; np = pos; fromQueue = false; }
+        else if (!queue.isEmpty()) { t = queue.get(0); np = pos; fromQueue = true; }
+        else {
+            int p = pos + 1;
+            if (p >= order.length) { if (repeat == REPEAT_ALL) p = 0; else return; } // advancing a category: not gapless
+            t = list.get(order[p]); np = p; fromQueue = false;
+        }
         final MediaPlayer forCur = cur;
         io.execute(() -> {
             final MediaPlayer mp = create(t);
@@ -293,6 +480,7 @@ public final class Engine {
                 if (g != nextGen || forCur != cur) { io.execute(mp::release); return; }
                 next = mp;
                 nextPos = np;
+                nextFromQueue = fromQueue;
                 mp.setOnCompletionListener(this::onCompletion);
                 mp.setOnPreparedListener(p2 -> {
                     if (p2 != next || forCur != cur) return;
@@ -313,8 +501,11 @@ public final class Engine {
             cur = next; next = null;
             nextGen++;
             prepared = true;
-            pos = nextPos;
-            track = list.get(order[pos]);
+            if (nextFromQueue && !queue.isEmpty()) { track = queue.remove(0); extras(); }
+            else { pos = nextPos; track = list.get(order[pos]); }
+            recent.remove(track.id);
+            recent.addFirst(track.id);
+            volume();
             cur.setOnErrorListener((p, w, x) -> { if (p == cur) skipSoon(); return true; });
             for (Listener l : listeners) l.onTrack(track);
             prepareNext();
@@ -322,7 +513,16 @@ public final class Engine {
         } else {
             if (next != null) { io.execute(next::release); next = null; }
             setPlaying(false);
-            if (repeat != REPEAT_OFF || pos + 1 < order.length) step(repeat == REPEAT_ONE ? 0 : 1, false);
+            if (sleepEndOfSong) {
+                // the sleep timer: the next song, ready and paused
+                sleepEndOfSong = false;
+                wantPlay = false;
+                step(1, false);
+                extras();
+                return;
+            }
+            boolean more = repeat != REPEAT_OFF || pos + 1 < order.length || !queue.isEmpty();
+            if (more) step(repeat == REPEAT_ONE ? 0 : 1, false);
         }
     }
 
@@ -365,10 +565,12 @@ public final class Engine {
                 if (playing) { pause(); resumeOnGain = true; }
                 break;
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
-                if (cur != null) cur.setVolume(0.25f, 0.25f);
+                duck = 0.25f;
+                volume();
                 break;
             case AudioManager.AUDIOFOCUS_GAIN:
-                if (cur != null) cur.setVolume(1f, 1f);
+                duck = 1f;
+                volume();
                 if (resumeOnGain) { resumeOnGain = false; play(); }
                 break;
             default: break;
@@ -383,8 +585,11 @@ public final class Engine {
         for (Lib.Track t : list) ids.append(t.id).append(',');
         StringBuilder ord = new StringBuilder();
         for (int o : order) ord.append(o).append(',');
+        StringBuilder rec = new StringBuilder();
+        for (String id : recent) rec.append(id).append(',');
         prefs.edit().putString("ids", ids.toString()).putString("order", ord.toString()).putInt("pos", pos)
-                .putLong("at", positionMs()).putString("source", source).putString("sourceKey", sourceKey).apply();
+                .putLong("at", positionMs()).putString("source", source).putString("sourceKey", sourceKey)
+                .putString("recent", rec.toString()).apply();
     }
 
     /** The last list, song and position (paused), if the library still has them. */
@@ -403,7 +608,7 @@ public final class Engine {
         list = l; order = ord;
         pos = Math.max(0, Math.min(prefs.getInt("pos", 0), l.size() - 1));
         source = prefs.getString("source", ""); sourceKey = prefs.getString("sourceKey", "");
-        load((int) prefs.getLong("at", 0), false);
+        load(list.get(order[pos]), (int) prefs.getLong("at", 0), false);
         for (Listener lis : listeners) lis.onModes();
         return true;
     }

@@ -26,8 +26,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public final class Lib {
     public static final class Track {
-        public String id, path, folder, title, artist, albumArtist, album, genre, cover, codec;
-        public int year, track, disc, sampleRate, bits;
+        public String id, path, folder, title, artist, albumArtist, album, genre, cover, codec, container = "", albumKey;
+        public int year, track, disc, sampleRate, bits, bitrate, channels;
+        public long size, added;
         public double duration;
         public boolean lossless;
     }
@@ -67,6 +68,16 @@ public final class Lib {
         }, "library").start();
     }
 
+    /** Scans again (after the music folders changed, or on request). */
+    public void rescan() {
+        new Thread(() -> {
+            scanning = true;
+            scanner.scan(false, (done, total, finished) -> { });
+            scanning = false;
+            build(scanner.load());
+        }, "library").start();
+    }
+
     private void build(JSONObject lib) {
         JSONArray a = lib == null ? null : lib.optJSONArray("tracks");
         List<Track> out = new ArrayList<>();
@@ -79,8 +90,12 @@ public final class Lib {
             t.album = o.optString("album"); t.genre = o.optString("genre");
             t.cover = o.isNull("cover") ? null : o.optString("cover", null);
             t.year = o.optInt("year"); t.track = o.optInt("track"); t.disc = o.optInt("disc"); t.duration = o.optDouble("duration", 0);
+            t.size = o.optLong("size"); t.added = o.optLong("added");
             JSONObject f = o.optJSONObject("fmt");
-            if (f != null) { t.codec = f.optString("codec"); t.sampleRate = f.optInt("sampleRate"); t.bits = f.optInt("bits"); t.lossless = f.optBoolean("lossless"); }
+            if (f != null) {
+                t.codec = f.optString("codec"); t.sampleRate = f.optInt("sampleRate"); t.bits = f.optInt("bits"); t.lossless = f.optBoolean("lossless");
+                t.bitrate = f.optInt("bitrate"); t.channels = f.optInt("channels"); t.container = f.optString("container");
+            }
             out.add(t);
         }
         final Collator col = Collator.getInstance();
@@ -92,7 +107,8 @@ public final class Lib {
             ids.put(t.id, t);
             String aa = t.albumArtist.isEmpty() ? t.artist : t.albumArtist;
             String akey = (aa + "|" + t.album).toLowerCase(Locale.ROOT);
-            group(al, t.album.isEmpty() ? akey + "|" + t.folder : akey, t.album.isEmpty() ? new File(t.folder).getName() : t.album, t).sub = aa;
+            t.albumKey = t.album.isEmpty() ? akey + "|" + t.folder : akey;
+            group(al, t.albumKey, t.album.isEmpty() ? new File(t.folder).getName() : t.album, t).sub = aa;
             group(ar, t.artist.toLowerCase(Locale.ROOT), t.artist.isEmpty() ? "Unknown artist" : t.artist, t);
             group(fo, t.folder, new File(t.folder).getName(), t).sub = t.folder;
             if (!t.genre.isEmpty()) group(ge, t.genre.toLowerCase(Locale.ROOT), t.genre, t);

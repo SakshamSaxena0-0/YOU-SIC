@@ -115,6 +115,42 @@ final class Library {
         save();
     }
 
+    /** The folders scanned (whole storages or single folders). */
+    synchronized List<String> folders() {
+        load();
+        List<String> out = new ArrayList<>();
+        JSONArray f = lib.optJSONArray("folders");
+        for (int i = 0; f != null && i < f.length(); i++) out.add(f.optString(i).replaceAll("/+$", ""));
+        return out;
+    }
+
+    synchronized void setFolders(List<String> folders) {
+        load();
+        JSONArray a = new JSONArray();
+        for (String f : folders) a.put(f);
+        try { lib.put("folders", a).put("foldersSet", true); } catch (JSONException ignored) { }
+        save();
+    }
+
+    /** Every folder holding music on the device (whether scanned or not), with how many songs each has. */
+    java.util.Map<String, Integer> musicFolders() {
+        java.util.Map<String, Integer> out = new java.util.TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        try (Cursor c = ctx.getContentResolver().query(audioUri(), new String[]{MediaStore.Audio.Media.DATA}, null, null, null)) {
+            while (c != null && c.moveToNext()) {
+                String p = c.getString(0);
+                if (p == null) continue;
+                int i = p.lastIndexOf('/');
+                if (i <= 0) continue;
+                String d = p.substring(0, i);
+                Integer n = out.get(d);
+                out.put(d, n == null ? 1 : n + 1);
+            }
+        } catch (Exception e) {
+            Log.w(App.TAG, "music folders", e);
+        }
+        return out;
+    }
+
     boolean has(String path) { return paths.contains(path); }
 
     /** A song's content:// address (from the last scan, or looked up by its path). */

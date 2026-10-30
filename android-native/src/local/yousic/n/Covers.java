@@ -26,10 +26,17 @@ public final class Covers {
 
     private Covers() {}
 
+    public static final int SMALL = 0, MEDIUM = 1, LARGE = 2;
+
     /** The cover now if it is in memory (null otherwise: then `then` gets it once decoded). */
-    public static Bitmap get(String key, boolean small, Ready then) {
+    public static Bitmap get(String key, boolean small, Ready then) { return get(key, small ? SMALL : LARGE, then); }
+
+    /** SMALL: list rows (the 220 px thumbnail), MEDIUM: grid tiles (480 px), LARGE: the player (1000 px). */
+    public static Bitmap get(String key, int size, Ready then) {
         if (key == null) return null;
-        final String k = key + (small ? "_s" : "");
+        final boolean small = size == SMALL;
+        final int px = size == SMALL ? 220 : size == MEDIUM ? 480 : 1000;
+        final String k = key + (size == SMALL ? "_s" : size == MEDIUM ? "_m" : "");
         Bitmap b = cache.get(k);
         if (b != null || then == null) return b;
         List<Ready> w = waiting.get(k);
@@ -39,7 +46,7 @@ public final class Covers {
         waiting.put(k, w);
         pool.execute(() -> {
             File f = App.get().lib.coverFile(key, small);
-            Bitmap bm = f.isFile() ? PlayerService.decode(f, small ? 220 : 1000) : null;
+            Bitmap bm = f.isFile() ? PlayerService.decode(f, px) : null;
             if (bm != null) bm.prepareToDraw();
             main.post(() -> {
                 if (bm != null) cache.put(k, bm);

@@ -17,3 +17,31 @@ html.android .tip { display: none; }
 /* battery: the blurred album-art background stays still. Its slow drift re-blurs the whole screen every
    frame, which a phone's GPU pays for the whole time the app is open. */
 html.android .bg-layer { animation: none; }
+
+/* ---------- speed: 120 Hz ----------
+   A phone composites every layer of the page again for every frame, and at 120 Hz it has 8.3 ms to do it.
+   Measured on a Galaxy M53 (WebView 156), scrolling the library took 57 ms a frame before these. */
+
+/* 1. Screens out of sight are hidden once they have slid away. The player under the library or the
+      equalizer shrinks and fades as before, but isn't blurred, and is hidden once it is covered. */
+html.android .app:not(.wide)[data-screen='library'] #player,
+html.android .app:not(.wide)[data-screen='eq'] #player {
+  filter: none; visibility: hidden;
+  transition: transform 0.55s var(--ease), opacity 0.45s ease, visibility 0s linear 0.55s;
+}
+html.android .app:not(.wide):not([data-screen='library']) #library,
+html.android .app:not(.wide):not([data-screen='eq']) #eq {
+  visibility: hidden;
+  transition: transform 0.55s var(--ease), opacity 0.45s ease, visibility 0s linear 0.55s;
+}
+
+/* 2. So is the theme's backdrop while the library or the equalizer covers the screen: their backgrounds
+      let a tenth of it through at most. (Pixel's library is see-through, so its backdrop stays.) */
+html.android:not(.theme-pixel):has(.app:not(.wide):is([data-screen='library'], [data-screen='eq'])) :is(#wall, #fx, #vsWorld, #lmWorld, #mnWorld) {
+  visibility: hidden; transition: visibility 0s linear 0.55s;
+}
+
+/* 3. Tiles, rows and covers fade in from a blur (popIn). Held at its end, that animation leaves each of them
+      with filter: blur(0px), and the GPU then draws every one separately, every frame. Here it holds only
+      its start: each returns to its own style once it has arrived, which looks the same. */
+html.android :is(.tile, .row.item, .gcell, .album-head) { animation-fill-mode: backwards; }

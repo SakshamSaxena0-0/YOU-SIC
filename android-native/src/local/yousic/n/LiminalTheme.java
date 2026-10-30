@@ -56,10 +56,17 @@ public final class LiminalTheme extends Theme {
         grain = Bitmap.createBitmap(g, g, Bitmap.Config.ARGB_8888);
         int[] pxs = new int[g * g];
         Random r = new Random(7);
-        for (int i = 0; i < pxs.length; i++) { int v = r.nextInt(256); pxs[i] = 0xFF000000 | (v << 16) | (v << 8) | v; }
+        // YouSic blends grey noise in with overlay at 14 %. A GPU does a plain alpha blend inside its tile memory
+        // but has to copy the screen out for overlay, every frame, so the same effect is baked here as light and dark
+        // specks drawn over normally: overlay at 14 % moves a colour of brightness b by 0.14 b d (d = noise, -1..1)
+        // while b < 0.5, which white at alpha 0.14 b d / (1 - b) or black at 0.14 |d| matches (b = 0.25, the dusk).
+        for (int i = 0; i < pxs.length; i++) {
+            float d = (r.nextInt(256) - 127.5f) / 127.5f;
+            int a = Math.round(255 * (d > 0 ? 0.14f * 0.25f * d / 0.75f : -0.14f * d));
+            pxs[i] = (a << 24) | (d > 0 ? 0xFFFFFF : 0);
+        }
         grain.setPixels(pxs, 0, g, 0, 0, g, g);
         grainPaint.setShader(new BitmapShader(grain, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT));
-        grainPaint.setBlendMode(BlendMode.OVERLAY);
         // the cover: a faded print (sepia 0.14, saturate 0.92, contrast 0.96)
         ColorMatrix cm = new ColorMatrix();
         cm.setSaturation(0.92f);
@@ -138,13 +145,22 @@ public final class LiminalTheme extends Theme {
         float[] j = JUMP[step & 3];
         m.reset(); m.setScale(2, 2); m.postTranslate(px(j[0]), px(j[1]));
         grainPaint.getShader().setLocalMatrix(m);
-        grainPaint.setAlpha(Math.round(255 * 0.14f));
         c.drawRect(0, 0, w, h, grainPaint);
         if (filmEdge == null || filmW != w || filmH != h) buildFilmEdge(w, h);
-        c.drawBitmap(filmEdge, 0, 0, null);
+        // only the band round the edge has anything in it: four strips, not a screenful of texture
+        int b = Math.round(px(32));
+        drawStrip(c, 0, 0, w, b); drawStrip(c, 0, h - b, w, h);
+        drawStrip(c, 0, b, b, h - b); drawStrip(c, w - b, b, w, h - b);
     }
 
-    /** inset 4 dp, 16 dp corners: ink outside, a soft burnt shadow inside */
+    private final android.graphics.Rect strip = new android.graphics.Rect();
+
+    private void drawStrip(Canvas c, int l, int t, int r, int b) {
+        strip.set(l, t, r, b);
+        c.drawBitmap(filmEdge, strip, strip, null);
+    }
+
+    /** inset 4 dp, 16 dp corners: ink outside, a soft burnt shadow inside (all within 32 dp of the edge) */
     private void buildFilmEdge(int w, int h) {
         filmW = w; filmH = h;
         filmEdge = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);

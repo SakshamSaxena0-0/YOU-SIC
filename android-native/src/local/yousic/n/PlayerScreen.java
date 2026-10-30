@@ -40,6 +40,7 @@ public final class PlayerScreen extends ViewGroup implements Engine.Listener {
 
     PlayerScreen(Context c, Engine e) {
         super(c);
+        setClipChildren(false); // the cover's glow reaches past the pager
         th = Theme.get(c);
         engine = e;
         pager = new ArtPager(c);

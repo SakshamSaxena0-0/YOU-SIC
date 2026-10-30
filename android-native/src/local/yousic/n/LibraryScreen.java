@@ -368,6 +368,8 @@ public final class LibraryScreen extends ViewGroup implements Engine.Listener, L
             right.setTypeface(th.numFace); right.setTextSize(th.px(11.5f)); right.setColor(th.textDim); right.setTextAlign(Paint.Align.RIGHT);
         }
 
+        @Override protected void onSizeChanged(int w, int h, int ow, int oh) { edgeTop.setSize(w, h); edgeBottom.setSize(w, h); }
+
         float maxScroll() { return Math.max(0, padTop + page.items.size() * rowH + padBottom + th.px(12) - getHeight()); }
 
         @Override protected void onDraw(Canvas c) {
@@ -377,6 +379,8 @@ public final class LibraryScreen extends ViewGroup implements Engine.Listener, L
             int first = Math.max(0, (int) ((scroll - padTop) / rowH));
             int last = Math.min(page.items.size() - 1, (int) ((scroll + getHeight() - padTop) / rowH));
             Lib.Track playing = engine.track();
+            c.save();
+            c.clipRect(0, padTop, w, getHeight() - padBottom); // not under the header or the mini player
             for (int i = first; i <= last; i++) {
                 Item it = page.items.get(i);
                 float top = padTop + i * rowH - scroll, cy = top + rowH / 2;
@@ -400,6 +404,10 @@ public final class LibraryScreen extends ViewGroup implements Engine.Listener, L
                         c.drawBitmap(b, src, r, coverP);
                     } else {
                         fill.setColor(th.panelHi); c.drawRect(r, fill);
+                        fill.setColor(Theme.alpha(th.textDim, 0.45f)); // a note
+                        float n = coverS * 0.16f, nx = r.centerX(), ny = r.centerY();
+                        c.drawCircle(nx - n * 0.35f, ny + n * 0.7f, n * 0.5f, fill);
+                        c.drawRect(nx + n * 0.02f, ny - n * 1.1f, nx + n * 0.22f, ny + n * 0.7f, fill);
                     }
                     c.restore();
                     x += coverS + th.px(14);
@@ -422,6 +430,7 @@ public final class LibraryScreen extends ViewGroup implements Engine.Listener, L
                     fill.clearShadowLayer();
                 }
             }
+            c.restore();
             boolean more = false;
             if (!edgeTop.isFinished()) { more |= edgeTop.draw(c); }
             if (!edgeBottom.isFinished()) {

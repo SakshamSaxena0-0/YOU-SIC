@@ -28,6 +28,7 @@ public final class MainActivity extends Activity implements Lib.Listener {
         if (Build.VERSION.SDK_INT >= 29) w.setNavigationBarContrastEnforced(false);
         stage = new Stage(this, app);
         setContentView(stage);
+        w.setBackgroundDrawable(null); // the stage's backdrop covers the window: no fill under it every frame
         app.lib.listen(this);
         List<String> need = new ArrayList<>();
         String audio = Build.VERSION.SDK_INT >= 33 ? Manifest.permission.READ_MEDIA_AUDIO : Manifest.permission.READ_EXTERNAL_STORAGE;

@@ -85,14 +85,21 @@ public final class PlayerService extends Service implements Engine.Listener {
     @Override public void onTrack(Lib.Track t) { update(); }
     @Override public void onState(boolean playing) { update(); }
 
+    private final java.util.concurrent.ExecutorService bg = java.util.concurrent.Executors.newSingleThreadExecutor();
+
     private void update() {
         Lib.Track t = engine.track();
         if (t == null) return;
         String key = t.cover == null ? "" : t.cover;
         if (!key.equals(artKey)) {
+            // decoded off the main thread; the notification is updated again once it is ready
             artKey = key;
-            File f = key.isEmpty() ? null : App.get().lib.coverFile(key, false);
-            art = f != null && f.isFile() ? decode(f, 512) : null;
+            art = null;
+            if (!key.isEmpty()) bg.execute(() -> {
+                File f = App.get().lib.coverFile(key, false);
+                final Bitmap b = f.isFile() ? decode(f, 512) : null;
+                if (b != null) main.post(() -> { if (key.equals(artKey)) { art = b; update(); } });
+            });
         }
         session.setMetadata(new MediaMetadata.Builder()
                 .putString(MediaMetadata.METADATA_KEY_TITLE, t.title).putString(MediaMetadata.METADATA_KEY_ARTIST, t.artist)

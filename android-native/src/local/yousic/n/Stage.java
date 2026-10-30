@@ -42,7 +42,7 @@ public final class Stage extends FrameLayout {
         addView(library);
         addView(fly, new LayoutParams(1, 1));
         addView(overlay);
-        library.setVisibility(GONE);
+        library.setVisibility(INVISIBLE); // laid out (the mini player's cover is where the art flies) but not drawn
         fly.setVisibility(GONE);
         player.onOpenLibrary = this::openLibrary;
         library.onClose = this::closeLibrary;
@@ -89,6 +89,9 @@ public final class Stage extends FrameLayout {
         fly.setPivotX(0); fly.setPivotY(0);
         library.setVisibility(VISIBLE);
         player.setVisibility(VISIBLE);
+        // both screens fade: as GPU layers that is a cheap blend, not two full-screen offscreen passes a frame
+        player.setLayerType(LAYER_TYPE_HARDWARE, null);
+        library.setLayerType(LAYER_TYPE_HARDWARE, null);
         fly.setVisibility(t == null ? GONE : VISIBLE);
         player.pager.cards[1].setVisibility(INVISIBLE);
         library.mini.coverHidden = true; library.mini.invalidate();
@@ -106,8 +109,10 @@ public final class Stage extends FrameLayout {
                 fly.setVisibility(GONE);
                 library.mini.coverHidden = false; library.mini.invalidate();
                 player.pager.cards[1].setVisibility(App.get().engine.track() == null ? INVISIBLE : VISIBLE);
+                player.setLayerType(LAYER_TYPE_NONE, null);
+                library.setLayerType(LAYER_TYPE_NONE, null);
                 if (libT >= 1) player.setVisibility(INVISIBLE); // covered: not drawn at all
-                if (libT <= 0) library.setVisibility(GONE);
+                if (libT <= 0) library.setVisibility(INVISIBLE);
             }
         });
         anim.start();

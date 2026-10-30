@@ -18,10 +18,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Playback: Android's MediaPlayer, gapless (the next song is prepared while one plays and handed over with
- * setNextMediaPlayer), with the queue, shuffle, repeat, audio focus and the saved session. Main thread only.
+ * setNextMediaPlayer), with the queue, shuffle, repeat, audio focus and the saved session. Called on the main
+ * thread; opening and releasing players (calls into the media server that can take tens of ms) run on `io`, so a
+ * song change never stalls a frame.
  */
 public final class Engine {
     public static final int REPEAT_OFF = 0, REPEAT_ALL = 1, REPEAT_ONE = 2;
@@ -39,6 +43,9 @@ public final class Engine {
     private final Lib lib;
     private final AudioManager audio;
     private final Handler main = new Handler(Looper.getMainLooper());
+    private final ExecutorService io = Executors.newSingleThreadExecutor(r -> new Thread(r, "engine-io"));
+    /** bumped by every load / prepareNext, so a player opened for a song since replaced is dropped */
+    private int gen, nextGen;
     private final List<Listener> listeners = new CopyOnWriteArrayList<>();
     private final SharedPreferences prefs;
 
@@ -210,10 +217,22 @@ public final class Engine {
         track = list.get(order[pos]);
         pendingSeek = atMs;
         wantPlay = play;
-        cur = create(track);
         prepared = false;
-        if (cur == null) { main.postDelayed(() -> step(1, false), 300); return; }
-        final MediaPlayer mp = cur;
+        final int g = ++gen;
+        final Lib.Track t = track;
+        io.execute(() -> {
+            final MediaPlayer mp = create(t);
+            main.post(() -> start(g, mp));
+        });
+        for (Listener l : listeners) l.onTrack(track);
+        save();
+    }
+
+    /** The player for load number `g`, opened: prepare it (unless another song was chosen meanwhile). */
+    private void start(int g, MediaPlayer mp) {
+        if (g != gen) { if (mp != null) io.execute(mp::release); return; }
+        if (mp == null) { skipSoon(); return; }
+        cur = mp;
         mp.setOnPreparedListener(p -> {
             if (p != cur) return;
             prepared = true;
@@ -224,12 +243,16 @@ public final class Engine {
         mp.setOnCompletionListener(this::onCompletion);
         mp.setOnErrorListener((p, what, extra) -> {
             Log.w(App.TAG, "playback error " + what + "/" + extra + " " + (track == null ? "" : track.path));
-            if (p == cur) main.postDelayed(() -> step(1, false), 300);
+            if (p == cur) skipSoon();
             return true;
         });
         try { mp.prepareAsync(); } catch (Exception e) { Log.w(App.TAG, "prepare", e); }
-        for (Listener l : listeners) l.onTrack(track);
-        save();
+    }
+
+    /** This song can't be played: on to the next (unless the user picks another first). */
+    private void skipSoon() {
+        final int g = gen;
+        main.postDelayed(() -> { if (g == gen) step(1, false); }, 300);
     }
 
     private MediaPlayer create(Lib.Track t) {
@@ -251,25 +274,34 @@ public final class Engine {
     /** Gapless: the following song, prepared now and started by MediaPlayer the instant this one ends. */
     private void prepareNext() {
         nextLinked = false;
-        if (next != null) { try { if (cur != null) cur.setNextMediaPlayer(null); } catch (Exception ignored) { } next.release(); next = null; }
+        final int g = ++nextGen;
+        if (next != null) {
+            try { if (cur != null) cur.setNextMediaPlayer(null); } catch (Exception ignored) { }
+            io.execute(next::release);
+            next = null;
+        }
         if (cur == null || !prepared) return;
         int p = repeat == REPEAT_ONE ? pos : pos + 1;
         if (p >= order.length) { if (repeat == REPEAT_ALL) p = 0; else return; }
-        Lib.Track t = list.get(order[p]);
-        MediaPlayer mp = create(t);
-        if (mp == null) return;
+        final Lib.Track t = list.get(order[p]);
         final int np = p;
         final MediaPlayer forCur = cur;
-        next = mp;
-        nextPos = np;
-        mp.setOnCompletionListener(this::onCompletion);
-        // prepared off the main thread (a synchronous prepare can block it for a fifth of a second)
-        mp.setOnPreparedListener(p2 -> {
-            if (p2 != next || forCur != cur) return;
-            try { cur.setNextMediaPlayer(p2); nextLinked = true; } catch (Exception e) { Log.w(App.TAG, "gapless " + t.path, e); }
+        io.execute(() -> {
+            final MediaPlayer mp = create(t);
+            if (mp == null) return;
+            main.post(() -> {
+                if (g != nextGen || forCur != cur) { io.execute(mp::release); return; }
+                next = mp;
+                nextPos = np;
+                mp.setOnCompletionListener(this::onCompletion);
+                mp.setOnPreparedListener(p2 -> {
+                    if (p2 != next || forCur != cur) return;
+                    try { cur.setNextMediaPlayer(p2); nextLinked = true; } catch (Exception e) { Log.w(App.TAG, "gapless " + t.path, e); }
+                });
+                mp.setOnErrorListener((p2, w, x) -> { if (p2 == next) { next = null; io.execute(p2::release); } return true; });
+                try { mp.prepareAsync(); } catch (Exception e) { Log.w(App.TAG, "gapless " + t.path, e); next = null; io.execute(mp::release); }
+            });
         });
-        mp.setOnErrorListener((p2, w, x) -> { if (p2 == next) { next = null; p2.release(); } return true; });
-        try { mp.prepareAsync(); } catch (Exception e) { Log.w(App.TAG, "gapless " + t.path, e); next = null; mp.release(); }
     }
 
     private void onCompletion(MediaPlayer mp) {
@@ -277,17 +309,18 @@ public final class Engine {
         if (next != null && nextLinked) {
             // MediaPlayer has already started the next one
             nextLinked = false;
-            cur.release();
+            io.execute(cur::release);
             cur = next; next = null;
+            nextGen++;
             prepared = true;
             pos = nextPos;
             track = list.get(order[pos]);
-            cur.setOnErrorListener((p, w, x) -> { if (p == cur) main.postDelayed(() -> step(1, false), 300); return true; });
+            cur.setOnErrorListener((p, w, x) -> { if (p == cur) skipSoon(); return true; });
             for (Listener l : listeners) l.onTrack(track);
             prepareNext();
             save();
         } else {
-            if (next != null) { next.release(); next = null; }
+            if (next != null) { io.execute(next::release); next = null; }
             setPlaying(false);
             if (repeat != REPEAT_OFF || pos + 1 < order.length) step(repeat == REPEAT_ONE ? 0 : 1, false);
         }
@@ -295,8 +328,13 @@ public final class Engine {
 
     private void release() {
         nextLinked = false;
-        if (next != null) { next.release(); next = null; }
-        if (cur != null) { try { cur.release(); } catch (Exception ignored) { } cur = null; }
+        nextGen++;
+        final MediaPlayer n = next, c = cur;
+        next = null; cur = null;
+        if (n != null || c != null) io.execute(() -> {
+            if (c != null) try { c.release(); } catch (Exception ignored) { }
+            if (n != null) n.release();
+        });
         prepared = false;
     }
 

@@ -37,7 +37,7 @@ public final class PlayerScreen extends ViewGroup implements Engine.Listener {
     final Stage stage;
     final VisView vis;
     final ArtPager pager;
-    final Ui.Btn like, dislike, listBtn, moreBtn;
+    final Ui.Btn like, dislike, listBtn, moreBtn, admireBtn;
     final Ui.TextChip titleChip, artistChip;
     /** the row of four buttons (long press between them to choose them) */
     final Ui.Btn[] slots = new Ui.Btn[4];
@@ -66,6 +66,8 @@ public final class PlayerScreen extends ViewGroup implements Engine.Listener {
         dislike = new Ui.Btn(c, Icons.THUMB_DOWN, Ui.Btn.ROUND);
         listBtn = new Ui.Btn(c, Icons.LIST, Ui.Btn.ROUND);
         moreBtn = new Ui.Btn(c, Icons.MORE, Ui.Btn.ROUND);
+        admireBtn = new Ui.Btn(c, Icons.EXPAND, Ui.Btn.ROUND);
+        for (Ui.Btn b : new Ui.Btn[]{ like, dislike, listBtn, moreBtn, admireBtn }) b.iconDp = 20;
         titleChip = new Ui.TextChip(c);
         titleChip.tp.setTypeface(th.titleFace); titleChip.tp.setTextSize(th.px(th.titleSize * 0.72f)); titleChip.tp.setColor(th.text);
         artistChip = new Ui.TextChip(c);
@@ -89,7 +91,7 @@ public final class PlayerScreen extends ViewGroup implements Engine.Listener {
         play = new PlayView(c);
         seek = new SeekView(c);
         meta = new MetaView(c);
-        for (View v : new View[]{ vis, pager, like, dislike, listBtn, moreBtn, titleChip, artistChip, slotGap, slots[0], slots[1], slots[2], slots[3],
+        for (View v : new View[]{ vis, pager, like, dislike, listBtn, moreBtn, admireBtn, titleChip, artistChip, slotGap, slots[0], slots[1], slots[2], slots[3],
                 prevCat, prev, next, nextCat, play, seek, meta }) addView(v);
 
         play.setOnClickListener(v -> engine.toggle());
@@ -101,6 +103,7 @@ public final class PlayerScreen extends ViewGroup implements Engine.Listener {
         dislike.click(() -> rate(-1));
         listBtn.click(stage::openQueue);
         moreBtn.click(() -> stage.trackMenu(engine.track()));
+        admireBtn.click(stage::admire);
         titleChip.setOnClickListener(v -> stage.openSource());
         titleChip.setOnLongClickListener(v -> { stage.trackMenu(engine.track()); return true; });
         artistChip.setOnClickListener(v -> stage.openArtist(engine.track()));
@@ -349,15 +352,20 @@ public final class PlayerScreen extends ViewGroup implements Engine.Listener {
         artRect.set(artLeft, artTop, artLeft + artSize, artTop + artSize);
         Ui.place(pager, 0, artTop - dp(40), w, artSize + dp(80));
         pager.setCard(artLeft, dp(40), artSize);
-        // on the art: like / dislike at its left foot, the queue and the menu at its right
-        int ab = dp(44), am = dp(12), ay = artTop + artSize - am - ab;
-        Ui.place(like, artLeft + am, ay, like.label != null ? dp(64) : ab, ab);
-        Ui.place(dislike, artLeft + am + (like.label != null ? dp(64) : ab) + dp(8), ay, ab, ab);
-        Ui.place(moreBtn, artLeft + artSize - am - ab, ay, ab, ab);
-        Ui.place(listBtn, artLeft + artSize - am - 2 * ab - dp(8), ay, ab, ab);
         int pad = artLeft;
-        Ui.place(titleChip, pad, titleTop, w - 2 * pad, dp(44));
-        Ui.place(artistChip, pad, artistTop, w - 2 * pad, dp(34));
+        // opposite the title and artist: rating and admire on the title's row, the queue and the menu on the artist's
+        int ab = dp(40), ag = dp(6), right = w - pad;
+        int likeW = like.label != null ? dp(56) : ab;
+        int x1 = right - ab;
+        Ui.place(admireBtn, x1, titleTop + (dp(44) - ab) / 2, ab, ab);
+        if (dislike.getVisibility() != GONE) { x1 -= ab + ag; Ui.place(dislike, x1, titleTop + (dp(44) - ab) / 2, ab, ab); }
+        if (like.getVisibility() != GONE) { x1 -= likeW + ag; Ui.place(like, x1, titleTop + (dp(44) - ab) / 2, likeW, ab); }
+        int y2 = artistTop + (dp(34) - ab) / 2;
+        Ui.place(moreBtn, right - ab, y2, ab, ab);
+        Ui.place(listBtn, right - 2 * ab - ag, y2, ab, ab);
+        int textRight = Math.min(x1, right - 2 * ab - ag) - dp(8);
+        Ui.place(titleChip, pad, titleTop, textRight - pad, dp(44));
+        Ui.place(artistChip, pad, artistTop, textRight - pad, dp(34));
         int bw = dp(76), gap = dp(8);
         Ui.place(slots[0], pad, btnTop, bw, btnH);
         Ui.place(slots[1], pad + bw + gap, btnTop, slots[1].label != null ? bw + dp(14) : bw, btnH);
@@ -400,6 +408,8 @@ public final class PlayerScreen extends ViewGroup implements Engine.Listener {
         /** the current cover is turned over: the song's details on its back */
         boolean flipped;
         private ValueAnimator flipAnim;
+        private boolean longDone;
+        private final Runnable admireLong = () -> { if (!moved) { longDone = true; performHapticFeedback(android.view.HapticFeedbackConstants.LONG_PRESS); stage.admire(); } };
         /** how far over the card is (0 front .. 1 back), for the glow behind it while it turns */
         private float flipT;
         private final RectF glowR = new RectF();
@@ -449,7 +459,6 @@ public final class PlayerScreen extends ViewGroup implements Engine.Listener {
                 cards[i].setAlpha(1 - 0.35f * d);
             }
             float fade = (1 - Math.min(1, Math.abs(offset) / (spacing * 0.3f))) * (flipped ? 0 : 1);
-            if (flipAnim == null) for (View v : new View[]{ like, dislike, listBtn, moreBtn }) v.setAlpha(fade);
             invalidate();
         }
 
@@ -462,12 +471,10 @@ public final class PlayerScreen extends ViewGroup implements Engine.Listener {
             if (flipAnim != null) { ValueAnimator a = flipAnim; flipAnim = null; a.cancel(); }
             k.flipping = false;
             k.setLayerType(LAYER_TYPE_NONE, null);
-            for (View v : new View[]{ like, dislike, listBtn, moreBtn }) v.setClickable(!on);
             if (!animate || Motion.speed == Motion.SPEED_OFF) {
                 k.setRotationY(0); k.setScaleX(1); k.setScaleY(1);
                 k.back = on; k.mirror = false;
                 k.invalidate();
-                for (View v : new View[]{ like, dislike, listBtn, moreBtn }) v.setAlpha(on ? 0 : 1);
                 return;
             }
             k.setCameraDistance(th.dp * 6000);
@@ -489,8 +496,6 @@ public final class PlayerScreen extends ViewGroup implements Engine.Listener {
                 float m = ((ang % 360) + 360) % 360;
                 boolean behind = m > 90 && m < 270;
                 if (behind != k.mirror) { k.mirror = behind; k.back = behind; k.invalidate(); }
-                float btn = on ? Math.max(0, 1 - e * 3) : Math.max(0, Math.min(1, (e - 0.6f) * 2.5f));
-                for (View v : new View[]{ like, dislike, listBtn, moreBtn }) v.setAlpha(btn);
                 flipT = on ? e : 1 - e;
                 invalidate();
             });
@@ -505,7 +510,6 @@ public final class PlayerScreen extends ViewGroup implements Engine.Listener {
                     k.setLayerType(LAYER_TYPE_NONE, null);
                     k.invalidate();
                     invalidate();
-                    for (View v : new View[]{ like, dislike, listBtn, moreBtn }) v.setAlpha(flipped ? 0 : 1);
                 }
             });
             flipAnim.start();
@@ -531,12 +535,14 @@ public final class PlayerScreen extends ViewGroup implements Engine.Listener {
                     // only the art itself
                     if (e.getY() < cardTop || e.getY() > cardTop + cardSize) { vt.recycle(); vt = null; return false; }
                     downX = lastX = e.getX(); downY = e.getY(); moved = false; vertical = false;
+                    postDelayed(admireLong, ViewConfiguration.getLongPressTimeout());
                     if (anim != null || linear != null) { stopSettle(); dragging = true; moved = true; getParent().requestDisallowInterceptTouchEvent(true); }
                     return true;
                 case MotionEvent.ACTION_MOVE: {
                     float dx = e.getX() - downX, dy = e.getY() - downY;
                     if (!dragging && !vertical && (Math.abs(dx) > slop || Math.abs(dy) > slop)) {
                         moved = true;
+                        removeCallbacks(admireLong);
                         if (Math.abs(dx) > Math.abs(dy)) dragging = true; else vertical = true;
                         getParent().requestDisallowInterceptTouchEvent(true);
                     }
@@ -557,7 +563,9 @@ public final class PlayerScreen extends ViewGroup implements Engine.Listener {
                 case MotionEvent.ACTION_UP:
                 case MotionEvent.ACTION_CANCEL: {
                     vt.computeCurrentVelocity(1000);
-                    boolean up = e.getActionMasked() == MotionEvent.ACTION_UP;
+                    removeCallbacks(admireLong);
+                    boolean up = e.getActionMasked() == MotionEvent.ACTION_UP && !longDone;
+                    longDone = false;
                     if (dragging) release(vt.getXVelocity());
                     else if (vertical) {
                         float dy = e.getY() - downY, vdy = vt.getYVelocity() / th.dp;

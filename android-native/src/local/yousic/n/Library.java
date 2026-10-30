@@ -404,6 +404,31 @@ final class Library {
         }
     }
 
+    /** The song's own picture at up to `max` px (for admiring it): embedded art, else Android's thumbnail. */
+    Bitmap fullArt(String path, int max) {
+        Uri uri = uriFor(path);
+        if (uri == null) return null;
+        MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+        try {
+            mmr.setDataSource(ctx, uri);
+            byte[] pic = mmr.getEmbeddedPicture();
+            if (pic != null) {
+                BitmapFactory.Options o = new BitmapFactory.Options();
+                o.inJustDecodeBounds = true;
+                BitmapFactory.decodeByteArray(pic, 0, pic.length, o);
+                o.inJustDecodeBounds = false;
+                o.inSampleSize = 1;
+                while (Math.max(o.outWidth, o.outHeight) / o.inSampleSize > max) o.inSampleSize *= 2;
+                Bitmap b = BitmapFactory.decodeByteArray(pic, 0, pic.length, o);
+                if (b != null) return b;
+            }
+        } catch (Exception ignored) {
+        } finally {
+            try { mmr.release(); } catch (Exception ignored) { }
+        }
+        try { return ctx.getContentResolver().loadThumbnail(uri, new Size(max, max), null); } catch (Exception e) { return null; }
+    }
+
     private Bitmap embeddedArt(Uri uri) {
         MediaMetadataRetriever mmr = new MediaMetadataRetriever();
         try {

@@ -18,7 +18,7 @@ public final class Icons {
             PREV_CAT = 17, NEXT_CAT = 18, PLAY = 19, PAUSE = 20, BACK = 21, CLOSE = 22, CHECK = 23, PLUS = 24, SORT = 25,
             SELECT = 26, FOLDER = 27, NOTE = 28, ALBUM = 29, ARTIST = 30, GENRE = 31, HEART = 32, LYRICS = 33, INFO = 34,
             STAR = 35, RECENT = 36, ADDED = 37, PLAY_NEXT = 38, THEME = 39, TUNE = 40, SCAN = 41, SPEED = 42, STAR_FILLED = 43,
-            QUEUE = 44, ZOOM = 45, STORAGE = 46, SHUFFLE_OFF = 47;
+            QUEUE = 44, ZOOM = 45, STORAGE = 46, SHUFFLE_OFF = 47, EXPAND = 48;
 
     private static final Path p = new Path(), q = new Path();
     private static final RectF r = new RectF();
@@ -362,6 +362,15 @@ public final class Icons {
                 c.drawLine(cx, cy + s * 0.08f, cx + s * 0.2f, cy - s * 0.14f, paint);
                 fill(paint);
                 c.drawCircle(cx, cy + s * 0.08f, s * 0.06f, paint);
+                break;
+            }
+            case EXPAND: {
+                // four corners opening out
+                float o = s * 0.36f, k = s * 0.16f;
+                for (int sx = -1; sx <= 1; sx += 2) for (int sy = -1; sy <= 1; sy += 2) {
+                    p.moveTo(cx + sx * o, cy + sy * (o - k)); p.lineTo(cx + sx * o, cy + sy * o); p.lineTo(cx + sx * (o - k), cy + sy * o);
+                }
+                c.drawPath(p, paint);
                 break;
             }
             case ZOOM: {

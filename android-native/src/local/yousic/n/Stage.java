@@ -52,6 +52,7 @@ public final class Stage extends FrameLayout {
     final Overlay overlay;
     LyricsScreen lyrics;
     EqScreen eq;
+    AdmireView admireView;
     private Sheet sheet;
     private float libT;           // 0 = player, 1 = library
     private ValueAnimator anim;
@@ -110,6 +111,7 @@ public final class Stage extends FrameLayout {
 
     /** Back: a popup, the lyrics, the equalizer, a page back in the library, the library; false: nowhere to go. */
     public boolean back() {
+        if (admireView != null) { admireView.close(); return true; }
         if (sheet != null) { sheet.dismiss(); return true; }
         if (lyrics != null) { closeLyrics(); return true; }
         if (eq != null) { closeEq(); return true; }
@@ -222,6 +224,30 @@ public final class Stage extends FrameLayout {
         fly.setTranslationX(Theme.lerp(from.left, to.left, t));
         fly.setTranslationY(Theme.lerp(from.top, to.top + library.getTranslationY(), t));
         fly.playing = 1 - t;
+    }
+
+    // ---------- admire the art: the cover alone, full screen, no UI ----------
+
+    void admire() {
+        Lib.Track t = engine.track();
+        if (t == null || admireView != null) return;
+        RectF start = new RectF(player.artRect);
+        start.offset(player.getLeft(), player.getTop());
+        admireView = new AdmireView(getContext(), this, t, start);
+        addView(admireView); // over everything, the film overlay too
+        admireView.open();
+        android.view.WindowInsetsController ic = ((Activity) getContext()).getWindow().getInsetsController();
+        if (ic != null) {
+            ic.setSystemBarsBehavior(android.view.WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+            ic.hide(WindowInsets.Type.systemBars());
+        }
+    }
+
+    void admireClosed(AdmireView v) {
+        removeView(v);
+        if (admireView == v) admireView = null;
+        android.view.WindowInsetsController ic = ((Activity) getContext()).getWindow().getInsetsController();
+        if (ic != null) ic.show(WindowInsets.Type.systemBars());
     }
 
     // ---------- lyrics (250 ms in, 150 ms out) and the equalizer ----------

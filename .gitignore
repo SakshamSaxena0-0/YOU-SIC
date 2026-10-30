@@ -8,3 +8,4 @@ android/build/
 android/yousic.keystore
 android/keystore.properties
 dist-android/
+android-native/build/

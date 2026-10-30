@@ -9,7 +9,8 @@
     "dist": "electron-builder --win dir",
     "installer": "electron-builder --win nsis",
     "check": "node scripts/check.js",
-    "android": "node android/build.js"
+    "android": "node android/build.js",
+    "android-native": "node android-native/build.js"
   },
   "license": "MIT",
   "dependencies": {

@@ -211,12 +211,7 @@ public final class LiminalTheme extends Theme {
         float rad = px(coverRadius) * (r.width() / px(300));
         rad = Math.max(px(4), Math.min(px(coverRadius), rad));
         // the gold glow round it (box-shadow 0 0 40px -6px gold 55%; brighter while playing)
-        float glow = r.width() * 0.16f;
-        glowPaint.setShader(new RadialGradient(r.centerX(), r.centerY(), r.width() * 0.5f + glow,
-                new int[]{ alpha(GOLD, 0.55f + 0.1f * playing), alpha(GOLD, 0.55f + 0.1f * playing), 0 },
-                new float[]{ 0, r.width() * 0.5f / (r.width() * 0.5f + glow), 1 }, Shader.TileMode.CLAMP));
-        c.drawRoundRect(r.left - glow, r.top - glow, r.right + glow, r.bottom + glow, rad + glow, rad + glow, glowPaint);
-        glowPaint.setShader(null);
+        drawGlow(c, r, glowFront(playing) * glowScale);
         path.reset();
         path.addRoundRect(r, rad, rad, Path.Direction.CW);
         c.save();
@@ -372,6 +367,42 @@ public final class LiminalTheme extends Theme {
         fill.setStyle(Paint.Style.STROKE);
         fill.setStrokeWidth(px(1));
         fill.setColor(alpha(CREAM, 0.14f));
+        c.drawRoundRect(r.left + px(0.5f), r.top + px(0.5f), r.right - px(0.5f), r.bottom - px(0.5f), radius, radius, fill);
+        fill.setStyle(Paint.Style.FILL);
+    }
+
+    @Override public float glowFront(float playing) { return 0.55f + 0.1f * playing; }
+    @Override public float glowBack() { return 0.32f; }
+
+    @Override
+    public void drawGlow(Canvas c, RectF r, float strength) {
+        if (strength <= 0.005f) return;
+        float rad = Math.max(px(4), Math.min(px(coverRadius), px(coverRadius) * (r.width() / px(300))));
+        float glow = r.width() * 0.16f;
+        glowPaint.setShader(new RadialGradient(r.centerX(), r.centerY(), r.width() * 0.5f + glow,
+                new int[]{ alpha(GOLD, strength), alpha(GOLD, strength), 0 },
+                new float[]{ 0, r.width() * 0.5f / (r.width() * 0.5f + glow), 1 }, Shader.TileMode.CLAMP));
+        c.drawRoundRect(r.left - glow, r.top - glow, r.right + glow, r.bottom + glow, rad + glow, rad + glow, glowPaint);
+        glowPaint.setShader(null);
+    }
+
+    private final Paint backPaint = new Paint(Paint.ANTI_ALIAS_FLAG), sunlit = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private float backH = -1;
+
+    /** an opaque dusk card with the sunset along its top, a cream hairline and a soft gold glow */
+    @Override
+    public void drawCardBack(Canvas c, RectF r, float radius) {
+        drawGlow(c, r, glowBack() * glowScale);
+        if (r.height() != backH) {
+            backH = r.height();
+            backPaint.setShader(new LinearGradient(0, r.top, 0, r.bottom, DUSK_HI, DUSK, Shader.TileMode.CLAMP));
+            sunlit.setShader(new LinearGradient(0, r.top, 0, r.top + r.height() * 0.55f, alpha(PEACH, 0.12f), 0, Shader.TileMode.CLAMP));
+        }
+        c.drawRoundRect(r, radius, radius, backPaint);
+        c.drawRoundRect(r, radius, radius, sunlit);
+        fill.setStyle(Paint.Style.STROKE);
+        fill.setStrokeWidth(px(1));
+        fill.setColor(alpha(CREAM, 0.3f));
         c.drawRoundRect(r.left + px(0.5f), r.top + px(0.5f), r.right - px(0.5f), r.bottom - px(0.5f), radius, radius, fill);
         fill.setStyle(Paint.Style.FILL);
     }

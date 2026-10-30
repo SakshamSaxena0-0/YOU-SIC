@@ -104,6 +104,17 @@ public abstract class Theme {
         }
     }
 
+    /** The light round the cover (0 = none). While the cover turns over it is drawn by the pager, behind it, and
+     *  the card itself is drawn without it (glowScale 0) into a GPU layer that just turns. */
+    public float glowScale = 1f;
+    public void drawGlow(Canvas c, RectF r, float strength) {}
+    /** the glow's strength round the cover's front (playing 0..1) and its back */
+    public float glowFront(float playing) { return 0; }
+    public float glowBack() { return 0; }
+
+    /** The back of the cover (tap the art to turn it over): a card the song's details are written on. */
+    public void drawCardBack(Canvas c, RectF r, float radius) { drawSheet(c, r, radius); }
+
     /** A switch (for menus and dialogs). */
     public void drawSwitch(Canvas c, float cx, float cy, float on) {
         float w = px(36), h = px(20);

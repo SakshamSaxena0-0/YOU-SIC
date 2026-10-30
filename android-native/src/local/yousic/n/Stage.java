@@ -371,7 +371,7 @@ public final class Stage extends FrameLayout {
         showSheet(s);
     }
 
-    private static Lib.Group find(List<Lib.Group> gs, String key) {
+    static Lib.Group find(List<Lib.Group> gs, String key) {
         for (Lib.Group g : gs) if (g.key.equals(key)) return g;
         return null;
     }

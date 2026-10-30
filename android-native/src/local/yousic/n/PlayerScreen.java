@@ -7,6 +7,8 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.text.Layout;
+import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.view.Choreographer;
@@ -15,7 +17,10 @@ import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
+import android.view.animation.PathInterpolator;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -213,6 +218,7 @@ public final class PlayerScreen extends ViewGroup implements Engine.Listener {
     }
 
     @Override public void onTrack(Lib.Track t) {
+        if (pager.flipped) pager.flip(false, false);
         pager.bind(false);
         boolean changed = titleChip.getTag() != t;
         titleChip.setTag(t);
@@ -274,6 +280,51 @@ public final class PlayerScreen extends ViewGroup implements Engine.Listener {
     void onShown() {
         seek.ticking(engine.isPlaying());
         vis.kick();
+    }
+
+    // ---------- swipe up anywhere for the lyrics (the art and the seek bar handle their own touches) ----------
+
+    private float iDownX, iDownY;
+    private boolean iTracking, iSwiping;
+    private VelocityTracker ivt;
+
+    @Override public boolean onInterceptTouchEvent(MotionEvent e) {
+        switch (e.getActionMasked()) {
+            case MotionEvent.ACTION_DOWN:
+                iDownX = e.getX(); iDownY = e.getY(); iTracking = true; iSwiping = false;
+                if (ivt != null) ivt.recycle();
+                ivt = VelocityTracker.obtain(); ivt.addMovement(e);
+                return false;
+            case MotionEvent.ACTION_MOVE: {
+                if (!iTracking || e.getPointerCount() > 1) return false;
+                ivt.addMovement(e);
+                float dx = e.getX() - iDownX, dy = e.getY() - iDownY;
+                int slop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
+                if (dy < -slop * 1.5f && Math.abs(dy) > Math.abs(dx) * 1.3f) { iSwiping = true; return true; }
+                if (Math.abs(dx) > slop * 2 || dy > slop * 2) iTracking = false;
+                return false;
+            }
+            default:
+                iTracking = false;
+                return false;
+        }
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    @Override public boolean onTouchEvent(MotionEvent e) {
+        if (!iSwiping) return false;
+        if (ivt != null) ivt.addMovement(e);
+        switch (e.getActionMasked()) {
+            case MotionEvent.ACTION_UP: case MotionEvent.ACTION_CANCEL: {
+                float vy = 0;
+                if (ivt != null) { ivt.computeCurrentVelocity(1000); vy = ivt.getYVelocity() / th.dp; ivt.recycle(); ivt = null; }
+                float dy = e.getY() - iDownY;
+                if (e.getActionMasked() == MotionEvent.ACTION_UP && (dy < -th.px(56) || vy < -Motion.FLING_DP_S)) stage.openLyrics();
+                iSwiping = false;
+                return true;
+            }
+            default: return true;
+        }
     }
 
     // ---------- layout (phone, portrait) ----------
@@ -346,6 +397,14 @@ public final class PlayerScreen extends ViewGroup implements Engine.Listener {
         private Lib.Group catGroup;
         private final TextPaint hint1 = new TextPaint(Paint.ANTI_ALIAS_FLAG), hint2 = new TextPaint(Paint.ANTI_ALIAS_FLAG);
         private final RectF hintR = new RectF();
+        /** the current cover is turned over: the song's details on its back */
+        boolean flipped;
+        private ValueAnimator flipAnim;
+        /** how far over the card is (0 front .. 1 back), for the glow behind it while it turns */
+        private float flipT;
+        private final RectF glowR = new RectF();
+        /** the web player's flip: 820 ms, lifting off the page mid-turn and overshooting a little as it lands */
+        private final android.animation.TimeInterpolator FLIP_EASE = new PathInterpolator(0.3f, 1.18f, 0.45f, 1f);
 
         ArtPager(Context c) {
             super(c);
@@ -389,9 +448,77 @@ public final class PlayerScreen extends ViewGroup implements Engine.Listener {
                 cards[i].setScaleX(s); cards[i].setScaleY(s);
                 cards[i].setAlpha(1 - 0.35f * d);
             }
-            float fade = 1 - Math.min(1, Math.abs(offset) / (spacing * 0.3f));
-            for (View v : new View[]{ like, dislike, listBtn, moreBtn }) v.setAlpha(fade);
+            float fade = (1 - Math.min(1, Math.abs(offset) / (spacing * 0.3f))) * (flipped ? 0 : 1);
+            if (flipAnim == null) for (View v : new View[]{ like, dislike, listBtn, moreBtn }) v.setAlpha(fade);
             invalidate();
+        }
+
+        /** Turns the current cover over (the song's details) or back. */
+        void flip(boolean on, boolean animate) {
+            if (on && engine.track() == null) return;
+            if (on == flipped) return;
+            flipped = on;
+            final CoverCard k = cards[1];
+            if (flipAnim != null) { ValueAnimator a = flipAnim; flipAnim = null; a.cancel(); }
+            k.flipping = false;
+            k.setLayerType(LAYER_TYPE_NONE, null);
+            for (View v : new View[]{ like, dislike, listBtn, moreBtn }) v.setClickable(!on);
+            if (!animate || Motion.speed == Motion.SPEED_OFF) {
+                k.setRotationY(0); k.setScaleX(1); k.setScaleY(1);
+                k.back = on; k.mirror = false;
+                k.invalidate();
+                for (View v : new View[]{ like, dislike, listBtn, moreBtn }) v.setAlpha(on ? 0 : 1);
+                return;
+            }
+            k.setCameraDistance(th.dp * 6000);
+            // the card is drawn once per face into a GPU layer which then just turns (drawing it in 3D every
+            // frame costs the GPU ~15 ms); its glow can't go in the layer, so the pager draws it behind
+            k.flipping = true;
+            k.setLayerType(LAYER_TYPE_HARDWARE, null);
+            k.invalidate();
+            final float a = on ? 0 : 180, b = on ? 180 : 360;
+            flipAnim = ValueAnimator.ofFloat(0, 1);
+            flipAnim.setDuration(Motion.ms(820));
+            flipAnim.setInterpolator(FLIP_EASE);
+            flipAnim.addUpdateListener(an -> {
+                float e = (float) an.getAnimatedValue();
+                float ang = a + (b - a) * e;
+                k.setRotationY(ang);
+                float s = e < 0.45f ? 1 - 0.1f * (e / 0.45f) : 0.9f + 0.1f * ((e - 0.45f) / 0.55f);
+                k.setScaleX(s); k.setScaleY(s);
+                float m = ((ang % 360) + 360) % 360;
+                boolean behind = m > 90 && m < 270;
+                if (behind != k.mirror) { k.mirror = behind; k.back = behind; k.invalidate(); }
+                float btn = on ? Math.max(0, 1 - e * 3) : Math.max(0, Math.min(1, (e - 0.6f) * 2.5f));
+                for (View v : new View[]{ like, dislike, listBtn, moreBtn }) v.setAlpha(btn);
+                flipT = on ? e : 1 - e;
+                invalidate();
+            });
+            flipAnim.addListener(new android.animation.AnimatorListenerAdapter() {
+                @Override public void onAnimationEnd(android.animation.Animator an) {
+                    if (flipAnim != an) return;
+                    flipAnim = null;
+                    // at rest: no 3D turn at all, just the face
+                    k.setRotationY(0); k.setScaleX(1); k.setScaleY(1);
+                    k.back = flipped; k.mirror = false;
+                    k.flipping = false;
+                    k.setLayerType(LAYER_TYPE_NONE, null);
+                    k.invalidate();
+                    invalidate();
+                    for (View v : new View[]{ like, dislike, listBtn, moreBtn }) v.setAlpha(flipped ? 0 : 1);
+                }
+            });
+            flipAnim.start();
+        }
+
+        /** a tap on the art: the back's buttons, else turn it over */
+        private void tapArt(float x, float y) {
+            if (flipped && flipAnim == null) {
+                CoverCard k = cards[1];
+                float cx = x - k.getLeft() - k.getTranslationX(), cy = y - k.getTop() - k.getTranslationY();
+                for (int i = 0; i < k.actions.size(); i++) if (k.actionR.get(i).contains(cx, cy)) { k.act(k.actions.get(i)); return; }
+            }
+            flip(!flipped, true);
         }
 
         @SuppressLint("ClickableViewAccessibility")
@@ -414,6 +541,7 @@ public final class PlayerScreen extends ViewGroup implements Engine.Listener {
                         getParent().requestDisallowInterceptTouchEvent(true);
                     }
                     if (dragging) {
+                        if (flipped) flip(false, false); // a swipe turns to the covers
                         offset += e.getX() - lastX;
                         // no neighbour that way: resist
                         if ((offset > 0 && engine.peek(-1) == null) || (offset < 0 && engine.peek(1) == null)) offset *= 0.92f;
@@ -437,7 +565,7 @@ public final class PlayerScreen extends ViewGroup implements Engine.Listener {
                         if (up && (dy > th.px(56) || (vdy > Motion.FLING_DP_S && dy > 0))) stage.openSource();
                         else if (up && (dy < -th.px(56) || (vdy < -Motion.FLING_DP_S && dy < 0))) stage.openLyrics();
                     } else if (up && !moved) {
-                        stage.openSource();
+                        tapArt(e.getX(), e.getY());
                     }
                     dragging = false; vertical = false;
                     vt.recycle(); vt = null;
@@ -573,6 +701,14 @@ public final class PlayerScreen extends ViewGroup implements Engine.Listener {
         }
 
         @Override protected void dispatchDraw(Canvas c) {
+            CoverCard k = cards[1];
+            if (k.flipping) {
+                // the glow stays on the page while the card turns, fading to the back's dimmer light
+                float s = k.getScaleX(), half = cardSize * s / 2, cx = cardLeft + cardSize / 2f, cy = cardTop + cardSize / 2f;
+                glowR.set(cx - half, cy - half, cx + half, cy + half);
+                float f = Math.max(0, Math.min(1, flipT));
+                th.drawGlow(c, glowR, th.glowFront(k.playing) * (1 - f) + th.glowBack() * f);
+            }
             super.dispatchDraw(c);
             if (catMode == 0 || catGroup == null) return;
             // over the incoming cover: what letting go here will play
@@ -593,6 +729,10 @@ public final class PlayerScreen extends ViewGroup implements Engine.Listener {
         Lib.Track track;
         Bitmap art;
         float playing;
+        /** showing the back (the song's details); mirror: seen from behind mid-turn; flipping: turning now */
+        boolean back, mirror, flipping;
+        final List<String> actions = new ArrayList<>();
+        final List<RectF> actionR = new ArrayList<>();
 
         CoverCard(Context c) { super(c); }
 
@@ -612,8 +752,166 @@ public final class PlayerScreen extends ViewGroup implements Engine.Listener {
 
         @Override protected void onDraw(Canvas c) {
             r.set(0, 0, getWidth(), getHeight());
-            th.drawCover(c, r, art, playing, null);
+            if (flipping) th.glowScale = 0;
+            if (back && track != null) {
+                if (mirror) { c.save(); c.scale(-1, 1, getWidth() / 2f, 0); }
+                drawBack(c, r, track);
+                if (mirror) c.restore();
+            } else th.drawCover(c, r, art, playing, null);
+            th.glowScale = 1;
         }
+
+        void act(String a) {
+            Lib.Track t = track;
+            if (t == null) return;
+            switch (a) {
+                case "album": stage.openGroup("album", Stage.find(App.get().lib.albums, t.albumKey)); break;
+                case "artist": stage.openArtist(t); break;
+                case "folder": stage.openGroup("folder", Stage.find(App.get().lib.folders, t.folder)); break;
+                default: break;
+            }
+        }
+
+        // ---- the back of the card: the song's details (the web player's flip card) ----
+
+        private final TextPaint kick = new TextPaint(Paint.ANTI_ALIAS_FLAG), ttl = new TextPaint(Paint.ANTI_ALIAS_FLAG),
+                art2 = new TextPaint(Paint.ANTI_ALIAS_FLAG), dt = new TextPaint(Paint.ANTI_ALIAS_FLAG), dd = new TextPaint(Paint.ANTI_ALIAS_FLAG),
+                chip = new TextPaint(Paint.ANTI_ALIAS_FLAG), foot = new TextPaint(Paint.ANTI_ALIAS_FLAG), btn = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+        private final Paint bp = new Paint(Paint.ANTI_ALIAS_FLAG);
+        private final RectF q = new RectF();
+
+        private void drawBack(Canvas c, RectF r, Lib.Track t) {
+            float S = r.width();
+            float rad = Math.min(th.px(th.coverRadius), Math.max(th.px(4), th.px(th.coverRadius) * S / th.px(300)));
+            th.drawCardBack(c, r, rad);
+            float pad = Math.max(th.px(14), Math.min(th.px(30), S * 0.07f));
+            float x = r.left + pad, w = S - 2 * pad;
+            float k = S / th.px(360); // the type follows the card's size
+            kick.setTypeface(th.uiMedium); kick.setTextSize(th.px(10.5f) * k); kick.setLetterSpacing(0.13f); kick.setColor(th.accent);
+            ttl.setTypeface(th.titleFace); ttl.setTextSize(Math.max(th.px(18), Math.min(th.px(30), S * 0.07f))); ttl.setColor(th.text);
+            art2.setTypeface(th.uiMedium); art2.setTextSize(Math.max(th.px(12), Math.min(th.px(17), S * 0.044f))); art2.setColor(th.accent);
+            dt.setTypeface(th.uiFace); dt.setTextSize(th.px(11) * k); dt.setColor(th.textDim);
+            dd.setTypeface(th.uiBold); dd.setTextSize(th.px(13.5f) * k); dd.setColor(th.text);
+            chip.setTypeface(th.numFace); chip.setTextSize(th.px(10.5f) * k); chip.setColor(th.accentHi);
+            foot.setTypeface(th.uiMedium); foot.setTextSize(th.px(12) * k); foot.setColor(th.textDim);
+            btn.setTypeface(th.uiMedium); btn.setTextSize(th.px(12) * k); btn.setColor(th.text);
+            float y = r.top + pad;
+            // kicker: SONG INFO · TRACK 3 · 2:27
+            String pos = (t.track > 0 ? "TRACK " + t.track + (t.disc > 1 ? " · DISC " + t.disc : "") + "  ·  " : "") + fmt((long) (t.duration * 1000));
+            bp.setColor(th.accent);
+            float ks = kick.getTextSize() * 1.3f;
+            Icons.draw(c, Icons.INFO, x + ks / 2, y + ks / 2, ks, bp);
+            CharSequence kt = TextUtils.ellipsize("SONG INFO  ·  " + pos, kick, w - ks - th.px(6), TextUtils.TruncateAt.END);
+            c.drawText(kt, 0, kt.length(), x + ks + th.px(6), y + ks / 2 - (kick.ascent() + kick.descent()) / 2, kick);
+            y += ks + th.px(8) * k;
+            // title (two lines at most), artist
+            StaticLayout tl = StaticLayout.Builder.obtain(t.title, 0, t.title.length(), ttl, Math.round(w)).setAlignment(Layout.Alignment.ALIGN_NORMAL)
+                    .setMaxLines(2).setEllipsize(TextUtils.TruncateAt.END).setLineSpacing(0, 0.95f).build();
+            c.save(); c.translate(x, y); tl.draw(c); c.restore();
+            y += tl.getHeight() + th.px(2);
+            CharSequence ar = TextUtils.ellipsize(t.artist.isEmpty() ? "Unknown artist" : t.artist, art2, w, TextUtils.TruncateAt.END);
+            c.drawText(ar, 0, ar.length(), x, y - art2.ascent(), art2);
+            y += art2.descent() - art2.ascent() + th.px(4) * k;
+            int rating = engine.rating(t);
+            if (rating != 0) {
+                String rs = rating < 0 ? "Disliked" : stage.ratingMode() == Stage.RATE_STARS ? new String(new char[rating]).replace("\0", "★") + new String(new char[5 - rating]).replace("\0", "☆") : "Liked";
+                foot.setColor(th.accent2);
+                c.drawText(rs, x, y - foot.ascent(), foot);
+                foot.setColor(th.textDim);
+                y += foot.descent() - foot.ascent() + th.px(4) * k;
+            }
+            // the bottom block, from the foot up: buttons, file, plays and size, format chips
+            float bottom = r.bottom - pad;
+            actions.clear(); actionR.clear();
+            float bh = th.px(30) * k, bx = x;
+            String[][] acts = { { "album", "Album" }, { "artist", "Artist" }, { "folder", "Folder" } };
+            int[] icons = { Icons.ALBUM, Icons.ARTIST, Icons.FOLDER };
+            for (int i = 0; i < acts.length; i++) {
+                if (i == 0 && t.album.isEmpty()) continue;
+                if (i == 1 && t.artist.isEmpty()) continue;
+                float bw = btn.measureText(acts[i][1]) + bh + th.px(14) * k;
+                q.set(bx, bottom - bh, bx + bw, bottom);
+                th.drawChip(c, q, bh / 2, false, false);
+                bp.setColor(th.text);
+                Icons.draw(c, icons[i], q.left + bh * 0.55f, q.centerY(), bh * 0.5f, bp);
+                c.drawText(acts[i][1], q.left + bh * 0.95f, q.centerY() - (btn.ascent() + btn.descent()) / 2, btn);
+                actions.add(acts[i][0]); actionR.add(new RectF(q));
+                bx += bw + th.px(6);
+            }
+            float by = bottom - bh - th.px(8) * k;
+            float lineH = foot.descent() - foot.ascent();
+            boolean room = S > th.px(240);
+            if (room && S > th.px(300)) {
+                foot.setTypeface(th.numFace); foot.setTextSize(th.px(10.5f) * k);
+                String file = t.path.substring(t.path.lastIndexOf('/') + 1);
+                CharSequence f = TextUtils.ellipsize(file, foot, w, TextUtils.TruncateAt.MIDDLE);
+                c.drawText(f, 0, f.length(), x, by - foot.descent(), foot);
+                by -= foot.descent() - foot.ascent() + th.px(4);
+                foot.setTypeface(th.uiMedium); foot.setTextSize(th.px(12) * k);
+            }
+            List<String> fl = new ArrayList<>();
+            int plays = engine.plays(t);
+            long last = engine.lastPlayed(t);
+            if (plays > 0) fl.add("Played " + plays + "×");
+            if (last > 0) fl.add("last " + ago(last));
+            if (t.size > 0) fl.add(String.format(Locale.ROOT, "%.1f MB", t.size / 1048576f));
+            if (room && !fl.isEmpty()) {
+                String fs = android.text.TextUtils.join("  ·  ", fl);
+                CharSequence f = TextUtils.ellipsize(fs, foot, w, TextUtils.TruncateAt.END);
+                c.drawText(f, 0, f.length(), x, by - foot.descent(), foot);
+                by -= lineH + th.px(6) * k;
+            }
+            // format chips (gold outlines)
+            List<String> chips = new ArrayList<>();
+            String codec = t.codec == null || t.codec.isEmpty() ? t.container : t.codec;
+            if (codec != null && !codec.isEmpty()) chips.add(codec.toUpperCase(Locale.ROOT));
+            if (t.bits > 0) chips.add(t.bits + "-bit");
+            if (t.sampleRate > 0) { float kh = t.sampleRate / 1000f; chips.add((kh == Math.round(kh) ? String.valueOf(Math.round(kh)) : String.format(Locale.ROOT, "%.1f", kh)) + " kHz"); }
+            if (t.bitrate > 0) chips.add(t.bitrate + " kbps");
+            if (t.channels > 0) chips.add(t.channels == 1 ? "Mono" : t.channels == 2 ? "Stereo" : t.channels + " ch");
+            float ch = chip.descent() - chip.ascent() + th.px(6) * k, cx2 = x;
+            float cy = by - ch;
+            bp.setStyle(Paint.Style.STROKE); bp.setStrokeWidth(th.px(1)); bp.setColor(Theme.alpha(th.accentHi, 0.5f));
+            for (String s : chips) {
+                float cw = chip.measureText(s) + th.px(16) * k;
+                if (cx2 + cw > x + w) break;
+                q.set(cx2, cy, cx2 + cw, cy + ch);
+                c.drawRoundRect(q, ch / 2, ch / 2, bp);
+                c.drawText(s, q.left + th.px(8) * k, q.centerY() - (chip.ascent() + chip.descent()) / 2, chip);
+                cx2 += cw + th.px(5);
+            }
+            bp.setStyle(Paint.Style.FILL);
+            float gridBottom = cy - th.px(10) * k;
+            // the grid: album, album artist, year, genre (as many as fit)
+            String[][] rows = {
+                    { "Album", t.album },
+                    { "Album artist", !t.albumArtist.isEmpty() && !t.albumArtist.equals(t.artist) ? t.albumArtist : "" },
+                    { "Year", t.year > 0 ? String.valueOf(t.year) : "" },
+                    { "Genre", t.genre } };
+            float labelW = 0;
+            for (String[] row : rows) if (!row[1].isEmpty()) labelW = Math.max(labelW, dt.measureText(row[0]));
+            float rowH = dd.descent() - dd.ascent() + th.px(4) * k;
+            y += th.px(6) * k;
+            int shown = 0;
+            for (String[] row : rows) {
+                if (row[1].isEmpty() || shown >= 4) continue;
+                if (y + rowH > gridBottom) break;
+                float base = y - dd.ascent();
+                c.drawText(row[0], x, base, dt);
+                CharSequence v = TextUtils.ellipsize(row[1], dd, w - labelW - th.px(14), TextUtils.TruncateAt.END);
+                c.drawText(v, 0, v.length(), x + labelW + th.px(14), base, dd);
+                y += rowH;
+                shown++;
+            }
+        }
+    }
+
+    static String ago(long ms) {
+        long s = (System.currentTimeMillis() - ms) / 1000;
+        long[] n = { 31536000, 2592000, 86400, 3600, 60 };
+        String[] u = { "year", "month", "day", "hour", "minute" };
+        for (int i = 0; i < n.length; i++) if (s >= n[i]) { long v = s / n[i]; return v + " " + u[i] + (v > 1 ? "s" : "") + " ago"; }
+        return "just now";
     }
 
     // =====================================================================================================

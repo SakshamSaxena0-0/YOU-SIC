@@ -52,7 +52,7 @@ public final class Engine {
     /** bumped by every load / prepareNext, so a player opened for a song since replaced is dropped */
     private int gen, nextGen;
     private final List<Listener> listeners = new CopyOnWriteArrayList<>();
-    private final SharedPreferences prefs, ratings;
+    private final SharedPreferences prefs, ratings, stats;
     /** the audio session every player joins (the equalizer and visualizer attach to it) */
     public final int session;
 
@@ -89,6 +89,7 @@ public final class Engine {
         session = audio.generateAudioSessionId();
         prefs = ctx.getSharedPreferences("engine", Context.MODE_PRIVATE);
         ratings = ctx.getSharedPreferences("ratings", Context.MODE_PRIVATE);
+        stats = ctx.getSharedPreferences("stats", Context.MODE_PRIVATE);
         shuffle = prefs.getBoolean("shuffle", false);
         repeat = prefs.getInt("repeat", REPEAT_ALL);
         for (String id : prefs.getString("recent", "").split(",")) if (!id.isEmpty()) recent.add(id);
@@ -275,6 +276,27 @@ public final class Engine {
 
     private void extras() { for (Listener l : listeners) l.onExtras(); }
 
+    // ---------- plays: a song counts once it has played past half way ----------
+
+    public int plays(Lib.Track t) { return t == null ? 0 : stats.getInt("p" + t.id, 0); }
+    public long lastPlayed(Lib.Track t) { return t == null ? 0 : stats.getLong("l" + t.id, 0); }
+
+    /** this song's play has been counted */
+    private boolean counted;
+
+    private void countPlay(Lib.Track t) {
+        if (t == null || (t == track && counted)) return;
+        if (t == track) counted = true;
+        stats.edit().putInt("p" + t.id, stats.getInt("p" + t.id, 0) + 1).putLong("l" + t.id, System.currentTimeMillis()).apply();
+    }
+
+    /** the song being left: counted if it got past half way */
+    private void countIfHeard() {
+        if (track == null || cur == null || !prepared) return;
+        long d = durationMs();
+        if (d > 0 && positionMs() > d / 2) countPlay(track);
+    }
+
     // ---------- the sleep timer ----------
 
     /** Pauses after this many minutes (0: off). The last 8 s fade out. */
@@ -390,6 +412,8 @@ public final class Engine {
     // ---------- MediaPlayer ----------
 
     private void load(Lib.Track t, int atMs, boolean play) {
+        countIfHeard();
+        counted = false;
         release();
         track = t;
         pendingSeek = atMs;
@@ -496,6 +520,8 @@ public final class Engine {
         if (mp != cur) return;
         if (next != null && nextLinked) {
             // MediaPlayer has already started the next one
+            countPlay(track);
+            counted = false;
             nextLinked = false;
             io.execute(cur::release);
             cur = next; next = null;
@@ -512,6 +538,7 @@ public final class Engine {
             save();
         } else {
             if (next != null) { io.execute(next::release); next = null; }
+            countPlay(track);
             setPlaying(false);
             if (sleepEndOfSong) {
                 // the sleep timer: the next song, ready and paused

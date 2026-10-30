@@ -51,7 +51,8 @@ import java.util.Map;
  * chronometers that tick by themselves.
  */
 public class NowPlayingWidget extends AppWidgetProvider {
-    /** PlaybackService action prefix for the buttons: "widget:prev", "widget:toggle", "widget:next", "widget:seekpct:0.5". */
+    /** PlaybackService action prefix for the buttons: "widget:prevcat", "widget:prev", "widget:toggle", "widget:next",
+     *  "widget:nextcat", "widget:seekpct:0.5". */
     static final String ACTION = "widget:";
     /** A tap on the bar: that fraction of the song ("seekpct:0.3125"). */
     static final String SEEK = "seekpct:";
@@ -172,9 +173,11 @@ public class NowPlayingWidget extends AppWidgetProvider {
             v.setViewLayoutMargin(R.id.elapsed, RemoteViews.MARGIN_TOP, g.timesY, P);
             v.setViewLayoutMargin(R.id.remain, RemoteViews.MARGIN_RIGHT, g.w - g.barL - g.barW, P);
             v.setViewLayoutMargin(R.id.remain, RemoteViews.MARGIN_TOP, g.timesY, P);
-            hit(v, R.id.hit_prev, 543 * g.sx, g.by, 120 * g.s);
-            hit(v, R.id.hit_play, 676 * g.sx, g.by, 180 * g.s);
-            hit(v, R.id.hit_next, 809 * g.sx, g.by, 120 * g.s);
+            hit(v, R.id.hit_prevcat, X_PREV_CAT * g.sx, g.by, 84 * g.s);
+            hit(v, R.id.hit_prev, X_PREV * g.sx, g.by, 90 * g.s);
+            hit(v, R.id.hit_play, X_PLAY * g.sx, g.by, 124 * g.s);
+            hit(v, R.id.hit_next, X_NEXT * g.sx, g.by, 90 * g.s);
+            hit(v, R.id.hit_nextcat, X_NEXT_CAT * g.sx, g.by, 84 * g.s);
         } else {
             // no way to place them: the stars that move go
             v.setViewVisibility(R.id.ring_star, View.GONE);
@@ -189,9 +192,11 @@ public class NowPlayingWidget extends AppWidgetProvider {
         }
         Intent open = new Intent(c, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         v.setOnClickPendingIntent(R.id.root, PendingIntent.getActivity(c, 20, open, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT));
+        v.setOnClickPendingIntent(R.id.hit_prevcat, button(c, "prevcat", 24));
         v.setOnClickPendingIntent(R.id.hit_prev, button(c, "prev", 21));
         v.setOnClickPendingIntent(R.id.hit_play, button(c, "toggle", 22));
         v.setOnClickPendingIntent(R.id.hit_next, button(c, "next", 23));
+        v.setOnClickPendingIntent(R.id.hit_nextcat, button(c, "nextcat", 25));
         progress(v, g, i, pl);
         m.updateAppWidget(id, v);
         geos.put(id, g);
@@ -290,8 +295,8 @@ public class NowPlayingWidget extends AppWidgetProvider {
             r = 160 * s; orbit = 196 * s;
             oy = 60 * sy; // the design's content runs from 30 (the ring's star) to 600 (the times) of 756
             cx = Math.max(236 * sx, orbit + 24 * s); cy = 262 * sy + oy;
-            title = 95 * sy + oy;  // title, artist and buttons centred beside the moon
-            by = 341 * sy + oy;
+            title = 115 * sy + oy; // title, artist and buttons centred beside the moon
+            by = 335 * sy + oy;
             barL = 64 * sx; barW = (DW - 128) * sx; barY = 540 * sy + oy;
             timesY = 562 * sy + oy;
         }
@@ -407,45 +412,62 @@ public class NowPlayingWidget extends AppWidgetProvider {
         k.drawArc(box, 135, 90, false, rim);
     }
 
+    // the buttons' centres on the design grid: previous category, previous, play / pause, next, next category
+    private static final float X_PREV_CAT = 504, X_PREV = 594, X_PLAY = 700, X_NEXT = 806, X_NEXT_CAT = 896;
+
     private static void controls(Canvas k, Geo g, boolean pl) {
         float s = g.s, y = g.by;
         Paint glyph = paint(STAR);
-        glyph.setStrokeWidth(6 * s);
+        glyph.setStrokeWidth(4.5f * s);
         glyph.setStrokeJoin(Paint.Join.ROUND);
         glyph.setStrokeCap(Paint.Cap.ROUND);
         glyph.setStyle(Paint.Style.FILL_AND_STROKE);
-        for (int dir : new int[] { -1, 1 }) { // previous (points left), next (points right)
-            float x = (dir < 0 ? 543 : 809) * g.sx, tip = x + dir * 13 * s, back = x - dir * 23 * s;
+        Paint bar = paint(STAR);
+        bar.setStrokeWidth(5.5f * s);
+        bar.setStrokeCap(Paint.Cap.ROUND);
+        Paint list = paint(alpha(STAR, 0.8f));
+        list.setStyle(Paint.Style.STROKE);
+        list.setStrokeWidth(4 * s);
+        list.setStrokeCap(Paint.Cap.ROUND);
+        list.setStrokeJoin(Paint.Join.ROUND);
+        for (int dir : new int[] { -1, 1 }) { // the previous ones point left, the next ones right
+            // previous / next song: a triangle against a bar
+            float x = (dir < 0 ? X_PREV : X_NEXT) * g.sx, tip = x + dir * 10 * s, back = x - dir * 17 * s;
             Path t = new Path();
-            t.moveTo(back, y - 24 * s);
+            t.moveTo(back, y - 18 * s);
             t.lineTo(tip, y);
-            t.lineTo(back, y + 24 * s);
+            t.lineTo(back, y + 18 * s);
             t.close();
             k.drawPath(t, glyph);
-            Paint bar = paint(STAR);
-            bar.setStrokeWidth(7 * s);
-            bar.setStrokeCap(Paint.Cap.ROUND);
-            float bx = x + dir * 23 * s;
-            k.drawLine(bx, y - 22 * s, bx, y + 22 * s, bar);
+            float bx = x + dir * 17 * s;
+            k.drawLine(bx, y - 16 * s, bx, y + 16 * s, bar);
+            // previous / next category: a list with a chevron on its outer side
+            float cx = (dir < 0 ? X_PREV_CAT : X_NEXT_CAT) * g.sx, l0 = cx - dir * 18 * s, l1 = cx + dir * 2 * s;
+            for (int row = -1; row <= 1; row++) k.drawLine(l0, y + row * 11 * s, l1, y + row * 11 * s, list);
+            Path ch = new Path();
+            ch.moveTo(cx + dir * 10 * s, y - 11 * s);
+            ch.lineTo(cx + dir * 20 * s, y);
+            ch.lineTo(cx + dir * 10 * s, y + 11 * s);
+            k.drawPath(ch, list);
         }
-        float px = 676 * g.sx;
+        float px = X_PLAY * g.sx;
         Paint ring = paint(alpha(ICE, 0.35f));
         ring.setStyle(Paint.Style.STROKE);
-        ring.setStrokeWidth(3 * s);
-        k.drawCircle(px, y, 88 * s, ring);
-        k.drawCircle(px, y, 72 * s, paint(STAR));
+        ring.setStrokeWidth(2.5f * s);
+        k.drawCircle(px, y, 62 * s, ring);
+        k.drawCircle(px, y, 50 * s, paint(STAR));
         Paint ink = paint(INK);
         if (pl) {
-            k.drawRoundRect(px - 24 * s, y - 26 * s, px - 9 * s, y + 26 * s, 5 * s, 5 * s, ink);
-            k.drawRoundRect(px + 9 * s, y - 26 * s, px + 24 * s, y + 26 * s, 5 * s, 5 * s, ink);
+            k.drawRoundRect(px - 17 * s, y - 19 * s, px - 6 * s, y + 19 * s, 4 * s, 4 * s, ink);
+            k.drawRoundRect(px + 6 * s, y - 19 * s, px + 17 * s, y + 19 * s, 4 * s, 4 * s, ink);
         } else {
             Path t = new Path();
-            t.moveTo(px - 18 * s, y - 30 * s);
-            t.lineTo(px + 32 * s, y);
-            t.lineTo(px - 18 * s, y + 30 * s);
+            t.moveTo(px - 13 * s, y - 22 * s);
+            t.lineTo(px + 23 * s, y);
+            t.lineTo(px - 13 * s, y + 22 * s);
             t.close();
             ink.setStrokeJoin(Paint.Join.ROUND);
-            ink.setStrokeWidth(6 * s);
+            ink.setStrokeWidth(4.5f * s);
             ink.setStyle(Paint.Style.FILL_AND_STROKE);
             k.drawPath(t, ink);
         }

@@ -100,34 +100,54 @@
         android:textColor="#FFA3A8BC"
         android:textSize="11sp" />
 
-    <!-- what the buttons drawn on the card answer to -->
+    <!-- what the drawn buttons answer to: previous category, previous, play / pause, next, next category -->
+    <FrameLayout
+        android:id="@+id/hit_prevcat"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_gravity="top|left"
+        android:layout_marginLeft="164dp"
+        android:layout_marginTop="125dp"
+        android:background="@drawable/widget_hit"
+        android:contentDescription="@string/widget_prevcat" />
+
     <FrameLayout
         android:id="@+id/hit_prev"
-        android:layout_width="43dp"
-        android:layout_height="43dp"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
         android:layout_gravity="top|left"
-        android:layout_marginLeft="172dp"
-        android:layout_marginTop="125dp"
+        android:layout_marginLeft="195dp"
+        android:layout_marginTop="124dp"
         android:background="@drawable/widget_hit"
         android:contentDescription="@string/widget_prev" />
 
     <FrameLayout
         android:id="@+id/hit_play"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
         android:layout_gravity="top|left"
-        android:layout_marginLeft="208dp"
-        android:layout_marginTop="115dp"
+        android:layout_marginLeft="227dp"
+        android:layout_marginTop="118dp"
         android:background="@drawable/widget_hit"
         android:contentDescription="@string/widget_play" />
 
     <FrameLayout
         android:id="@+id/hit_next"
-        android:layout_width="43dp"
-        android:layout_height="43dp"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
         android:layout_gravity="top|left"
-        android:layout_marginLeft="266dp"
-        android:layout_marginTop="125dp"
+        android:layout_marginLeft="271dp"
+        android:layout_marginTop="124dp"
         android:background="@drawable/widget_hit"
         android:contentDescription="@string/widget_next" />
+
+    <FrameLayout
+        android:id="@+id/hit_nextcat"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_gravity="top|left"
+        android:layout_marginLeft="304dp"
+        android:layout_marginTop="125dp"
+        android:background="@drawable/widget_hit"
+        android:contentDescription="@string/widget_nextcat" />
 </FrameLayout>

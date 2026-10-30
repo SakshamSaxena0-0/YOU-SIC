@@ -500,9 +500,43 @@ export class LibraryView {
     if (node.type === 'person') return this.store.sortTracks(this.store.tracks.filter((t) => t[node.field] === node.key), 'album');
     if (node.type === 'hier') {
       const pre = node.path.toLowerCase();
-      return this.store.tracks.filter((t) => t.folder.toLowerCase() === pre || t.folder.toLowerCase().startsWith(pre + '\\')).sort((a, b) => a.path.localeCompare(b.path));
+      return this.store.tracks.filter((t) => { const f = t.folder.toLowerCase(); return f === pre || f.startsWith(pre + '\\') || f.startsWith(pre + '/'); })
+        .sort((a, b) => a.path.localeCompare(b.path));
     }
     return [];
+  }
+
+  // ---------- previous / next category ----------
+
+  // The categories beside one, in its parent's list as the library shows it: albums for an album, the folders
+  // in the same parent folder for a folder, and so on. Null for lists that have none (All Songs, search...).
+  _siblings(node) {
+    let parent = { folder: 'folders', album: 'albums', genre: 'genres', year: 'years', playlist: 'playlists' }[node.type];
+    if (node.type === 'person' || node.type === 'personAll') parent = { artist: 'artists', albumArtist: 'albumArtists', composer: 'composers' }[node.field];
+    if (parent) return (this.resolve({ type: parent, title: '' }).items || []).filter((it) => it.node);
+    if (node.type !== 'hier' || !node.path) return null;
+    const cut = Math.max(node.path.lastIndexOf('\\'), node.path.lastIndexOf('/'));
+    const inParent = cut > 0 ? this.resolve({ type: 'hier', path: node.path.slice(0, cut), title: '' }).items : [];
+    return inParent.some((it) => it.node.path === node.path) ? inParent : this.resolve({ type: 'hier', path: null }).items; // a top folder
+  }
+
+  // Plays the category before (dir -1) or after (dir 1) the one playing, skipping empty ones and wrapping around.
+  stepCategory(dir) {
+    const node = this.player.source?.node;
+    const sibs = node && this._siblings(node);
+    if (!sibs || sibs.length < 2) { toast(`No other categories beside ${node?.title || 'this list'}`); return; }
+    const type = node.type === 'personAll' ? 'person' : node.type;
+    let i = sibs.findIndex((it) => it.node.type === type && it.node.key === node.key && it.node.path === node.path && it.node.field === node.field);
+    if (i < 0) i = dir > 0 ? -1 : 0;
+    for (let n = 0; n < sibs.length; n++) {
+      i = (i + dir + sibs.length) % sibs.length;
+      const it = sibs[i], tracks = this._tracksForNode(it.node);
+      if (!tracks.length) continue;
+      const shuffle = !!this.store.settings.shuffle;
+      this.player.playList(this.store.sortTracks(tracks, this.store.settings.sorts[it.node.type] || 'default'), shuffle ? -1 : 0, { title: it.title, node: it.node }, { shuffle });
+      toast(`${dir > 0 ? 'Next' : 'Previous'} category: ${it.title}`);
+      return;
+    }
   }
 
   async addToPlaylist(tracks) {

@@ -54,7 +54,8 @@ class App {
         return this.engine.addEventListener('meta', () => this.engine.seek(t), { once: true });
       }
       ({ prev: () => this.player.prev(), next: () => this.player.next(), toggle: () => this.player.toggle(),
-        play: () => { if (!this.engine.playing) this.player.toggle(); }, pause: () => { if (this.engine.playing) this.player.toggle(); } })[c]?.();
+        play: () => { if (!this.engine.playing) this.player.toggle(); }, pause: () => { if (this.engine.playing) this.player.toggle(); },
+        prevcat: () => this.library.stepCategory(-1), nextcat: () => this.library.stepCategory(1) })[c]?.();
     });
     pa.onProgress((m) => this._scanProgress(m));
 

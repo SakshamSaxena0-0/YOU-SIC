@@ -3,6 +3,16 @@
 export const EQ_FREQS = [31, 62, 125, 250, 500, 1000, 2000, 4000, 8000, 16000];
 const FADE = 0.14;
 
+// Moves a parameter smoothly to v (time constant tc), then sets v exactly. A setTargetAtTime on its own never
+// finishes, and Chromium then treats the parameter as changing on every sample: a filter recomputes its
+// coefficients per sample instead of once. On a phone (Android WebView) that made the audio thread work
+// about a fifth harder, with the EQ flat.
+function glide(p, v, t, tc) {
+  p.cancelScheduledValues(t);
+  p.setTargetAtTime(v, t, tc);
+  p.setValueAtTime(v, t + tc * 6);
+}
+
 export class AudioEngine extends EventTarget {
   constructor() {
     super();
@@ -213,12 +223,12 @@ export class AudioEngine extends EventTarget {
   }
 
   // ---- DSP params ----
-  setBand(i, db) { this.bands[i].gain.setTargetAtTime(db, this.ctx.currentTime, 0.015); }
-  setPreamp(db) { this.preamp.gain.setTargetAtTime(Math.pow(10, db / 20), this.ctx.currentTime, 0.015); }
-  setBass(db) { this.bass.gain.setTargetAtTime(db, this.ctx.currentTime, 0.015); }
-  setTreble(db) { this.treble.gain.setTargetAtTime(db, this.ctx.currentTime, 0.015); }
-  setBalance(v) { this.panner.pan.setTargetAtTime(v, this.ctx.currentTime, 0.015); }
-  setVolume(v) { this.volume.gain.setTargetAtTime(v * v, this.ctx.currentTime, 0.02); }
+  setBand(i, db) { glide(this.bands[i].gain, db, this.ctx.currentTime, 0.015); }
+  setPreamp(db) { glide(this.preamp.gain, Math.pow(10, db / 20), this.ctx.currentTime, 0.015); }
+  setBass(db) { glide(this.bass.gain, db, this.ctx.currentTime, 0.015); }
+  setTreble(db) { glide(this.treble.gain, db, this.ctx.currentTime, 0.015); }
+  setBalance(v) { glide(this.panner.pan, v, this.ctx.currentTime, 0.015); }
+  setVolume(v) { glide(this.volume.gain, v * v, this.ctx.currentTime, 0.02); }
   setTempo(r) {
     this.tempo = r;
     this.decks.forEach((d) => (d.el.playbackRate = r));
@@ -235,12 +245,12 @@ export class AudioEngine extends EventTarget {
     const old = this.reverbParams;
     this.reverbParams = { ...old, ...params };
     const p = this.reverbParams, t = this.ctx.currentTime;
-    this.revWet.gain.setTargetAtTime(p.mix * 1.4, t, 0.03);
-    this.revDry.gain.setTargetAtTime(1 - p.mix * 0.45, t, 0.03);
-    this.revPre.delayTime.setTargetAtTime(p.predelay * 0.25, t, 0.03);
-    this.revEcho.gain.setTargetAtTime(p.predelayMix * 0.6, t, 0.03);
-    this.revLP.frequency.setTargetAtTime(20000 * Math.pow(1 - p.damp, 2) + 900, t, 0.03);
-    this.revHP.frequency.setTargetAtTime(20 + p.filter * p.filter * 1500, t, 0.03);
+    glide(this.revWet.gain, p.mix * 1.4, t, 0.03);
+    glide(this.revDry.gain, 1 - p.mix * 0.45, t, 0.03);
+    glide(this.revPre.delayTime, p.predelay * 0.25, t, 0.03);
+    glide(this.revEcho.gain, p.predelayMix * 0.6, t, 0.03);
+    glide(this.revLP.frequency, 20000 * Math.pow(1 - p.damp, 2) + 900, t, 0.03);
+    glide(this.revHP.frequency, 20 + p.filter * p.filter * 1500, t, 0.03);
     if (old.size !== p.size || old.fade !== p.fade) {
       clearTimeout(this._irT);
       this._irT = setTimeout(() => this._buildImpulse(), 120);

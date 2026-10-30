@@ -199,6 +199,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+        PlaybackService.appVisible(this);
         if (web != null) web.evaluateJavascript("window.__paResume && window.__paResume()", null);
     }
 

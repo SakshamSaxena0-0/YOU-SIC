@@ -13,8 +13,6 @@ import android.content.pm.ServiceInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Icon;
-import android.media.AudioAttributes;
-import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.media.MediaMetadata;
 import android.media.session.MediaSession;
@@ -33,25 +31,35 @@ import java.io.File;
 
 /**
  * Playback outside the app: a media notification and lock-screen controls (MediaSession), headset and
- * Bluetooth buttons, audio focus (pause for a call or another player, resume after) and pausing when
- * headphones are unplugged. While music plays it runs in the foreground with a wake lock, so the page keeps
- * playing with the screen off and after the app is closed from the recent apps list.
+ * Bluetooth buttons and pausing when headphones are unplugged. While music plays it runs in the foreground
+ * with a wake lock, so the page keeps playing with the screen off and after the app is closed from the
+ * recent apps list.
  *
  * The music itself plays in the page (Web Audio, with the equalizer and effects); this service only
  * mirrors what the page tells it (Bridge.nowPlaying) and sends the buttons back as commands.
+ *
+ * Audio focus (pausing for a call or another player, resuming after a short interruption, ducking) is left
+ * to the WebView: it requests focus itself whenever the page's audio plays. A second request from here
+ * took the focus away from the WebView, which then paused the music.
  */
 public class PlaybackService extends Service {
     private static final String CHANNEL = "playback";
     private static final int NOTE = 1;
+    /** How long a pause lasts before the service leaves the foreground. Between two songs the page reports
+     *  "not playing" for a moment; leaving the foreground then would fail to come back with the screen off
+     *  (Android lets a background app start a foreground service only in a few cases). */
+    private static final long LEAVE_FOREGROUND_MS = 10_000;
 
     private static PlaybackService inst;
     private static JSONObject info;
     private static volatile boolean playing;
+    /** Android refused to start the service (the app was in the background); try again when the app is opened. */
+    private static boolean startRefused;
 
+    private final Handler main = new Handler(Looper.getMainLooper());
+    private final Runnable leaveForeground = this::leaveForeground;
     private MediaSession session;
-    private AudioManager audio;
-    private AudioFocusRequest focus;
-    private boolean hasFocus, resumeOnGain, foreground, noisyOn;
+    private boolean foreground, noisyOn;
     private PowerManager.WakeLock wake;
     private Bitmap art;
     private String artKey = "";
@@ -67,11 +75,23 @@ public class PlaybackService extends Service {
             info = next;
             playing = next != null && next.optBoolean("playing");
             if (inst != null) inst.apply();
-            else if (playing) {
-                Intent it = new Intent(c, PlaybackService.class);
-                try { c.startForegroundService(it); } catch (Exception e) { android.util.Log.w(MainActivity.TAG, "start service", e); }
-            }
+            else if (playing) start(c);
         });
+    }
+
+    private static void start(Context c) {
+        try {
+            c.startForegroundService(new Intent(c, PlaybackService.class));
+            startRefused = false;
+        } catch (Exception e) {
+            startRefused = true;
+            android.util.Log.w(MainActivity.TAG, "start service", e);
+        }
+    }
+
+    /** The app came to the front (main thread): start the service now if Android refused it earlier. */
+    static void appVisible(Context c) {
+        if (startRefused && inst == null && playing) start(c);
     }
 
     static void stop(Context c) {
@@ -88,8 +108,7 @@ public class PlaybackService extends Service {
         ch.setShowBadge(false);
         nm.createNotificationChannel(ch);
 
-        audio = getSystemService(AudioManager.class);
-        wake = getSystemService(PowerManager.class).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "yousic:playback");
+        wake =getSystemService(PowerManager.class).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "yousic:playback");
         wake.setReferenceCounted(false);
 
         session = new MediaSession(this, "YouSic");
@@ -127,9 +146,9 @@ public class PlaybackService extends Service {
     }
 
     private void apply() {
+        main.removeCallbacks(leaveForeground);
         if (info == null) {
             session.setActive(false);
-            releaseFocus();
             if (wake.isHeld()) wake.release();
             noisy(false);
             stopForeground(STOP_FOREGROUND_REMOVE);
@@ -161,22 +180,38 @@ public class PlaybackService extends Service {
 
         Notification n = build();
         if (playing) {
-            requestFocus();
             if (!wake.isHeld()) wake.acquire();
             noisy(true);
             goForeground(n);
         } else {
-            if (wake.isHeld()) wake.release();
             noisy(false);
-            if (foreground) { stopForeground(STOP_FOREGROUND_DETACH); foreground = false; }
+            // stay in the foreground (and awake) for a while: this may only be the gap between two songs
             getSystemService(NotificationManager.class).notify(NOTE, n);
+            if (foreground) main.postDelayed(leaveForeground, LEAVE_FOREGROUND_MS);
+            else if (wake.isHeld()) wake.release();
         }
     }
 
+    /** Paused for a while: the notification can be swiped away and the phone may sleep. */
+    private void leaveForeground() {
+        if (playing || !foreground) return;
+        stopForeground(STOP_FOREGROUND_DETACH);
+        foreground = false;
+        if (wake.isHeld()) wake.release();
+        getSystemService(NotificationManager.class).notify(NOTE, build());
+    }
+
     private void goForeground(Notification n) {
-        if (Build.VERSION.SDK_INT >= 29) startForeground(NOTE, n, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK);
-        else startForeground(NOTE, n);
-        foreground = true;
+        try {
+            if (Build.VERSION.SDK_INT >= 29) startForeground(NOTE, n, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK);
+            else startForeground(NOTE, n);
+            foreground = true;
+        } catch (Exception e) {
+            // Android refused (the app is in the background and no button was pressed): show the
+            // notification anyway; the music keeps playing while the wake lock holds
+            android.util.Log.w(MainActivity.TAG, "foreground", e);
+            getSystemService(NotificationManager.class).notify(NOTE, n);
+        }
     }
 
     private Bitmap loadArt(String key) {
@@ -217,46 +252,6 @@ public class PlaybackService extends Service {
         return b.build();
     }
 
-    // ---------- audio focus: calls, other players ----------
-
-    private void requestFocus() {
-        if (hasFocus) return;
-        if (focus == null) {
-            focus = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
-                    .setAudioAttributes(new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_MEDIA)
-                            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build())
-                    .setWillPauseWhenDucked(false)
-                    .setOnAudioFocusChangeListener(this::onFocus)
-                    .build();
-        }
-        hasFocus = audio.requestAudioFocus(focus) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
-    }
-
-    private void releaseFocus() {
-        if (focus != null && hasFocus) audio.abandonAudioFocusRequest(focus);
-        hasFocus = false;
-    }
-
-    private void onFocus(int change) {
-        switch (change) {
-            case AudioManager.AUDIOFOCUS_LOSS:
-                hasFocus = false;
-                resumeOnGain = false;
-                if (playing) command("pause");
-                break;
-            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
-                resumeOnGain = playing;
-                if (playing) command("pause");
-                break;
-            case AudioManager.AUDIOFOCUS_GAIN:
-                hasFocus = true;
-                if (resumeOnGain) { resumeOnGain = false; command("play"); }
-                break;
-            default:
-                break; // ducking is done by the system
-        }
-    }
-
     // ---------- headphones unplugged ----------
 
     private final BroadcastReceiver noisyReceiver = new BroadcastReceiver() {
@@ -282,8 +277,8 @@ public class PlaybackService extends Service {
     @Override
     public void onDestroy() {
         if (inst == this) inst = null;
+        main.removeCallbacks(leaveForeground);
         noisy(false);
-        releaseFocus();
         if (wake.isHeld()) wake.release();
         session.release();
         super.onDestroy();

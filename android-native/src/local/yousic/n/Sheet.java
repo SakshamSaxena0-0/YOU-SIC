@@ -72,12 +72,12 @@ public final class Sheet extends View {
         th = Theme.get(c);
         this.title = title;
         slop = ViewConfiguration.get(c).getScaledTouchSlop();
-        titleH = th.px(62); itemH = th.px(52); headH = th.px(36); btnH = th.px(56); radius = th.px(26);
-        titleP.setTypeface(th.titleFace); titleP.setTextSize(th.px(24)); titleP.setColor(th.text);
-        textP.setTypeface(th.uiMedium); textP.setTextSize(th.px(15.5f)); textP.setColor(th.text);
-        valueP.setTypeface(th.uiFace); valueP.setTextSize(th.px(13.5f)); valueP.setColor(th.textDim); valueP.setTextAlign(Paint.Align.RIGHT);
+        titleH = th.px(56); itemH = th.px(48); headH = th.px(34); btnH = th.px(52); radius = th.px(24);
+        titleP.setTypeface(th.titleFace); titleP.setTextSize(th.px(th.titleCaps ? 17 : 22)); titleP.setColor(th.text);
+        textP.setTypeface(th.uiMedium); textP.setTextSize(th.px(14.5f)); textP.setColor(th.text);
+        valueP.setTypeface(th.uiFace); valueP.setTextSize(th.px(12.5f)); valueP.setColor(th.textDim); valueP.setTextAlign(Paint.Align.RIGHT);
         headP.setTypeface(th.uiMedium); headP.setTextSize(th.px(11)); headP.setColor(th.accent); headP.setLetterSpacing(0.16f);
-        btnP.setTypeface(th.uiBold); btnP.setTextSize(th.px(16)); btnP.setColor(th.accent); btnP.setTextAlign(Paint.Align.CENTER);
+        btnP.setTypeface(th.uiBold); btnP.setTextSize(th.px(15)); btnP.setColor(th.accent); btnP.setTextAlign(Paint.Align.CENTER);
         setClickable(true);
     }
 
@@ -150,7 +150,7 @@ public final class Sheet extends View {
         th.drawSheet(c, panel, radius);
         if (title != null) {
             CharSequence t = TextUtils.ellipsize(title, titleP, panel.width() - th.px(48), TextUtils.TruncateAt.END);
-            c.drawText(t, 0, t.length(), panel.left + th.px(24), panel.top + th.px(40), titleP);
+            c.drawText(t, 0, t.length(), panel.left + th.px(24), panel.top + th.px(36), titleP);
         }
         c.save();
         c.clipRect(panel.left, listTop, panel.right, listBottom);
@@ -192,7 +192,7 @@ public final class Sheet extends View {
         if (it.icon != 0) {
             p.setColor(it.checked && it.check == RADIO ? th.accentHi : th.text);
             p.setAlpha(alpha);
-            Icons.draw(c, it.icon, x + th.px(11), y + rh / 2, th.px(22), p);
+            Icons.draw(c, it.icon, x + th.px(10), y + rh / 2, th.px(19), p);
             x += th.px(38);
         }
         float right = r - th.px(24);

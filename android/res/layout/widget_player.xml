@@ -39,13 +39,48 @@
         android:layout_gravity="top|left"
         android:contentDescription="@null" />
 
+    <!-- the bar along the bottom: progress, and tap anywhere on it to seek (seek_zones) -->
+    <ProgressBar
+        android:id="@+id/bar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="307dp"
+        android:layout_height="3dp"
+        android:layout_gravity="top|left"
+        android:layout_marginLeft="23dp"
+        android:layout_marginTop="213dp"
+        android:indeterminate="false"
+        android:max="1000"
+        android:maxWidth="4000dp"
+        android:maxHeight="2000dp"
+        android:minWidth="0dp"
+        android:minHeight="0dp"
+        android:progress="0"
+        android:progressDrawable="@drawable/widget_bar" />
+
+    <ImageView
+        android:id="@+id/bar_star"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|left"
+        android:contentDescription="@null" />
+
+    <LinearLayout
+        android:id="@+id/seek_zones"
+        android:layout_width="307dp"
+        android:layout_height="30dp"
+        android:layout_gravity="top|left"
+        android:layout_marginLeft="23dp"
+        android:layout_marginTop="199dp"
+        android:contentDescription="@string/widget_seek"
+        android:orientation="horizontal" />
+
     <Chronometer
         android:id="@+id/elapsed"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="top|left"
         android:layout_marginLeft="23dp"
-        android:layout_marginTop="173dp"
+        android:layout_marginTop="221dp"
         android:fontFamily="@font/manrope_semibold"
         android:fontFeatureSettings="tnum"
         android:includeFontPadding="false"
@@ -57,7 +92,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="top|right"
-        android:layout_marginTop="173dp"
+        android:layout_marginTop="221dp"
         android:layout_marginRight="23dp"
         android:fontFamily="@font/manrope_semibold"
         android:fontFeatureSettings="tnum"

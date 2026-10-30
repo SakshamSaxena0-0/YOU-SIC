@@ -142,7 +142,12 @@ public class PlaybackService extends Service {
                 stopSelf();
                 return START_NOT_STICKY;
             }
-            command(a.substring(NowPlayingWidget.ACTION.length()));
+            String cmd = a.substring(NowPlayingWidget.ACTION.length());
+            if (cmd.startsWith(NowPlayingWidget.SEEK)) { // a tap on the bar: that far into the song
+                double f = Double.parseDouble(cmd.substring(NowPlayingWidget.SEEK.length())), d = NowPlayingWidget.duration(this);
+                cmd = d > 0 ? "seek:" + f * d : null;
+            }
+            if (cmd != null) command(cmd);
             if (!playing) main.postDelayed(leaveForeground, LEAVE_FOREGROUND_MS);
             return START_NOT_STICKY;
         } else if ("dismiss".equals(a)) {

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The widget's progress bar: a faint icy track, filled in ice up to the progress, with rounded ends. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@android:id/background">
+        <shape>
+            <corners android:radius="100dp" />
+            <solid android:color="#388CB5D3" />
+        </shape>
+    </item>
+    <item android:id="@android:id/progress">
+        <scale
+            android:scaleGravity="left"
+            android:scaleWidth="100%">
+            <shape>
+                <corners android:radius="100dp" />
+                <solid android:color="#FF8CB5D3" />
+            </shape>
+        </scale>
+    </item>
+</layer-list>

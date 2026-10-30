@@ -42,17 +42,21 @@ import java.util.Map;
 
 /**
  * The home-screen widget ("Moon Player", 5 x 3 cells), styled after a starry-night wallpaper and drawn with
- * no background: the cover is a moon with the song's progress orbiting it. Prev, play/pause and next control
- * the app (PlaybackService; with the app closed, it starts the page in the background); a tap anywhere else
- * opens the app.
+ * no background: the cover is a moon with the song's progress orbiting it, and a thin bar along the bottom
+ * shows it too (tap the bar to jump there). Prev, play/pause and next control the app (PlaybackService; with
+ * the app closed, it starts the page in the background); a tap anywhere else opens the app.
  *
  * Drawn as a bitmap once per song, play state and size. While a song plays only the progress moves: the
- * ring and its star are updated every few seconds while the screen is on, and the times are chronometers
- * that tick by themselves.
+ * ring, the bar and their stars are updated every few seconds while the screen is on, and the times are
+ * chronometers that tick by themselves.
  */
 public class NowPlayingWidget extends AppWidgetProvider {
-    /** PlaybackService action prefix for the buttons: "widget:prev", "widget:toggle", "widget:next". */
+    /** PlaybackService action prefix for the buttons: "widget:prev", "widget:toggle", "widget:next", "widget:seekpct:0.5". */
     static final String ACTION = "widget:";
+    /** A tap on the bar: that fraction of the song ("seekpct:0.3125"). */
+    static final String SEEK = "seekpct:";
+    /** The bar can't be dragged (widgets only get taps): it is split into this many tap-to-seek zones. */
+    private static final int ZONES = 24;
 
     // the wallpaper's palette
     private static final int STAR = 0xFFF2F3F8, DIM = 0xFFA3A8BC, ICE = 0xFF8CB5D3, ICE_HI = 0xFFC4DDF0, INK = 0xFF0A0A16;
@@ -141,10 +145,13 @@ public class NowPlayingWidget extends AppWidgetProvider {
         Bitmap star = star(8 * g.s);
         g.starW = star.getWidth();
         v.setImageViewBitmap(R.id.ring_star, star);
+        Bitmap knob = star(5 * g.s);
+        g.knobW = knob.getWidth();
+        v.setImageViewBitmap(R.id.bar_star, knob);
 
         float px = TypedValue.COMPLEX_UNIT_PX;
-        v.setTextViewTextSize(R.id.elapsed, (int) px, 30 * g.s);
-        v.setTextViewTextSize(R.id.remain, (int) px, 30 * g.s);
+        v.setTextViewTextSize(R.id.elapsed, (int) px, 28 * g.s);
+        v.setTextViewTextSize(R.id.remain, (int) px, 28 * g.s);
         if (Build.VERSION.SDK_INT >= 31) {
             int P = TypedValue.COMPLEX_UNIT_PX;
             float ring = 399 * g.s; // the ring drawable's ratios are for a 196 radius, 5 thick ring in 399
@@ -152,16 +159,33 @@ public class NowPlayingWidget extends AppWidgetProvider {
             v.setViewLayoutHeight(R.id.ring, ring, P);
             v.setViewLayoutMargin(R.id.ring, RemoteViews.MARGIN_LEFT, g.cx - ring / 2, P);
             v.setViewLayoutMargin(R.id.ring, RemoteViews.MARGIN_TOP, g.cy - ring / 2, P);
-            v.setViewLayoutMargin(R.id.elapsed, RemoteViews.MARGIN_LEFT, 64 * g.sx, P);
-            v.setViewLayoutMargin(R.id.elapsed, RemoteViews.MARGIN_TOP, 486 * g.sy + g.oy, P);
-            v.setViewLayoutMargin(R.id.remain, RemoteViews.MARGIN_RIGHT, 64 * g.sx, P);
-            v.setViewLayoutMargin(R.id.remain, RemoteViews.MARGIN_TOP, 486 * g.sy + g.oy, P);
+            float thick = 7 * g.s, zone = 84 * g.s;
+            v.setViewLayoutWidth(R.id.bar, g.barW, P);
+            v.setViewLayoutHeight(R.id.bar, thick, P);
+            v.setViewLayoutMargin(R.id.bar, RemoteViews.MARGIN_LEFT, g.barL, P);
+            v.setViewLayoutMargin(R.id.bar, RemoteViews.MARGIN_TOP, g.barY - thick / 2, P);
+            v.setViewLayoutWidth(R.id.seek_zones, g.barW, P);
+            v.setViewLayoutHeight(R.id.seek_zones, zone, P);
+            v.setViewLayoutMargin(R.id.seek_zones, RemoteViews.MARGIN_LEFT, g.barL, P);
+            v.setViewLayoutMargin(R.id.seek_zones, RemoteViews.MARGIN_TOP, g.barY - zone / 2, P);
+            v.setViewLayoutMargin(R.id.elapsed, RemoteViews.MARGIN_LEFT, g.barL, P);
+            v.setViewLayoutMargin(R.id.elapsed, RemoteViews.MARGIN_TOP, g.timesY, P);
+            v.setViewLayoutMargin(R.id.remain, RemoteViews.MARGIN_RIGHT, g.w - g.barL - g.barW, P);
+            v.setViewLayoutMargin(R.id.remain, RemoteViews.MARGIN_TOP, g.timesY, P);
             hit(v, R.id.hit_prev, 543 * g.sx, g.by, 120 * g.s);
             hit(v, R.id.hit_play, 676 * g.sx, g.by, 180 * g.s);
             hit(v, R.id.hit_next, 809 * g.sx, g.by, 120 * g.s);
         } else {
-            // no way to place it: the ring's star goes
+            // no way to place them: the stars that move go
             v.setViewVisibility(R.id.ring_star, View.GONE);
+            v.setViewVisibility(R.id.bar_star, View.GONE);
+        }
+        // the bar's tap-to-seek zones
+        v.removeAllViews(R.id.seek_zones);
+        for (int z = 0; z < ZONES; z++) {
+            RemoteViews zone = new RemoteViews(c.getPackageName(), R.layout.widget_seek_zone);
+            zone.setOnClickPendingIntent(R.id.zone, button(c, SEEK + (z + 0.5) / ZONES, 100 + z));
+            v.addView(R.id.seek_zones, zone);
         }
         Intent open = new Intent(c, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         v.setOnClickPendingIntent(R.id.root, PendingIntent.getActivity(c, 20, open, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT));
@@ -187,11 +211,12 @@ public class NowPlayingWidget extends AppWidgetProvider {
         return PendingIntent.getForegroundService(c, code, i, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
-    /** The moving parts: the ring, its star, and the times. */
+    /** The moving parts: the ring and the bar, their stars, and the times. */
     private static void progress(RemoteViews v, Geo g, JSONObject i, boolean pl) {
         double dur = i == null ? 0 : i.optDouble("duration", 0), pos = position(i, pl);
         float p = dur > 0 ? (float) Math.min(1, pos / dur) : 0;
         v.setProgressBar(R.id.ring, 1000, Math.round(p * 1000), false);
+        v.setProgressBar(R.id.bar, 1000, Math.round(p * 1000), false);
         long now = SystemClock.elapsedRealtime();
         v.setChronometer(R.id.elapsed, now - (long) (pos * 1000), null, pl);
         v.setChronometer(R.id.remain, now + (long) ((dur - pos) * 1000), "−%s", pl);
@@ -202,7 +227,15 @@ public class NowPlayingWidget extends AppWidgetProvider {
             double a = -Math.PI / 2 + p * 2 * Math.PI;
             v.setViewLayoutMargin(R.id.ring_star, RemoteViews.MARGIN_LEFT, (float) (g.cx + g.orbit * Math.cos(a)) - g.starW / 2f, P);
             v.setViewLayoutMargin(R.id.ring_star, RemoteViews.MARGIN_TOP, (float) (g.cy + g.orbit * Math.sin(a)) - g.starW / 2f, P);
+            v.setViewLayoutMargin(R.id.bar_star, RemoteViews.MARGIN_LEFT, g.barL + p * g.barW - g.knobW / 2f, P);
+            v.setViewLayoutMargin(R.id.bar_star, RemoteViews.MARGIN_TOP, g.barY - g.knobW / 2f, P);
         }
+    }
+
+    /** The length of the song the widget shows, in seconds (0 if unknown). */
+    static double duration(Context c) {
+        JSONObject i = current(c);
+        return i == null ? 0 : i.optDouble("duration", 0);
     }
 
     // ---------- state ----------
@@ -243,9 +276,10 @@ public class NowPlayingWidget extends AppWidgetProvider {
 
     private static final class Geo {
         final int w, h;
-        /** oy: how far everything moves down to sit in the middle of the widget */
-        final float sx, sy, s, oy, cx, cy, r, orbit, by;
-        int starW;
+        /** oy: how far everything moves down to sit in the middle of the widget; title: the title's top;
+         *  by: the buttons' centre line; bar: the progress bar's left end, width and centre line */
+        final float sx, sy, s, oy, cx, cy, r, orbit, title, by, barL, barW, barY, timesY;
+        int starW, knobW;
 
         Geo(Context c, AppWidgetManager m, int id) {
             float[] dp = sizeDp(m, id);
@@ -254,9 +288,12 @@ public class NowPlayingWidget extends AppWidgetProvider {
             h = Math.max(160, Math.round(dp[1] * d));
             sx = w / DW; sy = h / DH; s = Math.min(sx, sy);
             r = 160 * s; orbit = 196 * s;
-            oy = 100 * sy; // the design's content runs from 30 to 522 of 756
+            oy = 60 * sy; // the design's content runs from 30 (the ring's star) to 600 (the times) of 756
             cx = Math.max(236 * sx, orbit + 24 * s); cy = 262 * sy + oy;
-            by = 412 * sy + oy;
+            title = 95 * sy + oy;  // title, artist and buttons centred beside the moon
+            by = 341 * sy + oy;
+            barL = 64 * sx; barW = (DW - 128) * sx; barY = 540 * sy + oy;
+            timesY = 562 * sy + oy;
         }
 
         boolean sameSize(Context c, AppWidgetManager m, int id) {
@@ -302,17 +339,8 @@ public class NowPlayingWidget extends AppWidgetProvider {
 
         moon(c, k, g, i);
 
-        // text: NOW PLAYING, the title (one line, or two smaller), the artist
-        float tx = 470 * g.sx, tw = g.w - tx - 44 * g.sx;
-        TextPaint label = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-        label.setTypeface(font(c, R.font.michroma));
-        label.setTextSize(27 * s);
-        label.setLetterSpacing(0.26f);
-        label.setColor(DIM);
-        float y = 92 * g.sy + g.oy - label.ascent();
-        k.drawText(pl ? "NOW PLAYING" : "PAUSED", tx, y, label);
-        y += label.descent() + 26 * s;
-
+        // text: the title (one line, or two smaller), the artist
+        float tx = 470 * g.sx, tw = g.w - tx - 44 * g.sx, y = g.title;
         String title = i == null ? "YouSic" : i.optString("title", "");
         String artist = i == null ? "Tap play to start" : i.optString("artist", "");
         TextPaint tp = new TextPaint(Paint.ANTI_ALIAS_FLAG);

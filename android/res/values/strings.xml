@@ -5,4 +5,5 @@
     <string name="widget_prev">Previous</string>
     <string name="widget_play">Play or pause</string>
     <string name="widget_next">Next</string>
+    <string name="widget_seek">Song position: tap to jump there</string>
 </resources>

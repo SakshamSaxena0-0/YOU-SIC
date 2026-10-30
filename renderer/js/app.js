@@ -46,8 +46,13 @@ class App {
     this._thumbIcons = { prev: iconPng('skip_previous'), next: iconPng('skip_next'), play: iconPng('play'), pause: iconPng('pause') };
     this.updateThumbar(false);
     pa.onCommand((c) => {
-      // Android's notification and lock screen can also play, pause and seek ("seek:<seconds>")
-      if (typeof c === 'string' && c.startsWith('seek:')) return this.engine.seek(Number(c.slice(5)) || 0);
+      // Android's notification, lock screen and widget can also play, pause and seek ("seek:<seconds>"). A
+      // widget seek can arrive while the app is starting, before the song has loaded: it waits for it.
+      if (typeof c === 'string' && c.startsWith('seek:')) {
+        const t = Number(c.slice(5)) || 0;
+        if (this.engine.duration) return this.engine.seek(t);
+        return this.engine.addEventListener('meta', () => this.engine.seek(t), { once: true });
+      }
       ({ prev: () => this.player.prev(), next: () => this.player.next(), toggle: () => this.player.toggle(),
         play: () => { if (!this.engine.playing) this.player.toggle(); }, pause: () => { if (this.engine.playing) this.player.toggle(); } })[c]?.();
     });

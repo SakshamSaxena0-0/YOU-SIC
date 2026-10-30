@@ -25,21 +25,21 @@ public final class NavBar extends ViewGroup {
         eq = new Ui.Btn(c, Icons.EQ, Ui.Btn.PLAIN);
         search = new Ui.Btn(c, Icons.SEARCH, Ui.Btn.PLAIN);
         menu = new Ui.Btn(c, Icons.MENU, Ui.Btn.PLAIN);
-        for (Ui.Btn b : new Ui.Btn[]{ library, eq, search, menu }) { b.iconDp = 22; addView(b); }
+        for (Ui.Btn b : new Ui.Btn[]{ library, eq, search, menu }) { b.iconDp = th.compact ? 22 : 26; addView(b); }
     }
 
     /** The height this bar takes from the bottom of the screen. */
-    int heightPx() { return Math.round(th.px(66)) + insetBottom; }
+    int heightPx() { return Math.round(th.px(th.compact ? 66 : 74)) + insetBottom; }
 
     @Override protected void onMeasure(int ws, int hs) { setMeasuredDimension(MeasureSpec.getSize(ws), heightPx()); }
 
     @Override protected void onLayout(boolean ch, int l, int t, int r, int b) {
         int w = r - l;
         float m = th.px(10);
-        bar.set(m, th.px(4), w - m, th.px(60));
+        bar.set(m, th.px(4), w - m, th.px(th.compact ? 60 : 68));
         int n = 4;
         float cell = bar.width() / n;
-        int bh = Math.round(th.px(48)), bw = Math.round(Math.min(cell - th.px(8), th.px(70)));
+        int bh = Math.round(th.px(th.compact ? 48 : 56)), bw = Math.round(Math.min(cell - th.px(8), th.px(th.compact ? 70 : 78)));
         Ui.Btn[] bs = { library, eq, search, menu };
         for (int i = 0; i < n; i++) {
             int cx = Math.round(bar.left + cell * (i + 0.5f));

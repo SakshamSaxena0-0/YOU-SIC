@@ -42,7 +42,7 @@ public final class Ui {
             this.style = style;
             setClickable(true);
             tp.setTypeface(th.uiMedium);
-            tp.setTextSize(th.px(13));
+            tp.setTextSize(th.px(th.compact ? 13 : 14));
         }
 
         public Btn click(Runnable r) { setOnClickListener(v -> r.run()); return this; }

@@ -28,10 +28,15 @@ public abstract class Theme {
     /** a glow round the play / pause glyph (0: none) */
     protected int playGlyphGlow;
 
-    /** the interface's scale: every size in the app is in these "dp" (Android's, a little smaller) */
-    public static final float UI_SCALE = 0.9f;
+    /** a smaller interface (Y2K Subway): everything at 0.9 of Android's dp, with a tighter player */
+    public final boolean compact;
 
-    protected Theme(Context c) { dp = c.getResources().getDisplayMetrics().density * UI_SCALE; }
+    protected Theme(Context c) { this(c, 1f); }
+
+    protected Theme(Context c, float scale) {
+        dp = c.getResources().getDisplayMetrics().density * scale;
+        compact = scale < 1f;
+    }
 
     public float px(float dps) { return dps * dp; }
 

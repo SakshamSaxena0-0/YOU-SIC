@@ -39,7 +39,7 @@ public final class Y2KTheme extends Theme {
     @Override public String name() { return "Y2K Subway"; }
 
     Y2KTheme(Context c) {
-        super(c);
+        super(c, 0.9f);
         bg = BG0; ink = BG0; text = TEXT; textDim = TEXT_DIM; accent = AQUA; accentHi = TEAL; accent2 = PINK;
         line = alpha(WHITE, 0.1f); panel = BG1; panelHi = BG2; stamp = TEXT;
         titleFace = c.getResources().getFont(R.font.michroma);

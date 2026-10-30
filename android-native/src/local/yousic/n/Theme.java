@@ -22,6 +22,11 @@ public abstract class Theme {
     public float titleSize = 34, artistSize = 15, albumSize = 13, timeSize = 11, rowTitle = 15, rowSub = 12.5f, headerSize = 26;
     /** the cover's corner radius */
     public float coverRadius = 14;
+    /** the song's title in capitals; a glow round titles (0: none) */
+    public boolean titleCaps;
+    public int titleGlow;
+    /** a glow round the play / pause glyph (0: none) */
+    protected int playGlyphGlow;
 
     protected Theme(Context c) { dp = c.getResources().getDisplayMetrics().density; }
 
@@ -74,6 +79,14 @@ public abstract class Theme {
 
     /** Icon colour: on (switched on), dim (secondary). */
     public int icon(boolean on, boolean dim) { return on ? accentHi : dim ? alpha(text, 0.55f) : text; }
+
+    /** A glow round icons (0: none). */
+    public int iconGlow(boolean on) { return 0; }
+
+    /** A list row that is pressed, selected or playing. */
+    public void drawRowHighlight(Canvas c, RectF r, float radius, boolean pressed, boolean selected, boolean playing) {
+        drawChip(c, r, radius, pressed, selected);
+    }
 
     /** The navigation bar at the bottom. */
     public void drawNavBar(Canvas c, RectF r, float radius) {
@@ -132,6 +145,7 @@ public abstract class Theme {
     /** play (morph 0) to pause (morph 1): each half of the triangle becomes a bar */
     public void drawPlayGlyph(Canvas c, float cx, float cy, float s, float t, int color) {
         glyphPaint.setColor(color);
+        if (playGlyphGlow != 0) glyphPaint.setShadowLayer(px(6), 0, 0, playGlyphGlow); else glyphPaint.clearShadowLayer();
         float h = s * 0.82f, bw = s * 0.27f, gap = s * 0.2f;
         float top = cy - h / 2, bot = cy + h / 2;
         // the triangle's left half (points to the right): left edge at x0, tip at x0 + w
@@ -168,12 +182,27 @@ public abstract class Theme {
     public abstract String name();
 
     /** whether a skin has been ported to the native app yet */
-    public static boolean ready(String name) { return name.equals("Liminal"); }
+    public static boolean ready(String name) { return name.equals("Liminal") || name.equals("Y2K Subway"); }
 
     private static Theme current;
 
+    private static Theme create(Context c, String name) {
+        if ("Y2K Subway".equals(name)) return new Y2KTheme(c);
+        return new LiminalTheme(c);
+    }
+
     public static Theme get(Context c) {
-        if (current == null) current = new LiminalTheme(c.getApplicationContext());
+        if (current == null) {
+            Context app = c.getApplicationContext();
+            current = create(app, app.getSharedPreferences("settings", Context.MODE_PRIVATE).getString("skin", "Liminal"));
+        }
         return current;
+    }
+
+    /** Switches skin (the screens are then built again). */
+    public static void use(Context c, String name) {
+        Context app = c.getApplicationContext();
+        app.getSharedPreferences("settings", Context.MODE_PRIVATE).edit().putString("skin", name).apply();
+        current = create(app, name);
     }
 }

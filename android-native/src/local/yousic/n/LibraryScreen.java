@@ -1010,7 +1010,7 @@ public final class LibraryScreen extends ViewGroup implements Engine.Listener, L
             boolean sel = page.selecting && page.selected.contains(i);
             if (i == pressed || isPlaying || sel) {
                 r.set(th.px(6), top + th.px(3), getWidth() - th.px(6), top + rh - th.px(3));
-                th.drawChip(c, r, th.px(16), i == pressed, sel);
+                th.drawRowHighlight(c, r, th.px(16), i == pressed, sel, isPlaying);
             }
             float cs = coverS(), rad = Math.min(th.px(16), cs * 0.2f);
             float x = pad;

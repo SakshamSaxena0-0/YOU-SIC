@@ -70,6 +70,7 @@ public final class PlayerScreen extends ViewGroup implements Engine.Listener {
         for (Ui.Btn b : new Ui.Btn[]{ like, dislike, listBtn, moreBtn, admireBtn }) b.iconDp = 20;
         titleChip = new Ui.TextChip(c);
         titleChip.tp.setTypeface(th.titleFace); titleChip.tp.setTextSize(th.px(th.titleSize * 0.72f)); titleChip.tp.setColor(th.text);
+        if (th.titleGlow != 0) titleChip.tp.setShadowLayer(th.px(10), 0, 0, th.titleGlow);
         artistChip = new Ui.TextChip(c);
         artistChip.tp.setTypeface(th.uiMedium); artistChip.tp.setTextSize(th.px(15)); artistChip.tp.setColor(th.accent);
         String saved = stage.prefs().getString("slots", S_VIS + "," + S_TIMER + "," + S_REPEAT + "," + S_SHUFFLE);
@@ -225,7 +226,8 @@ public final class PlayerScreen extends ViewGroup implements Engine.Listener {
         pager.bind(false);
         boolean changed = titleChip.getTag() != t;
         titleChip.setTag(t);
-        titleChip.setText(t == null ? "YouSic" : t.title);
+        String title = t == null ? "YouSic" : t.title;
+        titleChip.setText(th.titleCaps ? title.toUpperCase(Locale.ROOT) : title);
         artistChip.setText(t == null ? "Tap play to start" : t.artist.isEmpty() ? "Unknown artist" : t.artist);
         if (changed && t != null && Motion.speed != Motion.SPEED_OFF) {
             for (View v : new View[]{ titleChip, artistChip }) {
@@ -239,6 +241,8 @@ public final class PlayerScreen extends ViewGroup implements Engine.Listener {
     }
 
     @Override public void onState(boolean playing) {
+        pager.cards[1].playing = playing ? 1 : 0;
+        pager.cards[1].invalidate();
         play.setPlaying(playing, true);
         seek.ticking(playing);
         vis.playing(playing);

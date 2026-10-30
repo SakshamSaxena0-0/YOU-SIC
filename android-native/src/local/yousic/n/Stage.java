@@ -492,7 +492,12 @@ public final class Stage extends FrameLayout {
         Sheet s = new Sheet(getContext(), "Skin");
         for (String name : Theme.NAMES) {
             boolean ready = Theme.ready(name);
-            Sheet.Item it = s.add(new Sheet.Item(Icons.THEME, name, () -> { }).radio(name.equals(th.name())));
+            Sheet.Item it = s.add(new Sheet.Item(Icons.THEME, name, () -> {
+                if (name.equals(th.name()) || !Theme.ready(name)) return;
+                // the screens are built again in the new skin (playback carries on)
+                Theme.use(getContext(), name);
+                ((Activity) getContext()).recreate();
+            }).radio(name.equals(th.name())));
             if (!ready) it.value("next update").disabled();
         }
         showSheet(s);
@@ -503,7 +508,7 @@ public final class Stage extends FrameLayout {
         s.add(new Sheet.Item(0, "Version", null).value(app.version()).stay());
         s.add(new Sheet.Item(0, "Songs", null).value(String.valueOf(app.lib.tracks.size())).stay());
         s.add(Sheet.Item.header("Fonts (SIL Open Font License)"));
-        for (String f : new String[]{ "Cormorant Garamond", "IBM Plex Sans", "JetBrains Mono", "DSEG7 Classic" }) s.add(new Sheet.Item(0, f, null).stay());
+        for (String f : new String[]{ "Cormorant Garamond", "IBM Plex Sans", "JetBrains Mono", "DSEG7 Classic", "Michroma", "Share Tech Mono", "Manrope" }) s.add(new Sheet.Item(0, f, null).stay());
         showSheet(s);
     }
 

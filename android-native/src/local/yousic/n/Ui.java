@@ -66,15 +66,17 @@ public final class Ui {
                     th.drawRound(c, w / 2f, h / 2f, Math.min(w, h) / 2f, pressed, style == ROUND_SMALL);
                     break;
                 default:
-                    if (pressed) {
+                    if (pressed || on) {
                         r.set(0, 0, w, h);
-                        th.drawChip(c, r, h / 2f, true, false);
+                        th.drawChip(c, r, h / 2f, pressed, on);
                     }
                     break;
             }
             int col = th.icon(on, dim);
-            if (pressed && style == PLAIN) col = th.accentHi;
+            if (pressed && style == PLAIN && !on) col = th.accentHi;
             p.setColor(col);
+            int glow = th.iconGlow(on);
+            if (glow != 0) p.setShadowLayer(th.px(4), 0, 0, glow); else p.clearShadowLayer();
             float s = th.px(iconDp);
             if (label != null && icon != 0) {
                 float tw = tp.measureText(label);

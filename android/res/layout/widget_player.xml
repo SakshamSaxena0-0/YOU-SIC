@@ -6,28 +6,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- no card: the moon (cover) and its orbit, the text, the buttons and the dark range, on the wallpaper -->
+    <!-- no card: the moon (cover) and its orbit, the text and the buttons, on the wallpaper -->
     <ImageView
         android:id="@+id/bg"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:contentDescription="@null"
         android:scaleType="fitXY" />
-
-    <!-- the lit part of the range: as wide as what has played -->
-    <FrameLayout
-        android:id="@+id/lit_clip"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|left">
-
-        <ImageView
-            android:id="@+id/lit"
-            android:layout_width="353dp"
-            android:layout_height="wrap_content"
-            android:contentDescription="@null"
-            android:scaleType="matrix" />
-    </FrameLayout>
 
     <!-- the orbit: progress around the moon -->
     <ProgressBar
@@ -53,15 +38,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="top|left"
         android:contentDescription="@null" />
-
-    <!-- the playhead on the range -->
-    <ImageView
-        android:id="@+id/head"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="top|left"
-        android:contentDescription="@null"
-        android:scaleType="matrix" />
 
     <Chronometer
         android:id="@+id/elapsed"

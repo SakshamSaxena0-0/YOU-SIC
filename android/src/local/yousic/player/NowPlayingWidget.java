@@ -33,32 +33,29 @@ import android.util.TypedValue;
 import android.view.View;
 import android.widget.RemoteViews;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 /**
- * The home-screen widget ("Moon Player", 5 x 3 cells), styled after a starry-night wallpaper: the cover is a
- * moon with the song's progress orbiting it, and the song's waveform is a mountain range that lights up as
- * it plays. Prev, play/pause and next control the app (PlaybackService; with the app closed, it starts the
- * page in the background); a tap anywhere else opens the app.
+ * The home-screen widget ("Moon Player", 5 x 3 cells), styled after a starry-night wallpaper and drawn with
+ * no background: the cover is a moon with the song's progress orbiting it. Prev, play/pause and next control
+ * the app (PlaybackService; with the app closed, it starts the page in the background); a tap anywhere else
+ * opens the app.
  *
- * Drawn as bitmaps once per song, play state and size. While a song plays only the progress moves: the
- * ring, the lit width of the range and two stars are updated every few seconds while the screen is on,
- * and the times are chronometers that tick by themselves.
+ * Drawn as a bitmap once per song, play state and size. While a song plays only the progress moves: the
+ * ring and its star are updated every few seconds while the screen is on, and the times are chronometers
+ * that tick by themselves.
  */
 public class NowPlayingWidget extends AppWidgetProvider {
     /** PlaybackService action prefix for the buttons: "widget:prev", "widget:toggle", "widget:next". */
     static final String ACTION = "widget:";
 
     // the wallpaper's palette
-    private static final int STAR = 0xFFF2F3F8, DIM = 0xFFA3A8BC, ICE = 0xFF8CB5D3, ICE_HI = 0xFFC4DDF0,
-            MIST = 0xFF71768C, HAZE = 0xFF3C3D4F, SLOPE = 0xFF151628, INK = 0xFF0A0A16;
+    private static final int STAR = 0xFFF2F3F8, DIM = 0xFFA3A8BC, ICE = 0xFF8CB5D3, ICE_HI = 0xFFC4DDF0, INK = 0xFF0A0A16;
     // the design is drawn on a 992 x 756 grid (the 5 x 3 cells on a 1080 px wide phone) and scaled to the widget
     private static final float DW = 992, DH = 756;
     private static final long TICK_MS = 5000;
@@ -139,16 +136,11 @@ public class NowPlayingWidget extends AppWidgetProvider {
         Geo g = new Geo(c, m, id);
         JSONObject i = current(c);
         boolean pl = playing && info != null;
-        g.ridge(wave(i), i == null ? 0 : (i.optString("title") + i.optString("artist")).hashCode());
         RemoteViews v = new RemoteViews(c.getPackageName(), R.layout.widget_player);
         v.setImageViewBitmap(R.id.bg, background(c, g, i, pl));
-        v.setImageViewBitmap(R.id.lit, lit(g));
         Bitmap star = star(8 * g.s);
         g.starW = star.getWidth();
         v.setImageViewBitmap(R.id.ring_star, star);
-        Bitmap head = head(g);
-        g.headW = head.getWidth();
-        v.setImageViewBitmap(R.id.head, head);
 
         float px = TypedValue.COMPLEX_UNIT_PX;
         v.setTextViewTextSize(R.id.elapsed, (int) px, 30 * g.s);
@@ -160,18 +152,15 @@ public class NowPlayingWidget extends AppWidgetProvider {
             v.setViewLayoutHeight(R.id.ring, ring, P);
             v.setViewLayoutMargin(R.id.ring, RemoteViews.MARGIN_LEFT, g.cx - ring / 2, P);
             v.setViewLayoutMargin(R.id.ring, RemoteViews.MARGIN_TOP, g.cy - ring / 2, P);
-            v.setViewLayoutWidth(R.id.lit, g.w, P);
             v.setViewLayoutMargin(R.id.elapsed, RemoteViews.MARGIN_LEFT, 64 * g.sx, P);
-            v.setViewLayoutMargin(R.id.elapsed, RemoteViews.MARGIN_TOP, 486 * g.sy, P);
+            v.setViewLayoutMargin(R.id.elapsed, RemoteViews.MARGIN_TOP, 486 * g.sy + g.oy, P);
             v.setViewLayoutMargin(R.id.remain, RemoteViews.MARGIN_RIGHT, 64 * g.sx, P);
-            v.setViewLayoutMargin(R.id.remain, RemoteViews.MARGIN_TOP, 486 * g.sy, P);
+            v.setViewLayoutMargin(R.id.remain, RemoteViews.MARGIN_TOP, 486 * g.sy + g.oy, P);
             hit(v, R.id.hit_prev, 543 * g.sx, g.by, 120 * g.s);
             hit(v, R.id.hit_play, 676 * g.sx, g.by, 180 * g.s);
             hit(v, R.id.hit_next, 809 * g.sx, g.by, 120 * g.s);
         } else {
-            // no way to place them: keep only what needs no positioning
-            v.setViewVisibility(R.id.lit_clip, View.GONE);
-            v.setViewVisibility(R.id.head, View.GONE);
+            // no way to place it: the ring's star goes
             v.setViewVisibility(R.id.ring_star, View.GONE);
         }
         Intent open = new Intent(c, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -198,7 +187,7 @@ public class NowPlayingWidget extends AppWidgetProvider {
         return PendingIntent.getForegroundService(c, code, i, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
-    /** The moving parts: the ring, the lit part of the range, its two stars, and the times. */
+    /** The moving parts: the ring, its star, and the times. */
     private static void progress(RemoteViews v, Geo g, JSONObject i, boolean pl) {
         double dur = i == null ? 0 : i.optDouble("duration", 0), pos = position(i, pl);
         float p = dur > 0 ? (float) Math.min(1, pos / dur) : 0;
@@ -210,10 +199,6 @@ public class NowPlayingWidget extends AppWidgetProvider {
         v.setViewVisibility(R.id.remain, dur > 0 ? View.VISIBLE : View.INVISIBLE);
         if (Build.VERSION.SDK_INT >= 31) {
             int P = TypedValue.COMPLEX_UNIT_PX;
-            float x = p * g.w, hx = Math.max(g.headW / 2f, Math.min(g.w - g.headW / 2f, x)); // the star stays inside
-            v.setViewLayoutWidth(R.id.lit_clip, x, P);
-            v.setViewLayoutMargin(R.id.head, RemoteViews.MARGIN_LEFT, hx - g.headW / 2f, P);
-            v.setViewLayoutMargin(R.id.head, RemoteViews.MARGIN_TOP, g.ridgeAt(hx) - 30 * g.s - g.headW / 2f, P);
             double a = -Math.PI / 2 + p * 2 * Math.PI;
             v.setViewLayoutMargin(R.id.ring_star, RemoteViews.MARGIN_LEFT, (float) (g.cx + g.orbit * Math.cos(a)) - g.starW / 2f, P);
             v.setViewLayoutMargin(R.id.ring_star, RemoteViews.MARGIN_TOP, (float) (g.cy + g.orbit * Math.sin(a)) - g.starW / 2f, P);
@@ -237,8 +222,7 @@ public class NowPlayingWidget extends AppWidgetProvider {
     /** What the full picture shows: when this changes, everything is drawn again. */
     private static String key(JSONObject i, boolean pl) {
         if (i == null) return "none";
-        JSONArray w = i.optJSONArray("wave");
-        return i.optString("title") + '\n' + i.optString("artist") + '\n' + i.optString("cover") + '\n' + (w == null ? 0 : w.toString().hashCode()) + '\n' + pl;
+        return i.optString("title") + '\n' + i.optString("artist") + '\n' + i.optString("cover") + '\n' + pl;
     }
 
     private static void save(Context c, JSONObject i, boolean pl) {
@@ -255,28 +239,13 @@ public class NowPlayingWidget extends AppWidgetProvider {
         return c.getSharedPreferences("widget", Context.MODE_PRIVATE);
     }
 
-    /** The song's waveform (48 peaks from the page) or, until it is decoded, one made up from its title. */
-    private static float[] wave(JSONObject i) {
-        JSONArray a = i == null ? null : i.optJSONArray("wave");
-        int n = 48;
-        float[] w = new float[n];
-        if (a != null && a.length() > 1) {
-            for (int k = 0; k < n; k++) w[k] = (float) a.optDouble(k * (a.length() - 1) / (n - 1), 0.3);
-            return w;
-        }
-        Random r = new Random(i == null ? 77 : (i.optString("title") + i.optString("artist")).hashCode());
-        float v = 0.5f;
-        for (int k = 0; k < n; k++) { v = Math.max(0.15f, Math.min(1, v + (r.nextFloat() - 0.5f) * 0.55f)); w[k] = v; }
-        return w;
-    }
-
     // ---------- geometry ----------
 
     private static final class Geo {
         final int w, h;
-        final float sx, sy, s, cx, cy, r, orbit, by, ridgeTop;
-        float[] rx, ry;
-        int starW, headW;
+        /** oy: how far everything moves down to sit in the middle of the widget */
+        final float sx, sy, s, oy, cx, cy, r, orbit, by;
+        int starW;
 
         Geo(Context c, AppWidgetManager m, int id) {
             float[] dp = sizeDp(m, id);
@@ -285,9 +254,9 @@ public class NowPlayingWidget extends AppWidgetProvider {
             h = Math.max(160, Math.round(dp[1] * d));
             sx = w / DW; sy = h / DH; s = Math.min(sx, sy);
             r = 160 * s; orbit = 196 * s;
-            cx = Math.max(236 * sx, orbit + 24 * s); cy = 262 * sy;
-            by = 412 * sy;
-            ridgeTop = 560 * sy;
+            oy = 100 * sy; // the design's content runs from 30 to 522 of 756
+            cx = Math.max(236 * sx, orbit + 24 * s); cy = 262 * sy + oy;
+            by = 412 * sy + oy;
         }
 
         boolean sameSize(Context c, AppWidgetManager m, int id) {
@@ -302,49 +271,6 @@ public class NowPlayingWidget extends AppWidgetProvider {
             int wd = o.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH), hd = o.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT);
             if (wd <= 0 || hd <= 0) { wd = 353; hd = 269; }
             return new float[] { wd, hd };
-        }
-
-        /**
-         * The range: peaks from the waveform (its loud and quiet parts spread apart), every other point dropped
-         * into a valley; heights and spacing vary a little (the same way for the same song), so it reads as
-         * mountains rather than a comb. It rises out of the ground at both ends (there is no card to end on).
-         */
-        void ridge(float[] wave, long seed) {
-            int n = wave.length;
-            Random r = new Random(seed);
-            float lo = 1, hi = 0;
-            for (float v : wave) { lo = Math.min(lo, v); hi = Math.max(hi, v); }
-            float span = h - ridgeTop - 40 * sy, step = (float) w / (n - 1);
-            rx = new float[n]; ry = new float[n];
-            for (int k = 0; k < n; k++) {
-                float v = hi - lo > 0.05f ? 0.3f + 0.7f * (wave[k] - lo) / (hi - lo) : wave[k];
-                float peak = k % 2 == 1 ? v * (0.8f + r.nextFloat() * 0.2f) : v * (0.35f + r.nextFloat() * 0.4f);
-                rx[k] = k == 0 || k == n - 1 ? k * step : (k + (r.nextFloat() - 0.5f) * 0.6f) * step;
-                float t = rx[k] / w, e = smooth(Math.min(t, 1 - t) / 0.12f);
-                ry[k] = h - e * (h - (ridgeTop + (1 - peak) * span));
-            }
-        }
-
-        private static float smooth(float x) {
-            x = Math.max(0, Math.min(1, x));
-            return x * x * (3 - 2 * x);
-        }
-
-        float ridgeAt(float x) {
-            for (int k = 1; k < rx.length; k++) if (x <= rx[k]) {
-                float t = (x - rx[k - 1]) / Math.max(1, rx[k] - rx[k - 1]);
-                return ry[k - 1] + (ry[k] - ry[k - 1]) * t;
-            }
-            return ry[ry.length - 1];
-        }
-
-        Path ridgePath(float dy) {
-            Path p = new Path();
-            p.moveTo(0, h - dy);
-            for (int k = 0; k < rx.length; k++) p.lineTo(rx[k], ry[k] - dy);
-            p.lineTo(w, h - dy);
-            p.close();
-            return p;
         }
     }
 
@@ -383,7 +309,7 @@ public class NowPlayingWidget extends AppWidgetProvider {
         label.setTextSize(27 * s);
         label.setLetterSpacing(0.26f);
         label.setColor(DIM);
-        float y = 92 * g.sy - label.ascent();
+        float y = 92 * g.sy + g.oy - label.ascent();
         k.drawText(pl ? "NOW PLAYING" : "PAUSED", tx, y, label);
         y += label.descent() + 26 * s;
 
@@ -411,12 +337,6 @@ public class NowPlayingWidget extends AppWidgetProvider {
         k.drawText(TextUtils.ellipsize(artist, ap, tw, TextUtils.TruncateAt.END).toString(), tx, y - ap.ascent(), ap);
 
         controls(k, g, pl);
-
-        // the song's range, dark, fading into the sky at the bottom (the lit part is the "lit" layer above it)
-        Paint range = paint(SLOPE);
-        float top = minY(g.ry);
-        range.setShader(new LinearGradient(0, top, 0, g.h, new int[] { SLOPE, alpha(SLOPE, 0.85f), alpha(SLOPE, 0) }, new float[] { 0, 0.55f, 1 }, Shader.TileMode.CLAMP));
-        k.drawPath(g.ridgePath(0), range);
         return b;
     }
 
@@ -503,17 +423,6 @@ public class NowPlayingWidget extends AppWidgetProvider {
         }
     }
 
-    /** The range where it has played: lit like the wallpaper's mist, clipped to the played width. */
-    private static Bitmap lit(Geo g) {
-        float top = minY(g.ry) - 2;
-        Bitmap b = Bitmap.createBitmap(g.w, Math.max(1, Math.round(g.h - top)), Bitmap.Config.ARGB_8888);
-        Canvas k = new Canvas(b);
-        Paint p = paint(ICE);
-        p.setShader(new LinearGradient(0, 0, 0, g.h - top, new int[] { ICE, MIST, alpha(HAZE, 0.6f), alpha(HAZE, 0) }, new float[] { 0, 0.3f, 0.7f, 1 }, Shader.TileMode.CLAMP));
-        k.drawPath(g.ridgePath(top), p);
-        return b;
-    }
-
     /** A star: a dot with a soft glow and a four-point glint. */
     private static Bitmap star(float r) {
         int size = Math.round(r * 9) | 1;
@@ -534,27 +443,6 @@ public class NowPlayingWidget extends AppWidgetProvider {
         glint.setAlpha(217);
         k.drawPath(g, glint);
         k.drawCircle(x, y, r, paint(ICE_HI));
-    }
-
-    /** The playhead: a star on the ridge with a line down to the bottom. */
-    private static Bitmap head(Geo g) {
-        float r = 7 * g.s;
-        int w = Math.round(r * 9) | 1;
-        int h = Math.round(g.h - minY(g.ry) + 40 * g.s + w);
-        Bitmap b = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-        Canvas k = new Canvas(b);
-        Paint line = paint(ICE_HI);
-        line.setStrokeWidth(3 * g.s);
-        line.setShader(new LinearGradient(0, w / 2f, 0, h, ICE_HI, alpha(ICE_HI, 0), Shader.TileMode.CLAMP));
-        k.drawLine(w / 2f, w / 2f, w / 2f, h, line);
-        drawStar(k, w / 2f, w / 2f, r);
-        return b;
-    }
-
-    private static float minY(float[] ys) {
-        float m = Float.MAX_VALUE;
-        for (float v : ys) m = Math.min(m, v);
-        return m;
     }
 
     private static final Map<Integer, Typeface> fonts = new HashMap<>();

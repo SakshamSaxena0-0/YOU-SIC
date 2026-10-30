@@ -471,23 +471,13 @@ class App {
   }
 
   // Android: the playback notification, lock screen, headset buttons and home-screen widget are native, so
-  // tell them what is playing (the track, whether it plays, where it is, and its waveform once decoded).
-  // Windows has no pa.nowPlaying.
+  // tell them what is playing (the track, whether it plays, and where it is). Windows has no pa.nowPlaying.
   _nowPlaying() {
     if (!pa.nowPlaying) return;
-    const t = this.player?.track, en = this.engine, w = this.playerView?.wave;
-    let wave = null;
-    if (t && w && w.peaksId === t.id && w.target) {
-      const n = 48, per = w.target.length / n;
-      wave = Array.from({ length: n }, (_, i) => {
-        let m = 0;
-        for (let j = Math.floor(i * per); j < Math.floor((i + 1) * per); j++) m = Math.max(m, w.target[j]);
-        return Math.round(m * 100) / 100;
-      });
-    }
+    const t = this.player?.track, en = this.engine;
     pa.nowPlaying(t ? {
       title: t.title, artist: t.artist || '', album: t.album || '', cover: t.cover || null,
-      duration: en.duration || t.duration || 0, position: en.currentTime || 0, playing: !!en.playing, rate: en.tempo || 1, wave,
+      duration: en.duration || t.duration || 0, position: en.currentTime || 0, playing: !!en.playing, rate: en.tempo || 1,
     } : null);
   }
 
@@ -497,7 +487,6 @@ class App {
       p.addEventListener('track', () => this._nowPlaying());
       en.addEventListener('seek', () => this._nowPlaying());
       en.addEventListener('meta', () => this._nowPlaying());
-      this.playerView.wave.onPeaks = () => this._nowPlaying();
     }
     if (!('mediaSession' in navigator)) return;
     const ms = navigator.mediaSession;

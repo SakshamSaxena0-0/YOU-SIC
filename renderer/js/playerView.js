@@ -2,7 +2,7 @@ import { $, $$, esc, fmtTime, coverUrl, clamp, spring, ANDROID } from './util.js
 import { setIcon, icon } from './icons.js';
 import { extractColors } from './palette.js';
 import { Waveform } from './waveform.js';
-import { THEME_COLORS } from './store.js';
+import { THEME_COLORS, GLASS_BRUTAL } from './store.js';
 
 const PLACEHOLDER = 'placeholder';
 
@@ -415,8 +415,8 @@ export class PlayerView {
     const s = this.store.settings;
     const root = document.documentElement;
     let accent = hexToRgb(s.accent), dark = [16, 16, 20];
-    // solid themes run on a fixed palette, whatever the cover looks like
-    const fixed = THEME_COLORS[s.theme];
+    // solid themes (and Liquid Glass's Brutal mood) run on a fixed palette, whatever the cover looks like
+    const fixed = THEME_COLORS[s.theme] || (this.app.brutal ? GLASS_BRUTAL : null);
     if (fixed) { accent = fixed.accent; dark = fixed.dark; url = ''; }
     if (s.dynamicAccent && url) {
       const c = await extractColors(url);

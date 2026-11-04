@@ -1,0 +1,96 @@
+/* ==========================================================================
+   Liquid Glass, Brutal mood (Settings > Mood; html.glass-brutal, app.js brutal)
+   Brutalised darkness: the same liquid glass, drained to black and white. Deep black, the wallpaper
+   pushed down to a dark grey texture under heavier grain (raw concrete), hard white rims and hairline
+   rules between the columns, heavy uppercase titles and raw mono labels, squarer slabs, and whatever is
+   selected or primary turned to solid white with black glyphs. The album colours are replaced by a
+   fixed bone white and black (store.js GLASS_BRUTAL), and the covers are black and white too unless
+   Settings > Black-and-white covers is off.
+   ========================================================================== */
+html.glass-brutal {
+  --br-ink: #000;
+  --br-coal: #070707;
+  --br-bone: #ecece8;
+  --br-bone-lo: #bdbdb8;
+  --br-rule: rgba(255, 255, 255, 0.13);
+  --br-rule-hi: rgba(255, 255, 255, 0.3);
+  --br-panel: rgba(0, 0, 0, 0.62);
+  --br-shade: rgba(0, 0, 0, 0.9);
+  --br-solid: linear-gradient(180deg, #ffffff, var(--br-bone) 48%, var(--br-bone-lo));
+  --br-r: 10px;      /* slabs: library cards, the dock, the tabs */
+  --br-r-sm: 7px;    /* what sits inside them */
+
+  --bg: var(--br-ink);
+  --text: var(--br-bone);
+  --dim: rgba(236, 236, 232, 0.6);
+  --dimmer: rgba(236, 236, 232, 0.4);
+  --line: var(--br-rule);
+  --art-scrim: var(--br-ink);
+  --hairline: linear-gradient(180deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.12) 40%, rgba(255, 255, 255, 0.3));
+  --glass-strong: linear-gradient(180deg, rgba(20, 20, 20, 0.96), rgba(6, 6, 6, 0.97));
+}
+
+/* ---------- darkness: no colour wash, the wallpaper a dark grey texture, concrete grain ---------- */
+html.glass-brutal .bg { background: var(--br-ink); }
+html.glass-brutal .bg-layer { display: none; }
+html.glass-brutal.glass-window:not(.wall-window) .bg { background: var(--br-panel); } /* Blur (acrylic): darken what Windows shows */
+html.glass-brutal .wall { filter: grayscale(1) brightness(0.3) contrast(1.4); }
+html.glass-brutal .grain { opacity: 0.075; }
+html.glass-brutal .library { background: var(--br-coal); }
+html.glass-brutal.glass-window .library, html.glass-brutal.glass-window .app.wide .side { background: var(--br-panel); }
+
+/* ---------- structure: hairline rules between the columns and under the headers ---------- */
+html.glass-brutal .app.wide :is(#library, #eq) { box-shadow: 1px 0 0 var(--br-rule-hi), 24px 0 60px -24px var(--br-shade); }
+html.glass-brutal .app.wide .side { box-shadow: inset 1px 0 0 var(--br-rule-hi); }
+html.glass-brutal :is(.lib-header, .side-header) { box-shadow: 0 1px 0 var(--br-rule); }
+
+/* ---------- type: heavy uppercase titles, raw mono labels ---------- */
+html.glass-brutal :is(#plTitle, .lib-title, .ah-title, .sheet-title) { text-transform: uppercase; font-weight: 800; letter-spacing: -0.02em; }
+html.glass-brutal #plTitle { line-height: 1.08; }
+html.glass-brutal .pl-artist { color: var(--br-bone); font-weight: 700; }
+html.glass-brutal :is(.tile-title, .pl-cat-label, .eq-tab, .set-sec, .tb-title) { font-family: var(--mono); text-transform: uppercase; }
+html.glass-brutal .tile-title { font-size: 12px; font-weight: 700; letter-spacing: 0.04em; line-height: 1.25; }
+html.glass-brutal .eq-tab { font-size: 11.5px; font-weight: 700; letter-spacing: 0.08em; }
+html.glass-brutal .pl-cat-label { letter-spacing: 0.24em; }
+html.glass-brutal .tile-count { color: var(--dim); }
+/* lyrics: crisp, the line being sung in bone white, the rest well back */
+html.glass-brutal .ly-line { color: rgba(236, 236, 232, 0.2); filter: none; }
+html.glass-brutal .ly-line:hover { color: rgba(236, 236, 232, 0.5); }
+html.glass-brutal .ly-line.active { color: var(--br-bone); text-shadow: none; }
+
+/* ---------- shapes: squarer slabs ---------- */
+html.glass-brutal :is(.tile, .tile.lg) { border-radius: var(--br-r); }
+html.glass-brutal .tile-ico { border-radius: var(--br-r-sm); }
+html.glass-brutal :is(.pl-nav, .pl-nav.lg) { border-radius: calc(var(--br-r) + 4px); }
+html.glass-brutal .eq-tabs { border-radius: var(--br-r); }
+html.glass-brutal :is(.eq-tab, .eq-tab-ink) { border-radius: var(--br-r-sm); }
+html.glass-brutal .tile:hover { box-shadow: 0 22px 40px -18px var(--br-shade), 0 0 0 1px var(--br-rule-hi); }
+
+/* ---------- hard light: brighter, crisper rims on the glass ---------- */
+html.glass-brutal.btn-ios :is(.lg, .btn)::before {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.45) 14%, rgba(255, 255, 255, 0.06) 36%,
+    rgba(255, 255, 255, 0.06) 64%, rgba(255, 255, 255, 0.4) 86%, rgba(255, 255, 255, 0.85) 100%);
+}
+
+/* ---------- solid white for what is primary or selected, with black glyphs ---------- */
+html.glass-brutal.btn-ios .ctl-play.lg {
+  --lg-bg: var(--br-solid); color: var(--br-ink);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.4), inset 0 -4px 8px rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(255, 255, 255, 0.45), 0 16px 34px -12px var(--br-shade);
+}
+html.glass-brutal.btn-ios .ctl-play .pp { fill: var(--br-ink); filter: none; }
+html.glass-brutal .pr-fill { filter: none; stroke-linecap: butt; }
+html.glass-brutal.btn-ios :is(.ctl-sm.on, .chip.on, .fchip.on) { --lg-bg: var(--br-solid); color: var(--br-ink); }
+html.glass-brutal.btn-ios .ctl-sm.on::after { background: var(--br-ink); box-shadow: none; }
+html.glass-brutal.btn-ios .ctl-sm.on .ico, html.glass-brutal.btn-ios .chip.on .ico { filter: none; }
+html.glass-brutal :is(.nav-ink, .eq-tab-ink) { background: var(--br-solid); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.35), 0 8px 20px -8px var(--br-shade); }
+html.glass-brutal .nav-btn.on { color: var(--br-ink); filter: none; }
+html.glass-brutal .eq-tab.active { color: var(--br-ink); }
+html.glass-brutal .switch:checked { background: var(--br-solid); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.35); }
+html.glass-brutal .switch:checked::after { background: var(--br-ink); }
+html.glass-brutal .badge.hires { color: var(--br-ink); background: var(--br-bone); box-shadow: none; }
+
+/* ---------- covers: high-contrast black and white (Settings > Black-and-white covers) ---------- */
+html.glass-brutal.br-mono-art :is(.aa-img:not(.ph), .aa-back, .it-art, .ah-art, .nb-art, .ab-art, .mini-art img) { filter: grayscale(1) brightness(0.8) contrast(1.4); }
+
+/* Settings: the album colour options do nothing in this mood; the covers option is this mood's own */
+html.glass-brutal .clear-only, html:not(.glass-brutal) .brutal-only { display: none; }

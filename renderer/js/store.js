@@ -10,6 +10,8 @@ export const THEME_COLORS = {
   liminal: { accent: [247, 197, 159], dark: [36, 26, 38] },
   midnight: { accent: [70, 227, 242], dark: [6, 8, 12] },
 };
+// Liquid Glass in its Brutal mood (settings.glassMood) is black and white whatever the cover looks like
+export const GLASS_BRUTAL = { accent: [236, 236, 232], dark: [9, 9, 9] };
 
 export const DEFAULT_SETTINGS = {
   volume: 0.8,
@@ -21,6 +23,8 @@ export const DEFAULT_SETTINGS = {
   accent: '#ff9f1c',
   blurBg: true,
   theme: 'glass', // glass (liquid glass over the wallpaper) | cyber (solid neon cyberpunk) | subway (y2k: dim teal, chrome, glass) | pixel (retro 90s desktop windows, pixel art) | vector-surrealism (dark fantasy as a flat surreal vector poster) | liminal (a vintage dream: sunset over a sea of clouds, on old film) | midnight (a city at 3 a.m.: dark polished gunmetal, chrome and cold cyan light)
+  glassMood: 'brutal', // Liquid Glass only: brutal (black and white, hard light, heavy type) | clear (clear glass tinted by the album)
+  monoArt: true, // Brutal mood: covers in black and white too
   refraction: true,
   windowBg: 'wallpaper', // wallpaper | acrylic | solid
   buttonStyle: 'ios', // ios (clear glass) | bubble | aqua (liquid-filled)

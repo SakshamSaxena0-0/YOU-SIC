@@ -27,24 +27,34 @@
         <button class="mini-full" id="full" title="Back to the full player (Esc)" data-icon="fullscreen"></button>
       </div>
       <div class="mini-main" id="main">
-        <div class="controls" id="ctl">
-          <button class="ctl ctl-sm lg" id="bVol" title="Mute (M) · scroll to change the volume" data-icon="volume_up"></button>
-          <button class="ctl ctl-sm lg" id="btnShuffle" title="Shuffle (S)" data-icon="shuffle"></button>
-          <button class="ctl ctl-md lg" id="btnPrev" title="Previous (Left)" data-icon="skip_previous"></button>
-          <div class="play-wrap">
-            <i class="spark sp-play1" aria-hidden="true"></i><i class="spark sp-play2" aria-hidden="true"></i>
-            <svg class="play-ring" viewBox="0 0 100 100" aria-hidden="true">
-              <circle class="pr-track" cx="50" cy="50" r="47"/>
-              <circle class="pr-fill" id="playRing" cx="50" cy="50" r="47" pathLength="100"/>
-            </svg>
-            <span class="froth" aria-hidden="true"><b></b><b></b><b></b><b></b><b></b><b></b><b></b></span>
-            <button class="ctl ctl-play lg lg-tint" id="btnPlay" title="Play / Pause (Space)">
-              <svg viewBox="0 0 24 24" class="pp"><path id="ppPath" d="M8 5 L8 19 L13.5 15.5 L13.5 8.5 Z M13.5 8.5 L13.5 15.5 L19 12 L19 12 Z"/></svg>
-            </button>
+        <div class="mini-ctl" id="ctlGroup">
+          <div class="controls" id="ctl">
+            <button class="ctl ctl-sm lg" id="bVol" title="Mute (M) · scroll to change the volume" data-icon="volume_up"></button>
+            <button class="ctl ctl-sm lg" id="btnShuffle" title="Shuffle (S)" data-icon="shuffle"></button>
+            <button class="ctl ctl-md lg" id="btnPrev" title="Previous (Left)" data-icon="skip_previous"></button>
+            <div class="play-wrap">
+              <i class="spark sp-play1" aria-hidden="true"></i><i class="spark sp-play2" aria-hidden="true"></i>
+              <svg class="play-ring" viewBox="0 0 100 100" aria-hidden="true">
+                <circle class="pr-track" cx="50" cy="50" r="47"/>
+                <circle class="pr-fill" id="playRing" cx="50" cy="50" r="47" pathLength="100"/>
+              </svg>
+              <span class="froth" aria-hidden="true"><b></b><b></b><b></b><b></b><b></b><b></b><b></b></span>
+              <button class="ctl ctl-play lg lg-tint" id="btnPlay" title="Play / Pause (Space)">
+                <svg viewBox="0 0 24 24" class="pp"><path id="ppPath" d="M8 5 L8 19 L13.5 15.5 L13.5 8.5 Z M13.5 8.5 L13.5 15.5 L19 12 L19 12 Z"/></svg>
+              </button>
+            </div>
+            <button class="ctl ctl-md lg" id="btnNext" title="Next (Right)" data-icon="skip_next"></button>
+            <button class="ctl ctl-sm lg" id="btnRepeat" title="Repeat (R)" data-icon="repeat"></button>
+            <button class="ctl ctl-sm lg" id="bLyrics" title="Lyrics (L)" data-icon="lyrics"></button>
           </div>
-          <button class="ctl ctl-md lg" id="btnNext" title="Next (Right)" data-icon="skip_next"></button>
-          <button class="ctl ctl-sm lg" id="btnRepeat" title="Repeat (R)" data-icon="repeat"></button>
-          <button class="ctl ctl-sm lg" id="bLyrics" title="Lyrics (L)" data-icon="lyrics"></button>
+          <!-- the song's progress: click or drag to move through it -->
+          <div class="mini-seek off" id="seek">
+            <span class="seek-times" id="tPos">0:00</span>
+            <div class="mini-track" id="track" role="slider" aria-label="Song position" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0">
+              <input type="range" id="seekRange" min="0" max="1000" value="0" tabindex="-1" aria-hidden="true">
+            </div>
+            <span class="seek-times" id="tDur">0:00</span>
+          </div>
         </div>
         <div class="mini-lyrics" id="lyr" aria-live="polite">
           <div class="ly-line active" id="l1"></div>

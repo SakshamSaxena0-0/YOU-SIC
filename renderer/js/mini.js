@@ -1,4 +1,4 @@
-import { $ } from './util.js';
+import { $, fmtTime } from './util.js';
 import { hydrateIcons, setIcon } from './icons.js';
 
 // The mini player window (mini.html). It plays nothing itself: the main window's renderer sends the state
@@ -9,6 +9,7 @@ const html = document.documentElement;
 const mini = $('#mini'), box = $('#box'), art = $('#art'), img = $('#cover'), ctl = $('#ctl');
 const main = $('#main'), panel = $('#panel'), panelIn = $('#panelIn'), lyr = $('#lyr'), l1 = $('#l1'), l2 = $('#l2');
 const ring = $('#playRing'), hud = $('#hud');
+const group = $('#ctlGroup'), seek = $('#seek'), track = $('#track'), range = $('#seekRange'), tPos = $('#tPos'), tDur = $('#tDur');
 
 const S = { track: null, time: null, shuffle: false, repeat: 'off', volume: 0.8, muted: false, lyrics: null };
 let recvAt = 0;
@@ -28,7 +29,7 @@ function apply(part) {
   Object.assign(S, part);
   if (part.look) applyLook(part.look);
   if ('track' in part) renderTrack();
-  if ('time' in part) { mini.classList.toggle('playing', !!S.time?.playing); tickRing(); }
+  if ('time' in part) { mini.classList.toggle('playing', !!S.time?.playing); tickTime(); }
   if ('shuffle' in part || 'repeat' in part) renderModes();
   if ('volume' in part || 'muted' in part) renderVol();
   if ('lyrics' in part || 'time' in part || 'track' in part) lyricsTick();
@@ -48,15 +49,15 @@ const idle = () => html.classList.toggle('idle', !document.hasFocus());
 addEventListener('focus', idle);
 addEventListener('blur', idle);
 
-// each theme sizes its buttons its own way: zoom the row to fit the box (or the panel)
+// each theme sizes its buttons its own way: zoom the row to fit the box (or the panel), above the progress
 function fit() {
   ctl.style.zoom = '1';
-  const host = ctl.parentElement, cs = getComputedStyle(host);
+  const host = group.parentElement, cs = getComputedStyle(host);
   const w = ctl.offsetWidth, h = ctl.offsetHeight;
   if (!w || !h) return;
   // room for the glows and the 'on' dots some themes draw just outside their buttons
   const W = host.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - 8;
-  const H = host.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom) - 4;
+  const H = host.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom) - seek.offsetHeight - 2 - 4;
   ctl.style.zoom = String(Math.min(1, W / w, H / h));
 }
 
@@ -74,13 +75,23 @@ function renderTrack() {
   img.src = t.cover;
 }
 
-let ringT = 0;
-function tickRing() {
-  clearTimeout(ringT);
-  const t = S.time;
-  const prog = t && t.dur ? Math.min(1, pos() / t.dur) : 0;
-  ring.style.strokeDashoffset = String(100 - prog * 100);
-  if (t && t.playing && t.dur) ringT = setTimeout(tickRing, 1000);
+// the ring round the play button and the progress bar, redrawn as the song's clock passes each second
+let timeT = 0, seekDrag = null;
+function tickTime() {
+  clearTimeout(timeT);
+  const t = S.time, dur = t && isFinite(t.dur) && t.dur > 0 ? t.dur : 0, p = Math.min(dur, pos());
+  ring.style.strokeDashoffset = String(100 - (dur ? (p / dur) * 100 : 0));
+  seek.classList.toggle('off', !dur);
+  tDur.textContent = fmtTime(dur);
+  track.setAttribute('aria-valuemax', String(Math.floor(dur)));
+  if (!seekDrag) showPos(dur ? p / dur : 0, p);
+  if (t && t.playing && dur) timeT = setTimeout(tickTime, Math.max(50, ((1 - (p % 1)) / (t.rate || 1)) * 1000 + 15));
+}
+function showPos(frac, sec) {
+  range.value = String(Math.round(frac * 1000));
+  range.style.setProperty('--p', `${frac * 100}%`);
+  tPos.textContent = fmtTime(sec);
+  track.setAttribute('aria-valuenow', String(Math.floor(sec)));
 }
 
 function renderModes() {
@@ -147,13 +158,38 @@ function setLines(a, b) {
   lyr.classList.add('roll');
 }
 
+// ---------- moving through the song: click or drag the bar; the song jumps on release ----------
+const seekFrac = (e) => { const r = track.getBoundingClientRect(); return Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)); };
+function seekShow(e) { const d = S.time?.dur || 0; seekDrag.frac = seekFrac(e); showPos(seekDrag.frac, seekDrag.frac * d); }
+track.addEventListener('pointerdown', (e) => {
+  if (e.button !== 0 || !S.time?.dur) return;
+  e.preventDefault();
+  seekDrag = { frac: 0 };
+  track.setPointerCapture(e.pointerId);
+  track.classList.add('drag');
+  seekShow(e);
+});
+track.addEventListener('pointermove', (e) => { if (seekDrag) seekShow(e); });
+track.addEventListener('pointerup', () => {
+  if (!seekDrag) return;
+  const t = seekDrag.frac * (S.time?.dur || 0);
+  cmd(`seek:${t.toFixed(2)}`);
+  // carry on from there at once; the main window's own update follows
+  S.time = { ...S.time, pos: t };
+  recvAt = performance.now();
+  seekEnd();
+  lyricsTick();
+});
+const seekEnd = () => { if (!seekDrag) return; seekDrag = null; track.classList.remove('drag'); tickTime(); };
+track.addEventListener('lostpointercapture', seekEnd);
+
 function setLyricsMode(on) {
   lyricsOn = on;
   try { localStorage.setItem('pr-mini-lyrics', on ? '1' : '0'); } catch {}
   mini.classList.toggle('lyr', on);
   mini.classList.remove('open');
   $('#bLyrics').classList.toggle('on', on);
-  (on ? panelIn : main).insertBefore(ctl, on ? null : lyr);
+  (on ? panelIn : main).insertBefore(group, on ? null : lyr);
   lyKey = '';
   fit();
   lyricsTick();
@@ -169,11 +205,11 @@ html.addEventListener('mouseleave', closeSoon);
 // clicks on the see-through part go to whatever is below; main.js forwards the moves so this still sees them
 let ignoring = true, drag = null;
 function setIgnore(on) { if (on !== ignoring) { ignoring = on; pa.miniIgnore(on); } }
-document.addEventListener('mousemove', (e) => { if (!drag) setIgnore(!e.target.closest('.mini-box, .mini-panel')); });
+document.addEventListener('mousemove', (e) => { if (!drag && !seekDrag) setIgnore(!e.target.closest('.mini-box, .mini-panel')); });
 
 // ---------- moving the window: drag the box anywhere but its buttons ----------
 box.addEventListener('pointerdown', (e) => {
-  if (e.button !== 0 || e.target.closest('button')) return;
+  if (e.button !== 0 || e.target.closest('button, .mini-track')) return;
   drag = { x: e.screenX, y: e.screenY, moved: false };
   box.setPointerCapture(e.pointerId);
   pa.miniDrag('start');
@@ -223,7 +259,7 @@ addEventListener('keydown', (e) => {
   else if (k === 'r' || k === 'R') cmd('repeat');
 });
 // the lyrics' times are of the song: catch up when the window comes back from sleep or a long stall
-document.addEventListener('visibilitychange', () => { if (!document.hidden) { tickRing(); lyricsTick(); } });
+document.addEventListener('visibilitychange', () => { if (!document.hidden) { tickTime(); lyricsTick(); } });
 
 // ---------- start ----------
 hydrateIcons();

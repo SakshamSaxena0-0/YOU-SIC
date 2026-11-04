@@ -1,5 +1,6 @@
-/* YouSic mini player (mini.html, main.js openMini). A box with the cover and the controls, or the
-   cover and two lines of the lyrics; while the lyrics show, the controls drop down into a panel on hover.
+/* YouSic mini player (mini.html, main.js openMini). A box with the cover and the controls over the song's
+   progress, or the cover and two lines of the lyrics; while the lyrics show, the controls and the progress
+   drop down into a panel on hover.
    The buttons and the lyric lines use the main player's classes, so each theme draws them as it does
    there (the row is zoomed to fit, by mini.js); the box and the panel take each theme's panel material,
    below. The window is see-through around them, with room for their shadows (--m). */
@@ -8,7 +9,7 @@
   --bw: 460px;        /* the box (main.js MINI.w x MINI.h) */
   --bh: 104px;
   --gap: 8px;         /* between the box and the panel */
-  --ph: 76px;         /* the panel */
+  --ph: 100px;        /* the panel (main.js MINI.panel) */
   --pad: 8px;
   --art: calc(var(--bh) - 2 * var(--pad));
 }
@@ -53,8 +54,22 @@ html[data-drop='up'] .mini-box { top: calc(var(--m) + var(--ph) + var(--gap)); }
 .mini-hud b { font: 700 13px/1 var(--mono); }
 
 .mini-main { position: relative; flex: 1; min-width: 0; height: 100%; display: grid; place-items: center; }
-/* the main player's controls row, zoomed to fit (mini.js fit) */
+/* the main player's controls row, zoomed to fit (mini.js fit), over the song's progress */
+.mini-ctl { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 2px; }
 .mini .controls { padding: 0; margin: 0; width: max-content; flex-wrap: nowrap; }
+
+/* ---------- the progress: each theme's slider and time digits; the thumb shows on hover ---------- */
+.mini-seek { width: 100%; display: flex; align-items: center; gap: 8px; }
+.mini .mini-seek .seek-times { display: block; flex: none; min-width: 4ch; margin: 0; padding: 0; line-height: 1; font-variant-numeric: tabular-nums; }
+.mini .mini-seek .seek-times:first-child { text-align: right; }
+html.theme-pixel .mini .mini-seek .seek-times { font-size: 16px; }
+/* a taller strip than the slider, so it is easy to hit; the slider only draws */
+.mini-track { position: relative; flex: 1; min-width: 0; display: flex; align-items: center; padding: 6px 0; cursor: pointer; }
+.mini-track input[type='range'] { flex: 1; min-width: 0; margin: 0; pointer-events: none; }
+.mini-track input[type='range']::-webkit-slider-thumb { transform: scale(0); transition: transform 0.22s var(--spring); }
+.mini-track:hover input[type='range']::-webkit-slider-thumb, .mini-track.drag input[type='range']::-webkit-slider-thumb { transform: scale(1); }
+.mini-seek.off { opacity: 0.5; }
+.mini-seek.off .mini-track { pointer-events: none; }
 
 /* ---------- lyrics: the line playing and the next one ---------- */
 .mini-lyrics { display: none; }
@@ -86,6 +101,8 @@ html[data-drop='up'] .mini-panel::before { bottom: auto; top: 100%; }
 .mini-panel-in { position: absolute; inset: 0; display: grid; place-items: center; box-sizing: border-box; padding: 6px 14px; }
 
 /* ---------- each theme's material (box and panel) ---------- */
+/* the play button's glow (Subway, Midnight) stays inside: the progress row leaves it little room */
+.mini-box, .mini-panel-in { overflow: clip; }
 /* Liquid Glass: the album's tint, smoked, with a clear rim */
 .mini-mat {
   border-radius: 20px;

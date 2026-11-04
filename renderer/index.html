@@ -69,6 +69,8 @@
 
         <div class="pl-header">
           <button class="icon-btn lg" data-act="library" title="Library (Ctrl+L)" data-icon="queue_music"></button>
+          <!-- wide layout: hide the player's header and controls so the album art shows on its own -->
+          <button class="icon-btn lg" id="plAdmire" data-icon="image" title="Admire art (A)" aria-pressed="false"></button>
           <div class="pl-cat" id="plCat" title="Track source">
             <div class="pl-cat-label">Playing from</div>
             <div class="pl-cat-name" id="plCatName">Library</div>
@@ -167,8 +169,7 @@
             <div class="lib-sub" id="libSub"></div>
           </div>
           <button class="icon-btn lg" id="libShuffle" data-icon="shuffle" title="Shuffle all in this list"></button>
-          <!-- wide layout: hide the player's header and controls so the album art shows on its own -->
-          <button class="icon-btn lg" id="libAdmire" data-icon="image" title="Admire art (A)" aria-pressed="false"></button>
+          <button class="icon-btn lg" id="libPlay" data-icon="play" title="Play all in this list"></button>
           <button class="icon-btn lg" id="libSearch" data-icon="search" title="Search (Ctrl+F)"></button>
           <button class="icon-btn lg" id="libMenu" data-icon="more_vert" title="List options"></button>
         </div>

@@ -194,13 +194,11 @@ input { font: inherit; color: inherit; }
 .app.wide #aaWrap .aa-back.aa-info { visibility: visible; opacity: 0; transition: opacity 0.35s ease, width 0.8s var(--spring), height 0.8s var(--spring), margin 0.8s var(--spring); }
 .app.wide #aaWrap.info-on .aa-back.aa-info { opacity: 1; }
 
-/* Admire art (the button beside the library's search, or A): the header, title block, seekbar, controls
-   and dock fade away with the fades over the cover, so nothing covers it. The same button, A, Esc and a
+/* Admire art (the picture button beside the player's library button, or A): the header, title block,
+   seekbar, controls and dock fade away with the fades over the cover, so nothing covers it. A, Esc and a
    tap on the cover bring them back. Wide layout only. */
-#libAdmire { display: none; }
-.app.wide #libAdmire { display: grid; }
-/* while admiring, the button stays lit in the accent colour */
-.app.wide.art-only #libAdmire { color: var(--accent); filter: drop-shadow(0 0 6px var(--acc-mid)); }
+#plAdmire { display: none; }
+.app.wide #plAdmire { display: grid; }
 .app.wide #player > :is(.pl-header, .pl-info, .seek, .controls, .pl-nav) { transition: opacity 0.35s ease, translate 0.45s var(--ease), visibility 0s linear 0s; }
 .app.wide.art-only #player > :is(.pl-header, .pl-info, .seek, .controls, .pl-nav) {
   opacity: 0; visibility: hidden; pointer-events: none;

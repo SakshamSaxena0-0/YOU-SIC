@@ -39,6 +39,7 @@ export class LibraryView {
     $('#searchInput').oninput = debounce(() => this._renderSearch(), 120);
     $('#searchInput').onkeydown = (e) => { if (e.key === 'Escape') this.toggleSearch(false); };
     $('#libShuffle').onclick = () => this.shuffleCurrent();
+    $('#libPlay').onclick = () => this.playCurrent();
     $('#libMenu').onclick = (e) => this.listOptions(e.currentTarget);
     // the root page's "Recently played" shelf follows playback (the previous track is counted on change)
     this.player.addEventListener('track', () => setTimeout(() => this._refreshShelf(), 300));
@@ -192,6 +193,7 @@ export class LibraryView {
     $('#libSub').textContent = sub;
     $('#libBack').classList.toggle('dim', this.stack.length <= 1);
     $('#libShuffle').style.visibility = this._tracksOf(p).length ? '' : 'hidden';
+    $('#libPlay').style.visibility = this._tracksOf(p).length ? '' : 'hidden';
     const t = $('.lib-titles');
     t.animate([{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }], { duration: 260, easing: 'ease-out' });
   }
@@ -422,6 +424,17 @@ export class LibraryView {
     }
     this.player.playList(tracks, i, { title: page.content.title, node: page.node }, { shuffle: this.store.settings.shuffle });
     page._playedList = this.player.list;
+    if (this.app.narrow) this.app.showPlayer();
+  }
+
+  // the open folder's (or album's, playlist's...) songs from the first, in the list's order
+  playCurrent() {
+    const page = this.top;
+    const tracks = page.tracks || this._sorted(page);
+    if (!tracks.length) return;
+    this.player.playList(tracks, 0, { title: page.content.title, node: page.node }, { shuffle: false });
+    page._playedList = this.player.list;
+    this.app.toast(`Playing ${page.content.title}`);
     if (this.app.narrow) this.app.showPlayer();
   }
 

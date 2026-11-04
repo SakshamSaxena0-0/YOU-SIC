@@ -73,7 +73,7 @@ class App {
 
     $$('#side .eq-tab').forEach((t) => (t.onclick = () => this.showSide(t.dataset.side)));
     $('#sideClose').onclick = () => this.showSide(null);
-    $('#libAdmire').onclick = () => this.toggleArt();
+    $('#plAdmire').onclick = () => this.toggleArt();
     this._layout();
     new ResizeObserver(() => { this._layout(); this._navInk(); if (!this.narrow) this._sideInk(); }).observe(document.body);
     document.fonts.ready.then(() => { if (!this.narrow) this._sideInk(); });
@@ -140,12 +140,13 @@ class App {
   }
 
   // Admire art (wide layout): show only the album art, with nothing over it (css: .art-only). The Admire art
-  // button beside the library's search, A, Esc and a tap on the cover bring the header and the controls back.
+  // button beside the player's library button turns it on; A, Esc and a tap on the cover bring the header and
+  // the controls back.
   toggleArt(force) {
     const on = !this.narrow && (force ?? !this.root.classList.contains('art-only'));
     if (on && this.playerView.flipped) this.playerView.flipArt(false);
     this.root.classList.toggle('art-only', on);
-    $('#libAdmire').setAttribute('aria-pressed', String(on));
+    $('#plAdmire').setAttribute('aria-pressed', String(on));
   }
 
   // the panel's tabs: 'lyrics', 'vis', or null to hide the panel

@@ -24,7 +24,6 @@ export const DEFAULT_SETTINGS = {
   blurBg: true,
   theme: 'glass', // glass (liquid glass over the wallpaper) | cyber (solid neon cyberpunk) | subway (y2k: dim teal, chrome, glass) | pixel (retro 90s desktop windows, pixel art) | vector-surrealism (dark fantasy as a flat surreal vector poster) | liminal (a vintage dream: sunset over a sea of clouds, on old film) | midnight (a city at 3 a.m.: dark polished gunmetal, chrome and cold cyan light)
   glassMood: 'brutal', // Liquid Glass only: brutal (black and white, hard light, heavy type) | clear (clear glass tinted by the album)
-  monoArt: true, // Brutal mood: covers in black and white too
   refraction: true,
   windowBg: 'wallpaper', // wallpaper | acrylic | solid
   buttonStyle: 'ios', // ios (clear glass) | bubble | aqua (liquid-filled)

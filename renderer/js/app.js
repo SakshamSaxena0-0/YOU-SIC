@@ -523,7 +523,6 @@ class App {
       this.playerView.refreshColors();
       requestAnimationFrame(() => { refreshLiquid(); this._navInk(); this._fitVolBar(); }); // its corners and type differ
     }
-    html.classList.toggle('br-mono-art', brutal && s.monoArt !== false);
     if (!s.dynamicAccent && !solid && !brutal) {
       const rgb = hexToRgb(s.accent);
       document.documentElement.style.setProperty('--accent', s.accent);
@@ -670,7 +669,6 @@ class App {
       ${pick('theme', 'Theme', 'Liquid Glass: clear glass over your wallpaper. Cyberpunk: neon HUD. Y2K Subway: dim teal, chrome and glass. Pixel: a retro 90s desktop in pixel art. Vector Surrealism: dark fantasy as a surreal vector poster. Liminal: a vintage dream, sunset over the clouds on old film. Midnight: a city at 3 a.m., dark polished gunmetal and cold cyan light', [['glass', 'Liquid Glass'], ['cyber', 'Cyberpunk'], ['subway', 'Y2K Subway'], ['pixel', 'Pixel'], ['vector-surrealism', 'Vector Surrealism'], ['liminal', 'Liminal'], ['midnight', 'Midnight']])}
       <div class="glass-only">
       ${pick('glassMood', 'Mood', 'Brutal: black and white, deep darkness, hard white light and heavy type. Clear: clear glass tinted by the album art', [['brutal', 'Brutal'], ['clear', 'Clear']])}
-      <div class="brutal-only">${tog('monoArt', 'Black-and-white covers', 'Album art in high-contrast black and white too')}</div>
       <div class="clear-only">
       ${tog('dynamicAccent', 'Album art colors', 'Accent color follows the current album art')}
       <div class="set-row"><div><div class="set-label">Accent color</div><div class="set-hint">Used when album art colors are off or the cover has none</div></div><input type="color" value="${s.accent}" data-c="accent"></div>

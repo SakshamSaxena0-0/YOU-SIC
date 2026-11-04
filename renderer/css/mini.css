@@ -1,0 +1,123 @@
+/* YouSic mini player (mini.html, main.js openMini). A box with the cover and the controls, or the
+   cover and two lines of the lyrics; while the lyrics show, the controls drop down into a panel on hover.
+   The buttons and the lyric lines use the main player's classes, so each theme draws them as it does
+   there (the row is zoomed to fit, by mini.js); the box and the panel take each theme's panel material,
+   below. The window is see-through around them, with room for their shadows (--m). */
+:root {
+  --m: 24px;          /* the see-through margin: shadows stay inside it */
+  --bw: 460px;        /* the box (main.js MINI.w x MINI.h) */
+  --bh: 104px;
+  --gap: 8px;         /* between the box and the panel */
+  --ph: 76px;         /* the panel */
+  --pad: 8px;
+  --art: calc(var(--bh) - 2 * var(--pad));
+}
+html.mini-doc, html.mini-doc body { background: transparent !important; overflow: hidden; }
+html.mini-doc body { margin: 0; user-select: none; -webkit-user-select: none; }
+
+.mini { position: fixed; inset: 0; pointer-events: none; }
+
+/* ---------- the box ---------- */
+.mini-box {
+  position: absolute; left: var(--m); top: var(--m); width: var(--bw); height: var(--bh); box-sizing: border-box;
+  display: flex; align-items: center; gap: 12px; padding: var(--pad) 12px var(--pad) var(--pad); pointer-events: auto; cursor: default;
+  animation: mini-in 0.38s var(--spring) backwards;
+}
+html[data-drop='up'] .mini-box { top: calc(var(--m) + var(--ph) + var(--gap)); }
+@keyframes mini-in { from { opacity: 0; transform: scale(0.92); } }
+.mini.bye .mini-box { opacity: 0; transform: scale(0.94); transition: opacity 0.16s ease, transform 0.16s ease; }
+.mini.dragging .mini-box { cursor: grabbing; }
+
+.mini-art { position: relative; width: var(--art); height: var(--art); flex: none; overflow: hidden; border-radius: 12px; cursor: grab; background: radial-gradient(120% 120% at 30% 20%, color-mix(in srgb, var(--accent) 45%, var(--tint)), var(--tint)); }
+.mini-art img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.3s ease; -webkit-user-drag: none; }
+.mini-art img.in { opacity: 1; }
+.mini-art.ph img { display: none; }
+.mini-ph { position: absolute; inset: 0; display: grid; place-items: center; color: color-mix(in srgb, var(--text) 55%, transparent); }
+.mini-ph .ico { width: 34px; height: 34px; }
+.mini-art:not(.ph) .mini-ph { display: none; }
+/* hover the cover: a corner button back to the full player (or double-click the cover); the rest of the
+   cover moves the window */
+.mini-full {
+  position: absolute; top: 5px; right: 5px; z-index: 2; width: 26px; height: 26px; display: grid; place-items: center; border-radius: 8px;
+  color: #fff; background: rgba(0, 0, 0, 0.55); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18); opacity: 0; transform: scale(0.8);
+  transition: opacity 0.18s ease, transform 0.25s var(--spring), background-color 0.15s; cursor: pointer;
+}
+.mini-full .ico { width: 16px; height: 16px; }
+.mini-art:hover .mini-full { opacity: 1; transform: none; }
+.mini-full:hover { background: rgba(0, 0, 0, 0.8); }
+.mini.dragging .mini-full { opacity: 0; }
+/* the volume, for a moment, after it changes here */
+.mini-hud { position: absolute; inset: 0; z-index: 1; display: grid; place-content: center; justify-items: center; gap: 2px; color: #fff; background: rgba(0, 0, 0, 0.55); opacity: 0; pointer-events: none; transition: opacity 0.2s ease; }
+.mini-hud.show { opacity: 1; }
+.mini-hud .ico { width: 22px; height: 22px; }
+.mini-hud b { font: 700 13px/1 var(--mono); }
+
+.mini-main { position: relative; flex: 1; min-width: 0; height: 100%; display: grid; place-items: center; }
+/* the main player's controls row, zoomed to fit (mini.js fit) */
+.mini .controls { padding: 0; margin: 0; width: max-content; flex-wrap: nowrap; }
+
+/* ---------- lyrics: the line playing and the next one ---------- */
+.mini-lyrics { display: none; }
+.mini.lyr .mini-lyrics { display: flex; flex-direction: column; justify-content: center; gap: 3px; width: 100%; height: 100%; min-width: 0; }
+.mini-lyrics .ly-line {
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; padding: 0; border-radius: 0;
+  font-size: 17px; line-height: 1.25; transform: none; filter: none; cursor: default;
+}
+.mini-lyrics .ly-line:not(.active) { -webkit-line-clamp: 1; font-size: 13.5px; color: var(--dim); text-shadow: none; }
+.mini-lyrics .ly-line:empty { display: none; }
+.mini-lyrics.roll .ly-line { animation: mini-roll 0.34s var(--ease) backwards; }
+.mini-lyrics.roll .ly-line:not(.active) { animation-delay: 0.05s; }
+@keyframes mini-roll { from { opacity: 0; transform: translateY(10px); } }
+
+/* ---------- the drop-down panel ---------- */
+.mini-panel {
+  position: absolute; left: calc(var(--m) + var(--pad) + var(--art) + 4px); right: var(--m); top: calc(var(--m) + var(--bh) + var(--gap)); height: var(--ph);
+  pointer-events: none; visibility: hidden; opacity: 0; transform: translateY(-12px) scale(0.96); transform-origin: 50% 0; clip-path: inset(0 0 100% 0);
+  transition: opacity 0.18s ease, transform 0.22s ease, clip-path 0.22s ease, visibility 0s linear 0.22s;
+}
+html[data-drop='up'] .mini-panel { top: var(--m); transform: translateY(12px) scale(0.96); transform-origin: 50% 100%; clip-path: inset(100% 0 0 0); }
+.mini.lyr.open:not(.dragging) .mini-panel {
+  pointer-events: auto; visibility: visible; opacity: 1; transform: none; clip-path: inset(calc(-1 * var(--m)));
+  transition: opacity 0.2s ease, transform 0.42s var(--spring), clip-path 0.34s var(--ease), visibility 0s;
+}
+/* covers the gap, so the pointer can cross from the box to the panel */
+.mini-panel::before { content: ''; position: absolute; left: 0; right: 0; bottom: 100%; height: calc(var(--gap) + 2px); }
+html[data-drop='up'] .mini-panel::before { bottom: auto; top: 100%; }
+.mini-panel-in { position: absolute; inset: 0; display: grid; place-items: center; box-sizing: border-box; padding: 6px 14px; }
+
+/* ---------- each theme's material (box and panel) ---------- */
+/* Liquid Glass: the album's tint, smoked, with a clear rim */
+.mini-mat {
+  border-radius: 20px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--tint) 75%, #1a1a20), color-mix(in srgb, var(--tint) 35%, #08080b));
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.13), inset 0 1px 0 rgba(255, 255, 255, 0.24), 0 12px 24px -12px rgba(0, 0, 0, 0.8);
+}
+html.theme-cyber .mini-mat {
+  border-radius: 0; border: 1px solid transparent; box-shadow: none;
+  background: linear-gradient(#0a0a13, #0a0a13) padding-box, linear-gradient(120deg, var(--cy-c), rgba(0, 240, 255, 0.25) 45%, var(--cy-y)) border-box;
+  clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
+}
+html.theme-cyber .mini-art { border-radius: 0; clip-path: polygon(10px 0, 100% 0, 100% 100%, 0 100%, 0 10px); }
+html.theme-subway .mini-mat {
+  border-radius: var(--r-card);
+  background: var(--glass), color-mix(in srgb, var(--bg-1) 92%, transparent);
+  box-shadow: var(--glass-shadow), 0 0 0 1px color-mix(in srgb, var(--chrome-hi) 22%, transparent), 0 12px 24px -12px color-mix(in srgb, var(--shade) 90%, transparent);
+}
+html.theme-subway .mini-art { border-radius: 10px; box-shadow: 0 0 0 1px color-mix(in srgb, var(--chrome-hi) 30%, transparent); }
+html.theme-pixel .mini-mat {
+  border-radius: 8px; border: 3px solid var(--px-ink); box-shadow: var(--px-shadow);
+  background: var(--px-tube), var(--px-scan), linear-gradient(180deg, #24134a, #100823);
+}
+html.theme-pixel .mini-art { border-radius: 4px; box-shadow: 0 0 0 2px var(--px-ink); }
+html.theme-vector-surrealism .mini-mat { border-radius: var(--vs-r-card); background: var(--vs-dusk); box-shadow: var(--vs-long); }
+html.theme-vector-surrealism .mini-art { border-radius: 22px 8px 22px 8px; }
+html.theme-liminal .mini-mat {
+  border-radius: var(--lm-r-lg); background: var(--lm-sunlit), var(--lm-panel-solid);
+  box-shadow: var(--lm-edge), 0 12px 24px -12px color-mix(in srgb, var(--lm-ink) 90%, transparent);
+}
+html.theme-liminal .mini-art { border-radius: 8px; }
+html.theme-midnight .mini-mat {
+  border-radius: var(--mn-r-lg); background: var(--mn-gloss-soft), var(--mn-panel-solid);
+  box-shadow: var(--mn-rim), 0 12px 24px -12px color-mix(in srgb, var(--mn-void) 95%, transparent);
+}
+html.theme-midnight .mini-art { border-radius: 10px; }

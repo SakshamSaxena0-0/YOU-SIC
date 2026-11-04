@@ -11,6 +11,7 @@ import { LyricsView } from './lyricsView.js';
 import { toast, menuAt, openSheet, closeSheet, chooser, closeMenu } from './ui.js';
 import { liquidAll, watchLiquid, refreshLiquid } from './liquidGlass.js';
 import { initVsWorld } from './vsWorld.js';
+import { MiniLink } from './miniLink.js';
 
 class App {
   constructor() {
@@ -50,6 +51,7 @@ class App {
     this.eq = new EqView(this);
     this.vis = new VisView(this);
     this.lyrics = new LyricsView(this);
+    this.mini = new MiniLink(this);
     this._applyLook();
     this._bindNav();
     this._bindKeys();
@@ -67,7 +69,10 @@ class App {
       }
       ({ prev: () => this.player.prev(), next: () => this.player.next(), toggle: () => this.player.toggle(),
         play: () => { if (!this.engine.playing) this.player.toggle(); }, pause: () => { if (this.engine.playing) this.player.toggle(); },
-        prevcat: () => this.library.stepCategory(-1), nextcat: () => this.library.stepCategory(1) })[c]?.();
+        prevcat: () => this.library.stepCategory(-1), nextcat: () => this.library.stepCategory(1),
+        // the mini player's buttons
+        shuffle: () => $('#btnShuffle').click(), repeat: () => $('#btnRepeat').click(), mute: () => this.toggleMute(),
+        'vol+': () => this.setVolume(this.store.settings.volume + 0.05), 'vol-': () => this.setVolume(this.store.settings.volume - 0.05) })[c]?.();
     });
     pa.onProgress((m) => this._scanProgress(m));
 
@@ -393,6 +398,7 @@ class App {
     $('#vbVal').textContent = Math.round(v * 100);
     setIcon($('#vbIco'), ic);
     $('#volBar').classList.toggle('muted', !!s.muted);
+    this.mini?.volume();
   }
 
   _bindVolume() {
@@ -409,6 +415,8 @@ class App {
     vr.onchange = () => vr.blur(); // so Space, the arrows and the other shortcuts reach the player again
     $('#vbIco').onclick = () => this.toggleMute();
     $('#volBar').addEventListener('wheel', wheel, { passive: false });
+    $('#miniBtn').onclick = () => this.mini.open();
+    if (!this.mini.supported) $('#miniBtn').style.display = 'none';
     new ResizeObserver(() => this._fitVolBar()).observe($('.controls'));
     this._syncVol();
   }
@@ -512,9 +520,10 @@ class App {
       document.documentElement.style.setProperty('--accent', s.accent);
       document.documentElement.style.setProperty('--accent-rgb', rgb.join(','));
     }
+    this.mini?.look();
   }
 
-  onAccent() { this.eq && this.eq.onAccent(); }
+  onAccent() { this.eq && this.eq.onAccent(); this.mini?.look(); }
 
   updateThumbar(playing) {
     if (!this._thumbIcons) return;

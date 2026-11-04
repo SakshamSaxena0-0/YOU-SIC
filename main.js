@@ -448,12 +448,74 @@ async function createWindow() {
   for (const ev of ['move', 'resize', 'maximize', 'unmaximize', 'restore']) win.on(ev, () => wall.on && sendGeom());
   for (const ev of ['focus', 'restore', 'show']) win.on(ev, () => wall.on && refreshWallpaper());
   screen.on('display-metrics-changed', () => { if (wall.on) { wall.v = 0; refreshWallpaper(); } });
+  // back from the taskbar while the mini player is up: the full player takes over again (not a stray
+  // restore around the moment the mini player appears and the main window minimises)
+  win.on('restore', () => { if (mini && Date.now() - miniShownAt > 1000) closeMini(); });
   win.on('close', () => {
+    if (mini) mini.destroy();
     try { fs.writeFileSync(path.join(dataDir, 'window.json'), JSON.stringify({ ...win.getNormalBounds(), maximized: win.isMaximized() })); } catch {}
   });
 }
 
 function thumbIcon(dataUrl) { return nativeImage.createFromDataURL(dataUrl); }
+
+// ---------- mini player ----------
+// A small always-on-top window (renderer/mini.html): the cover and the transport, or two lines of the
+// lyrics. The main window minimises while it shows and the music keeps playing there; the main renderer
+// sends it the state (mini:state) and it sends commands back (mini:cmd -> 'cmd'). The window is
+// see-through around its box: the controls drop down into that room (up, in the lower half of the
+// screen), and clicks there go through to whatever is below (setIgnoreMouseEvents).
+const MINI = { w: 460, h: 104, gap: 8, panel: 76, m: 24 };
+const MINI_W = MINI.w + 2 * MINI.m, MINI_H = 2 * MINI.m + MINI.h + MINI.gap + MINI.panel;
+let mini = null, miniState = {}, miniDrop = 'down', miniDrag = null, miniShownAt = 0;
+
+// the box's top left on screen <-> the window's
+const miniWinPos = (box, drop) => ({ x: box.x - MINI.m, y: box.y - MINI.m - (drop === 'up' ? MINI.panel + MINI.gap : 0) });
+function miniBox() {
+  const b = mini.getBounds();
+  return { x: b.x + MINI.m, y: b.y + MINI.m + (miniDrop === 'up' ? MINI.panel + MINI.gap : 0) };
+}
+
+// keep the box on its screen; the controls drop towards the roomier half
+function miniPlace(box) {
+  const wa = screen.getDisplayNearestPoint({ x: Math.round(box.x + MINI.w / 2), y: Math.round(box.y + MINI.h / 2) }).workArea;
+  box.x = Math.round(Math.min(Math.max(box.x, wa.x + 4), wa.x + wa.width - MINI.w - 4));
+  box.y = Math.round(Math.min(Math.max(box.y, wa.y + 4), wa.y + wa.height - MINI.h - 4));
+  miniDrop = box.y + MINI.h / 2 > wa.y + wa.height / 2 ? 'up' : 'down';
+  mini.setBounds({ ...miniWinPos(box, miniDrop), width: MINI_W, height: MINI_H });
+  mini.webContents.send('mini:drop', miniDrop);
+  return box;
+}
+
+async function openMini() {
+  if (mini) { mini.show(); return; }
+  const saved = await readJson('mini.json', null);
+  const wa = screen.getDisplayMatching(win.getBounds()).workArea;
+  const box = saved && Number.isFinite(saved.x) ? { x: saved.x, y: saved.y } : { x: wa.x + wa.width - MINI.w - 24, y: wa.y + 24 };
+  mini = new BrowserWindow({
+    width: MINI_W, height: MINI_H, frame: false, transparent: true, backgroundColor: '#00000000', hasShadow: false,
+    resizable: false, maximizable: false, minimizable: false, fullscreenable: false, skipTaskbar: true, alwaysOnTop: true, show: false,
+    title: 'YouSic mini player', icon: path.join(ROOT, 'build', 'icon.png'),
+    webPreferences: { preload: path.join(ROOT, 'preload.js'), contextIsolation: true, nodeIntegration: false, sandbox: true, backgroundThrottling: false },
+  });
+  miniPlace(box);
+  mini.setIgnoreMouseEvents(true, { forward: true }); // the page turns this off over its box
+  mini.loadURL('app://local/renderer/mini.html');
+  mini.once('ready-to-show', () => { if (!mini) return; mini.show(); miniShownAt = Date.now(); win.minimize(); });
+  mini.on('closed', () => {
+    mini = null;
+    if (!win || win.isDestroyed()) return;
+    win.webContents.send('mini:closed');
+    if (win.isMinimized()) win.restore();
+    win.focus();
+  });
+}
+
+function closeMini() {
+  if (!mini) return;
+  try { writeJson('mini.json', miniBox()); } catch {}
+  mini.close();
+}
 
 function setupIpc() {
   ipcMain.handle('lib:get', () => library);
@@ -488,6 +550,28 @@ function setupIpc() {
     e.returnValue = true;
   });
   ipcMain.on('win:min', () => win.minimize());
+  // mini player
+  ipcMain.on('mini:open', (_e, state) => { miniState = state || {}; openMini(); });
+  ipcMain.on('mini:close', () => closeMini());
+  ipcMain.on('mini:state', (_e, part) => {
+    Object.assign(miniState, part);
+    if (mini && !mini.isDestroyed()) mini.webContents.send('mini:state', part);
+  });
+  ipcMain.handle('mini:hello', () => ({ drop: miniDrop, state: miniState }));
+  ipcMain.on('mini:cmd', (_e, c) => { if (win && !win.isDestroyed()) win.webContents.send('cmd', c); });
+  ipcMain.on('mini:ignore', (_e, on) => { if (mini) mini.setIgnoreMouseEvents(!!on, { forward: true }); });
+  ipcMain.on('mini:drag', (_e, phase) => {
+    if (!mini) return;
+    const c = screen.getCursorScreenPoint();
+    if (phase === 'start') { const b = mini.getBounds(); miniDrag = { cx: c.x, cy: c.y, x: b.x, y: b.y }; return; }
+    if (!miniDrag) return;
+    if (phase === 'move') {
+      mini.setBounds({ x: miniDrag.x + c.x - miniDrag.cx, y: miniDrag.y + c.y - miniDrag.cy, width: MINI_W, height: MINI_H });
+    } else {
+      miniDrag = null;
+      writeJson('mini.json', miniPlace(miniBox()));
+    }
+  });
   ipcMain.on('win:max', () => (win.isMaximized() ? win.unmaximize() : win.maximize()));
   ipcMain.handle('win:glass', (_e, on) => {
     on = !!on && GLASS_SUPPORTED;

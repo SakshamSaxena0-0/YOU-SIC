@@ -25,4 +25,16 @@ contextBridge.exposeInMainWorld('pa', {
   setWallpaperMode: (on) => ipcRenderer.send('win:wallpaper', on),
   onWallpaper: (cb) => ipcRenderer.on('wall', (_e, w) => cb(w)),
   onGeom: (cb) => ipcRenderer.on('win:geom', (_e, g) => cb(g)),
+  // mini player: the main window's side
+  miniOpen: (state) => ipcRenderer.send('mini:open', state),
+  miniClose: () => ipcRenderer.send('mini:close'),
+  miniState: (part) => ipcRenderer.send('mini:state', part),
+  onMiniClosed: (cb) => ipcRenderer.on('mini:closed', () => cb()),
+  // mini player: its own window's side
+  miniHello: () => ipcRenderer.invoke('mini:hello'),
+  miniCmd: (c) => ipcRenderer.send('mini:cmd', c),
+  miniIgnore: (on) => ipcRenderer.send('mini:ignore', on),
+  miniDrag: (phase) => ipcRenderer.send('mini:drag', phase),
+  onMiniState: (cb) => ipcRenderer.on('mini:state', (_e, part) => cb(part)),
+  onMiniDrop: (cb) => ipcRenderer.on('mini:drop', (_e, d) => cb(d)),
 });

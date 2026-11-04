@@ -465,7 +465,7 @@ function thumbIcon(dataUrl) { return nativeImage.createFromDataURL(dataUrl); }
 // sends it the state (mini:state) and it sends commands back (mini:cmd -> 'cmd'). The window is
 // see-through around its box: the controls drop down into that room (up, in the lower half of the
 // screen), and clicks there go through to whatever is below (setIgnoreMouseEvents).
-const MINI = { w: 460, h: 104, gap: 8, panel: 100, m: 24 };
+const MINI = { w: 460, h: 120, gap: 8, panel: 120, m: 24 };
 const MINI_W = MINI.w + 2 * MINI.m, MINI_H = 2 * MINI.m + MINI.h + MINI.gap + MINI.panel;
 let mini = null, miniState = {}, miniDrop = 'down', miniDrag = null, miniShownAt = 0;
 

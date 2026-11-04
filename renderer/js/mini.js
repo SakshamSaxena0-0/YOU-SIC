@@ -9,7 +9,7 @@ const html = document.documentElement;
 const mini = $('#mini'), box = $('#box'), art = $('#art'), img = $('#cover'), ctl = $('#ctl');
 const main = $('#main'), panel = $('#panel'), panelIn = $('#panelIn'), lyr = $('#lyr'), l1 = $('#l1'), l2 = $('#l2');
 const ring = $('#playRing'), hud = $('#hud');
-const group = $('#ctlGroup'), seek = $('#seek'), track = $('#track'), range = $('#seekRange'), tPos = $('#tPos'), tDur = $('#tDur');
+const name = $('#name'), group = $('#ctlGroup'), seek = $('#seek'), track = $('#track'), range = $('#seekRange'), tPos = $('#tPos'), tDur = $('#tDur');
 
 const S = { track: null, time: null, shuffle: false, repeat: 'off', volume: 0.8, muted: false, lyrics: null };
 let recvAt = 0;
@@ -57,14 +57,16 @@ function fit() {
   if (!w || !h) return;
   // room for the glows and the 'on' dots some themes draw just outside their buttons
   const W = host.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - 8;
-  const H = host.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom) - seek.offsetHeight - 2 - 4;
+  const H = host.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom) - name.offsetHeight - seek.offsetHeight - 2 * 2 - 4;
   ctl.style.zoom = String(Math.min(1, W / w, H / h));
 }
 
 // ---------- song, state, modes, volume ----------
 function renderTrack() {
   const t = S.track;
-  art.title = t ? (t.artist ? `${t.title} — ${t.artist}` : t.title) : 'Nothing playing';
+  art.title = name.title = t ? (t.artist ? `${t.title} — ${t.artist}` : t.title) : 'Nothing playing';
+  $('#plTitle').textContent = t ? t.title : 'Nothing playing';
+  $('#plArtist').textContent = (t && t.artist) || '';
   if (!t || !t.cover) { art.classList.add('ph'); img.removeAttribute('src'); img.dataset.src = ''; return; }
   if (img.dataset.src === t.cover) return;
   img.dataset.src = t.cover;

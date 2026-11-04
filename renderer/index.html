@@ -138,6 +138,13 @@
           </div>
           <button class="ctl ctl-md lg" id="btnNext" title="Next (Ctrl+Right)" data-icon="skip_next"></button>
           <button class="ctl ctl-sm lg" id="btnRepeat" title="Repeat (R)" data-icon="repeat"></button>
+          <!-- the app's own volume (the music only, not Windows'). Shown when the row has room beside the
+               controls; otherwise the speaker button in the header opens the same slider as a popup -->
+          <div class="vol-bar" id="volBar">
+            <button class="vb-ico" id="vbIco" title="Mute (M)" data-icon="volume_up"></button>
+            <input type="range" id="vbRange" min="0" max="100" value="80" aria-label="Volume">
+            <span class="seek-times vb-val" id="vbVal">80</span>
+          </div>
         </div>
 
         <nav class="pl-nav lg" data-lg-blur="10" id="plNav">

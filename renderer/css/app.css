@@ -411,6 +411,26 @@ input { font: inherit; color: inherit; }
 #ppPath { d: path('M8 5 L8 19 L13.5 15.5 L13.5 8.5 Z M13.5 8.5 L13.5 15.5 L19 12 L19 12 Z'); transition: d 0.36s cubic-bezier(0.4, 0, 0.2, 1); }
 .playing #ppPath { d: path('M6.5 5 L6.5 19 L10.5 19 L10.5 5 Z M13.5 5 L13.5 19 L17.5 19 L17.5 5 Z'); }
 
+/* the volume bar (the app's own volume): right of the transport, its end in line with the seekbar's, when
+   the row has room (.vol-inline); otherwise a row of its own under the transport (.vol-row). App._fitVolBar()
+   picks. It replaces the header's speaker button. The slider and the number take each theme's own slider
+   and time styles. */
+.controls { position: relative; }
+.vol-bar { display: none; align-items: center; gap: 6px; }
+.app:is(.vol-inline, .vol-row) .vol-bar { display: flex; }
+.app:is(.vol-inline, .vol-row) #volBtn { display: none; }
+.app.vol-inline .vol-bar { position: absolute; top: 12px; bottom: 8px; right: 24px; }
+.app.vol-row .controls { flex-wrap: wrap; row-gap: 2px; }
+.app.vol-row .vol-bar { flex: 0 0 100%; justify-content: center; }
+.app.vol-row .vol-bar input[type='range'] { flex: 0 1 180px; }
+.vb-ico { display: grid; place-items: center; width: 32px; height: 32px; flex: none; border-radius: 50%; color: var(--dim); transition: color 0.2s, background 0.2s; }
+.vb-ico:hover { color: var(--text); background: rgba(255, 255, 255, 0.06); }
+.vb-ico .ico { width: 20px; height: 20px; }
+.vol-bar.muted .vb-ico { color: var(--accent); }
+.vol-bar input[type='range'] { flex: 1; min-width: 0; margin: 0 4px; }
+.vol-bar .seek-times.vb-val { display: block; flex: none; min-width: 3ch; margin: 0; padding: 0; text-align: right; font-variant-numeric: tabular-nums; }
+.vol-bar.no-val .vb-val { display: none; }
+
 /* floating dock */
 .pl-nav {
   position: relative; display: flex; justify-content: space-around; margin: 6px 18px 16px; padding: 6px; flex: none; border-radius: 22px;

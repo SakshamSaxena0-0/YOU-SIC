@@ -387,6 +387,11 @@ class App {
     const ic = v === 0 ? 'volume_off' : v < 0.5 ? 'volume_down' : 'volume_up';
     setIcon($('#volBtn'), ic);
     setIcon($('#volIco'), ic);
+    $('#vbRange').value = Math.round(v * 100);
+    $('#vbRange').style.setProperty('--p', `${v * 100}%`);
+    $('#vbVal').textContent = Math.round(v * 100);
+    setIcon($('#vbIco'), ic);
+    $('#volBar').classList.toggle('muted', !!s.muted);
   }
 
   _bindVolume() {
@@ -397,7 +402,34 @@ class App {
     $('#volBtn').addEventListener('wheel', wheel, { passive: false });
     $('#volPop').addEventListener('wheel', wheel, { passive: false });
     addEventListener('pointerdown', (e) => { if (!e.target.closest('#volPop, #volBtn')) $('#volPop').classList.remove('open'); });
+    // the bar beside the controls
+    const vr = $('#vbRange');
+    vr.oninput = () => this.setVolume(vr.value / 100);
+    vr.onchange = () => vr.blur(); // so Space, the arrows and the other shortcuts reach the player again
+    $('#vbIco').onclick = () => this.toggleMute();
+    $('#volBar').addEventListener('wheel', wheel, { passive: false });
+    new ResizeObserver(() => this._fitVolBar()).observe($('.controls'));
     this._syncVol();
+  }
+
+  // The volume bar goes right of the transport (which stays centred), its end in line with the seekbar's,
+  // when the row leaves it room for the speaker and a 64 px slider (the number goes first when it's tight);
+  // otherwise it takes a row of its own under the transport.
+  _fitVolBar() {
+    const row = $('.controls'), end = $('#btnRepeat'), bar = $('#volBar');
+    const room = row.clientWidth - 24 - (end.offsetLeft + end.offsetWidth) - 18;
+    const inline = room >= 110;
+    this.root.classList.toggle('vol-inline', inline);
+    this.root.classList.toggle('vol-row', !inline);
+    bar.style.width = inline ? `${Math.min(room, 200)}px` : '';
+    bar.classList.remove('no-val');
+    if (inline && $('#vbRange').offsetWidth < 64) bar.classList.add('no-val');
+  }
+
+  // the bar shows the volume itself while it is on screen
+  _volBarShown() {
+    const r = this.root.classList;
+    return !r.contains('art-only') && (!this.narrow || this.screen === 'player');
   }
 
   _toggleVolPop() {
@@ -409,7 +441,7 @@ class App {
   }
 
   _flashVol() {
-    if ($('#volPop').classList.contains('open')) return;
+    if ($('#volPop').classList.contains('open') || this._volBarShown()) return;
     toast(`Volume ${Math.round(this.store.settings.volume * 100)}%`, 700);
   }
 
@@ -457,6 +489,7 @@ class App {
       this.playerView.wave.setTheme(theme);
       this.playerView.refreshFx();
       refreshLiquid();
+      requestAnimationFrame(() => this._fitVolBar()); // each theme sizes and spaces the controls its own way
     }
     this.root.classList.toggle('no-blur', !s.blurBg);
     document.documentElement.classList.toggle('no-refract', !s.refraction);

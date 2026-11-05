@@ -148,3 +148,9 @@ html.theme-midnight .mini-mat {
   box-shadow: var(--mn-rim), 0 12px 24px -12px color-mix(in srgb, var(--mn-void) 95%, transparent);
 }
 html.theme-midnight .mini-art { border-radius: 10px; }
+html.theme-chrome .mini-mat {
+  border: 2px solid transparent; border-radius: var(--cr-r-lg);
+  background: var(--cr-gloss-soft) padding-box, var(--cr-black) padding-box, var(--cr-bezel);
+  box-shadow: var(--cr-outline), 0 12px 24px -12px color-mix(in srgb, var(--cr-void) 95%, transparent);
+}
+html.theme-chrome .mini-art { border-radius: 10px; }

@@ -1,0 +1,130 @@
+/* ==========================================================================
+   Chrome theme (html.theme-chrome): design tokens
+   Mirror-polished chrome on dark brushed gunmetal. Every button is a piece of metal: the library's
+   tiles are chrome plates in thick bevelled bezels, reflecting one room across the whole grid; the
+   icons sit in inset squares of black chrome; labels are engraved in mono capitals. No colour of its
+   own: the only colour is the album art, which stays as it is and lights the panels beside it
+   (css/seamless.css). Every colour, material, radius, font and shadow the theme uses is defined here;
+   css/chrome.css (the component rules) only reads these tokens (`npm run check` fails on a literal
+   colour there). See THEME_CHROME.md.
+   Fonts: Manrope and JetBrains Mono (app.css), already bundled and declared.
+   ========================================================================== */
+
+html.theme-chrome {
+  /* ---- palette: gunmetal to polished steel (a hair cool) ---- */
+  --cr-void: #08090A;      /* the darkest metal: shadows, the far end of every gradient */
+  --cr-ground: #121315;    /* the page: dark gunmetal */
+  --cr-iron-9: #17181B;
+  --cr-iron-8: #1E1F22;
+  --cr-iron-7: #27282C;    /* sheets, menus */
+  --cr-iron-6: #34363A;
+  --cr-iron-5: #4A4C51;
+  --cr-steel-4: #74767B;
+  --cr-steel-3: #9C9EA3;
+  --cr-steel-2: #C4C6C9;
+  --cr-steel-1: #E1E2E4;
+  --cr-white: #FAFAFB;     /* where polished chrome catches the light */
+  --cr-ink: #0C0D0E;       /* text engraved in bright chrome */
+  --cr-red: #E35D5D;       /* close, danger */
+
+  /* ---- text (contrast on iron-7, the lightest panel; ink on steel-2, the darkest bright chrome) ---- */
+  --cr-text: #ECEDEF;      /* 12.6:1 on iron-7 */
+  --cr-text-dim: #A3A5A9;  /* 6.0:1 on iron-7, 7.5:1 on the ground */
+  --cr-text-ink: var(--cr-ink); /* 11.4:1 on steel-2, 7.3:1 on steel-3 (the darkest of bright chrome) */
+  --cr-line: color-mix(in srgb, var(--cr-steel-1) 10%, transparent);
+
+  /* ---- light ---- */
+  --cr-shadow: 0 22px 44px -18px color-mix(in srgb, var(--cr-void) 95%, transparent);
+  --cr-shadow-sm: 0 8px 16px -8px color-mix(in srgb, var(--cr-void) 95%, transparent);
+  --cr-emboss: 0 1px 0 color-mix(in srgb, var(--cr-void) 85%, transparent);           /* light text raised off dark metal */
+  --cr-engrave: 0 1px 0 color-mix(in srgb, var(--cr-white) 55%, transparent);       /* dark text cut into bright metal */
+  --cr-glint: drop-shadow(0 0 4px color-mix(in srgb, var(--cr-white) 55%, transparent));
+
+  /* ---- materials ---- */
+  /* mirror chrome: the bright sky above a soft horizon, the dark floor below it, a lit lower edge */
+  --cr-mirror: linear-gradient(180deg, var(--cr-white) 0%, var(--cr-steel-1) 10%, var(--cr-steel-2) 28%, var(--cr-steel-3) 44%,
+    var(--cr-iron-5) 50%, var(--cr-iron-7) 60%, var(--cr-iron-8) 72%, var(--cr-iron-6) 88%, var(--cr-steel-4) 100%);
+  /* bright chrome without the dark floor, for plates that carry dark text all over (on, primary) */
+  --cr-mirror-lite: linear-gradient(180deg, var(--cr-white) 0%, var(--cr-steel-1) 30%, var(--cr-steel-2) 49%, var(--cr-steel-3) 51%,
+    var(--cr-steel-2) 74%, var(--cr-steel-1) 100%);
+  /* the domed version, for round chrome (the play button, studs, switch balls): bright all over, the
+     room's reflection a soft dark band low down */
+  --cr-mirror-dome: radial-gradient(110% 90% at 50% 0%, var(--cr-white), var(--cr-steel-1) 38%, var(--cr-steel-2) 58%, var(--cr-steel-3) 72%,
+    var(--cr-steel-4) 86%, var(--cr-iron-5) 100%);
+  /* the room, reflected in the plates: dark figures with crisp edges, two window streaks, a lamp and
+     the far floor, in a 560 x 700 room. Each tile is offset into it by its place in the grid (chrome.css
+     sets background-position from --cr-rx / --cr-ry), so neighbouring tiles show neighbouring parts of
+     it; inside the bezel only (padding-box) */
+  --cr-room:
+    radial-gradient(120px 210px at 235px 250px, color-mix(in srgb, var(--cr-void) 70%, transparent), color-mix(in srgb, var(--cr-void) 62%, transparent) 58%, transparent 61%) 0 0 / 560px 700px padding-box,
+    radial-gradient(80px 150px at 470px 430px, color-mix(in srgb, var(--cr-void) 58%, transparent), color-mix(in srgb, var(--cr-void) 50%, transparent) 55%, transparent 59%) 0 0 / 560px 700px padding-box,
+    linear-gradient(106deg, transparent 0 17%, color-mix(in srgb, var(--cr-white) 34%, transparent) 17.5%, color-mix(in srgb, var(--cr-white) 20%, transparent) 26%, transparent 26.5%,
+      transparent 58%, color-mix(in srgb, var(--cr-white) 16%, transparent) 58.5%, color-mix(in srgb, var(--cr-white) 9%, transparent) 63%, transparent 63.5%) 0 0 / 560px 700px padding-box,
+    radial-gradient(220px 120px at 400px 110px, color-mix(in srgb, var(--cr-white) 36%, transparent), transparent 70%) 0 0 / 560px 700px padding-box,
+    radial-gradient(180px 140px at 90px 600px, color-mix(in srgb, var(--cr-void) 45%, transparent), transparent 70%) 0 0 / 560px 700px padding-box;
+  /* black chrome: icon squares, round buttons, the dock */
+  --cr-black: linear-gradient(180deg, var(--cr-iron-6) 0%, var(--cr-iron-8) 46%, var(--cr-void) 52%, var(--cr-iron-9) 80%, var(--cr-iron-7) 100%);
+  --cr-gloss: linear-gradient(180deg, color-mix(in srgb, var(--cr-white) 24%, transparent), color-mix(in srgb, var(--cr-white) 6%, transparent) 46%, transparent 50%);
+  --cr-gloss-soft: linear-gradient(180deg, color-mix(in srgb, var(--cr-white) 10%, transparent), transparent 48%);
+  --cr-dome: radial-gradient(90% 55% at 50% 4%, color-mix(in srgb, var(--cr-white) 34%, transparent), color-mix(in srgb, var(--cr-white) 6%, transparent) 60%, transparent 62%);
+  /* the bezel: a thick frame of polished chrome round a plate (a border-box background) */
+  --cr-bezel: linear-gradient(180deg, var(--cr-white) 0%, var(--cr-steel-1) 10%, var(--cr-steel-3) 30%, var(--cr-iron-6) 52%,
+    var(--cr-iron-5) 58%, var(--cr-steel-3) 75%, var(--cr-steel-1) 90%, var(--cr-white) 100%) border-box;
+  /* a turned ring of glossy steel for round and small buttons: a glint on every corner */
+  --cr-ring: linear-gradient(180deg, color-mix(in srgb, var(--cr-white) 70%, transparent), transparent 40%),
+    conic-gradient(var(--cr-steel-2), var(--cr-steel-4) 6%, var(--cr-steel-1) 12.5%, var(--cr-steel-4) 19%, var(--cr-steel-3) 25%,
+    var(--cr-steel-1) 32%, var(--cr-white) 37.5%, var(--cr-steel-2) 43%, var(--cr-steel-4) 50%, var(--cr-iron-5) 57%, var(--cr-steel-1) 62.5%,
+    var(--cr-steel-4) 69%, var(--cr-steel-3) 75%, var(--cr-steel-1) 82%, var(--cr-white) 87.5%, var(--cr-steel-1) 94%, var(--cr-steel-2));
+  /* the inside edge of a bezel: a dark groove, then a raised lip of steel, then a little depth */
+  --cr-groove: inset 0 0 0 1px color-mix(in srgb, var(--cr-void) 85%, transparent), inset 0 0 0 2.5px color-mix(in srgb, var(--cr-steel-2) 75%, transparent),
+    inset 0 0 0 3.5px color-mix(in srgb, var(--cr-void) 45%, transparent), inset 0 0 8px 3px color-mix(in srgb, var(--cr-void) 30%, transparent);
+  /* outside every bezel: a black outline, so the chrome reads on any background */
+  --cr-outline: 0 0 0 1px color-mix(in srgb, var(--cr-void) 90%, transparent);
+  /* a groove cut into the metal: inputs, slider tracks, switches */
+  --cr-cut: inset 0 2px 5px var(--cr-void), inset 0 0 0 1px color-mix(in srgb, var(--cr-void) 90%, transparent), 0 1px 0 color-mix(in srgb, var(--cr-white) 10%, transparent);
+  --cr-pressed: inset 0 3px 8px color-mix(in srgb, var(--cr-void) 85%, transparent), inset 0 0 0 1px color-mix(in srgb, var(--cr-void) 90%, transparent);
+  --cr-edge: inset 0 0 0 1px var(--cr-line), inset 0 1px 0 color-mix(in srgb, var(--cr-white) 12%, transparent);
+  /* spun steel: knobs */
+  --cr-spun: conic-gradient(from 200deg, var(--cr-iron-6), var(--cr-steel-4) 9%, var(--cr-iron-7) 21%, var(--cr-iron-5) 34%, var(--cr-iron-8) 48%, var(--cr-steel-4) 59%, var(--cr-iron-7) 72%, var(--cr-iron-5) 86%, var(--cr-iron-6));
+  /* sheets and menus: a slab of dark polished metal */
+  --cr-slab: linear-gradient(180deg, var(--cr-iron-7), var(--cr-iron-9));
+  /* filled progress: a bar of bright steel */
+  --cr-flow: linear-gradient(90deg, var(--cr-steel-4), var(--cr-steel-1) 70%, var(--cr-white));
+  --cr-flow-v: linear-gradient(0deg, var(--cr-steel-4), var(--cr-steel-1) 70%, var(--cr-white));
+
+  /* ---- the ground: dark gunmetal, brushed side to side, lit from above ---- */
+  --cr-floor:
+    repeating-linear-gradient(0deg, color-mix(in srgb, var(--cr-white) 2.2%, transparent) 0 1px, transparent 1px 3px),
+    radial-gradient(120% 70% at 50% -10%, color-mix(in srgb, var(--cr-steel-4) 16%, transparent), transparent 70%),
+    linear-gradient(180deg, var(--cr-iron-8), var(--cr-ground) 45%, var(--cr-void));
+
+  /* ---- shape: machined, a little rounded ---- */
+  --cr-r-sm: 7px;
+  --cr-r: 10px;
+  --cr-r-lg: 14px;
+  --cr-r-pill: 999px;
+  --cr-bezel-w: 4px;
+
+  /* ---- motion: quick, then settled ---- */
+  --cr-ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --cr-t: 220ms;
+
+  /* ---- type ---- */
+  --cr-display: 'Manrope', 'Segoe UI', sans-serif;     /* titles: heavy capitals */
+  --cr-ui: 'Manrope', 'Segoe UI', sans-serif;
+  --cr-label: 'JetBrains Mono', 'Cascadia Mono', Consolas, monospace;  /* engraved labels */
+  --cr-num: 'JetBrains Mono', 'Cascadia Mono', Consolas, monospace;
+
+  /* ---- the shared app variables, mapped onto the tokens ---- */
+  --bg: var(--cr-ground);
+  --text: var(--cr-text);
+  --dim: var(--cr-text-dim);
+  --dimmer: var(--cr-text-dim);
+  --line: var(--cr-line);
+  --mono: var(--cr-num);
+  --acc-light: var(--cr-white);
+  --acc-deep: var(--cr-steel-3);
+  --art-scrim: var(--cr-ground);
+  background: var(--cr-ground);
+  color-scheme: dark;
+}

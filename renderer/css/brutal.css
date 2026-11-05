@@ -125,27 +125,7 @@ html.glass-brutal .switch:checked { background: var(--br-solid); box-shadow: ins
 html.glass-brutal .switch:checked::after { background: var(--br-ink); }
 html.glass-brutal .badge.hires { color: var(--br-ink); background: var(--br-bone); box-shadow: none; }
 
-/* ---------- seamless columns: the cover dissolves into its own light (ambient.js) ---------- */
-/* The cover (and its scrim) fade out over --amb-f at both sides. Under that fade lies the light of the
-   cover's edge (.amb-edge), and the same light runs on into the panel beside it (.amb-l, .amb-r, under
-   each panel's content), so where the cover's column ends there is only light on both sides: no
-   border. Wide windows only. */
-.amb { display: none; }
-html.glass-brutal .app.wide { --amb-f: clamp(64px, 7.5vw, 160px); }
-html.glass-brutal .app.wide .amb { display: block; position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
-html.glass-brutal .app.wide #aaWrap > .amb-edge { inset: calc(-1 * var(--bt, 0px)) auto calc(-1 * var(--bb, 0px)) auto; width: var(--amb-f); }
-html.glass-brutal .app.wide #aaWrap > .amb-el { left: calc(-1 * var(--bl, 0px)); }
-html.glass-brutal .app.wide #aaWrap > .amb-er { right: calc(-1 * var(--br, 0px)); }
-.amb canvas { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 0.9s ease; }
-.amb canvas.show { opacity: 0.6; }
-html.glass-brutal .app.wide #aaWrap :is(.aa-track, .aa-scrim) {
-  --m: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.1) calc(var(--amb-f) * 0.2), rgba(0, 0, 0, 0.5) calc(var(--amb-f) * 0.5),
-    rgba(0, 0, 0, 0.9) calc(var(--amb-f) * 0.8), #000 var(--amb-f), #000 calc(100% - var(--amb-f)), rgba(0, 0, 0, 0.9) calc(100% - var(--amb-f) * 0.8),
-    rgba(0, 0, 0, 0.5) calc(100% - var(--amb-f) * 0.5), rgba(0, 0, 0, 0.1) calc(100% - var(--amb-f) * 0.2), transparent);
-  -webkit-mask-image: var(--m); mask-image: var(--m);
-}
-/* tap the cover and it dims for the song's details: its light dims with it */
-html.glass-brutal .app.wide:has(#aaWrap.info-on) .amb canvas.show { opacity: 0.25; }
+/* ---------- seamless columns: the cover dissolves into its own light: css/seamless.css, ambient.js ---------- */
 
 /* ---------- the side panels' matte finish (library / equalizer on the left, lyrics on the right) ---------- */
 /* The panels' ground, a touch lifted and finer-grained, like matte card over the cover's light; their

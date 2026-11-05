@@ -144,6 +144,12 @@ export class Waveform {
       const v = (k) => cs.getPropertyValue(k).trim();
       this.mn = { cyan: v('--mn-cyan'), deep: v('--mn-cyan-deep'), ice: v('--mn-ice'), steel: v('--mn-steel-3'), chrome: v('--mn-chrome'), void: v('--mn-void') };
     }
+    // and the Chrome theme
+    if (name === 'chrome') {
+      const cs = getComputedStyle(document.documentElement);
+      const v = (k) => cs.getPropertyValue(k).trim();
+      this.cr = { white: v('--cr-white'), s1: v('--cr-steel-1'), s2: v('--cr-steel-2'), s3: v('--cr-steel-3'), s4: v('--cr-steel-4'), iron: v('--cr-iron-5'), void: v('--cr-void') };
+    }
     this.invalidate();
   }
 
@@ -369,6 +375,40 @@ export class Waveform {
     g.lineWidth = 1.5; g.strokeStyle = c.cyan; g.stroke();
   }
 
+  // Chrome theme: bars of polished steel standing on a mirror. What has played is bright chrome (a sky
+  // over a hard horizon, like the tiles); what is still to come is dark iron; the mirror below shows a
+  // faint reflection of both. The playhead is a hairline with a chrome stud on it.
+  _drawCr(g, w, h, prog) {
+    const c = this.cr;
+    const step = w / BARS, bw = Math.max(1, step * 0.5), line = Math.round(h * 0.64) + 0.5;
+    const pT = new Path2D(), pB = new Path2D(), uT = new Path2D(), uB = new Path2D();
+    for (let i = 0; i < BARS; i++) {
+      const x = i * step + (step - bw) / 2, v = this.cur[i];
+      const up = Math.max(1.5, v * (line - 4)), down = Math.max(1, v * (h - line - 2) * 0.7);
+      const played = (i + 0.5) / BARS <= prog;
+      (played ? pT : uT).rect(x, line - up - 1, bw, up);
+      (played ? pB : uB).rect(x, line + 2, bw, down);
+    }
+    g.fillStyle = c.iron; g.fill(uT);
+    g.globalAlpha = 0.25; g.fill(uB); g.globalAlpha = 1;
+    const pg = g.createLinearGradient(0, 2, 0, line);
+    pg.addColorStop(0, c.white); pg.addColorStop(0.42, c.s2); pg.addColorStop(0.5, c.s4); pg.addColorStop(0.53, c.s3); pg.addColorStop(1, c.s1);
+    g.fillStyle = pg; g.fill(pT);
+    const rg = g.createLinearGradient(0, line, 0, h);
+    rg.addColorStop(0, c.s2); rg.addColorStop(1, c.void);
+    g.globalAlpha = 0.35; g.fillStyle = rg; g.fill(pB); g.globalAlpha = 1;
+    // the mirror's edge
+    g.fillStyle = c.s1; g.globalAlpha = 0.16; g.fillRect(0, line, w, 1); g.globalAlpha = 1;
+    if (this.hover >= 0 && !this.dragging) { g.fillStyle = c.s1; g.globalAlpha = 0.4; g.fillRect(this.hover * w - 0.5, 2, 1, h - 4); g.globalAlpha = 1; }
+    const px = prog * w;
+    g.fillStyle = c.white; g.fillRect(Math.round(px) - 0.5, 1, 1, h - 2);
+    const r = this.dragging ? 6.5 : 5;
+    const sg = g.createLinearGradient(0, line - r, 0, line + r);
+    sg.addColorStop(0, c.white); sg.addColorStop(0.45, c.s2); sg.addColorStop(0.5, c.s4); sg.addColorStop(1, c.s1);
+    g.beginPath(); g.arc(px, line, r, 0, Math.PI * 2); g.fillStyle = sg; g.fill();
+    g.lineWidth = 1; g.strokeStyle = c.void; g.stroke();
+  }
+
   // Pixel theme: the waveform as a grid of square cells, like an old LED/pixel equalizer.
   _drawPixel(g, w, h, prog) {
     const cell = 6, gap = 1, pitch = cell + gap;
@@ -416,6 +456,7 @@ export class Waveform {
     if (this.theme === 'vector-surrealism' && this.vs) { this._drawVs(g, w, h, prog); return moving; }
     if (this.theme === 'liminal' && this.lm) { this._drawLm(g, w, h, prog); return moving; }
     if (this.theme === 'midnight' && this.mn) { this._drawMn(g, w, h, prog); return moving; }
+    if (this.theme === 'chrome' && this.cr) { this._drawCr(g, w, h, prog); return moving; }
     const step = w / BARS;
     const cy = this.cyber;
     const bw = Math.max(1.2, step * (cy ? 0.62 : 0.56));

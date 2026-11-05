@@ -53,6 +53,12 @@ for (const a of (fs.readFileSync(path.join(root, 'renderer/css/midnight.tokens.c
   if (!fs.existsSync(path.join(root, a))) fail(`midnight.tokens.css: missing asset ${a}`);
 }
 
+console.log('2e. Chrome tokens');
+const cr = fs.readFileSync(path.join(root, 'renderer/css/chrome.css'), 'utf8');
+const crLit = cr.match(/#[0-9a-fA-F]{3,8}|rgba?\(|hsla?\(/g) || [];
+if (crLit.length) fail(`chrome.css: ${crLit.length} literal colour(s) (use the tokens in chrome.tokens.css): ${crLit.slice(0, 5).join(', ')}`);
+else console.log('  no literal colours in component rules');
+
 console.log('3. font licences');
 const fonts = path.join(root, 'renderer/fonts');
 const files = fs.readdirSync(fonts);

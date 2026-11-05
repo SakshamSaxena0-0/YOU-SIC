@@ -1,7 +1,7 @@
 import { debounce, sortKey } from './util.js';
 
 // Themes (Settings > Theme). Every theme but glass is solid and runs on a fixed palette.
-export const THEMES = ['glass', 'cyber', 'subway', 'pixel', 'vector-surrealism', 'liminal', 'midnight'];
+export const THEMES = ['glass', 'cyber', 'subway', 'pixel', 'vector-surrealism', 'liminal', 'midnight', 'chrome'];
 export const THEME_COLORS = {
   cyber: { accent: [252, 238, 10], dark: [7, 7, 13] },
   subway: { accent: [111, 227, 200], dark: [7, 18, 20] },
@@ -9,6 +9,7 @@ export const THEME_COLORS = {
   'vector-surrealism': { accent: [239, 125, 69], dark: [10, 6, 16] },
   liminal: { accent: [247, 197, 159], dark: [36, 26, 38] },
   midnight: { accent: [70, 227, 242], dark: [6, 8, 12] },
+  chrome: { accent: [225, 226, 228], dark: [18, 19, 21] },
 };
 // Liquid Glass in its Brutal mood (settings.glassMood) is black and white whatever the cover looks like
 export const GLASS_BRUTAL = { accent: [236, 236, 232], dark: [9, 9, 9] };
@@ -22,7 +23,7 @@ export const DEFAULT_SETTINGS = {
   dynamicAccent: true,
   accent: '#ff9f1c',
   blurBg: true,
-  theme: 'glass', // glass (liquid glass over the wallpaper) | cyber (solid neon cyberpunk) | subway (y2k: dim teal, chrome, glass) | pixel (retro 90s desktop windows, pixel art) | vector-surrealism (dark fantasy as a flat surreal vector poster) | liminal (a vintage dream: sunset over a sea of clouds, on old film) | midnight (a city at 3 a.m.: dark polished gunmetal, chrome and cold cyan light)
+  theme: 'glass', // glass (liquid glass over the wallpaper) | cyber (solid neon cyberpunk) | subway (y2k: dim teal, chrome, glass) | pixel (retro 90s desktop windows, pixel art) | vector-surrealism (dark fantasy as a flat surreal vector poster) | liminal (a vintage dream: sunset over a sea of clouds, on old film) | midnight (a city at 3 a.m.: dark polished gunmetal, chrome and cold cyan light) | chrome (mirror-polished chrome plates on dark brushed gunmetal)
   glassMood: 'brutal', // Liquid Glass only: brutal (black and white, hard light, heavy type) | clear (clear glass tinted by the album)
   refraction: true,
   windowBg: 'wallpaper', // wallpaper | acrylic | solid

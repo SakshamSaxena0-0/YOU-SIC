@@ -80,10 +80,25 @@ html.glass-brutal.btn-ios :is(.lg, .btn)::before {
     rgba(255, 255, 255, 0.06) 64%, rgba(255, 255, 255, 0.4) 86%, rgba(255, 255, 255, 0.85) 100%);
 }
 
+/* ---------- metal rims on the buttons (only the rim: the glass inside is as before) ---------- */
+/* A ring of polished steel: the light catches it top-left and bottom-right (where the glass is lit
+   everywhere else), with dark bands between, the way a turned metal bezel reflects the room. Drawn as a
+   conic gradient round the button's centre, so every shape gets the same bands. The panels' buttons get
+   it brushed (lower contrast) to suit their matte finish. Glass that isn't a button (the dock, the tab
+   bars, the search field) keeps its glass rim. */
+html.glass-brutal {
+  --br-metal: conic-gradient(#d2d2ce, #6a6a67 8%, #242423 14%, #8a8a87 21%, #e6e6e2 28%, #fff 35%, #a2a29e 42%, #3c3c3b 51%,
+    #1c1c1b 62%, #7c7c79 72%, #dadad6 81%, #fff 87%, #b8b8b4 94%, #d2d2ce);
+  --br-metal-brushed: conic-gradient(#acaca8, #646461 8%, #3a3a39 14%, #737370 21%, #a8a8a4 28%, #cbcbc7 35%, #898986 42%, #4a4a48 51%,
+    #353534 62%, #686865 72%, #a3a39f 81%, #c6c6c2 87%, #9d9d99 94%, #acaca8);
+  --br-metal-w: 2px;
+}
+html.glass-brutal.btn-ios :is(button, a, [role='button']):is(.lg, .btn)::before { padding: var(--br-metal-w); background: var(--br-metal); }
+
 /* ---------- solid white for what is primary or selected, with black glyphs ---------- */
 html.glass-brutal.btn-ios .ctl-play.lg {
   --lg-bg: var(--br-solid); color: var(--br-ink);
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.4), inset 0 -4px 8px rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(255, 255, 255, 0.45), 0 16px 34px -12px var(--br-shade);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.4), inset 0 -4px 8px rgba(0, 0, 0, 0.16), 0 16px 34px -12px var(--br-shade);
 }
 html.glass-brutal.btn-ios .ctl-play .pp { fill: var(--br-ink); filter: none; }
 html.glass-brutal .pr-fill { filter: none; stroke-linecap: butt; }
@@ -121,7 +136,7 @@ html.glass-brutal .app.wide:has(#aaWrap.info-on) .amb canvas.show { opacity: 0.2
 
 /* ---------- the side panels' matte finish (library / equalizer on the left, lyrics on the right) ---------- */
 /* The panels' ground, a touch lifted and finer-grained, like matte card over the cover's light; their
-   glass a little flatter, with softer rims. It comes in away from the cover (gone at the cover's edge),
+   glass a little flatter (its buttons' metal rims brushed, above). It comes in away from the cover (gone at the cover's edge),
    so the columns still meet without a seam. The cover's column keeps its own finish. */
 html.glass-brutal .app.wide :is(.amb-l, .amb-r)::after {
   content: ''; position: absolute; inset: 0; pointer-events: none;
@@ -141,10 +156,11 @@ html.glass-brutal.btn-ios .app.wide :is(#library, #eq, .side) :is(.lg, .btn):not
     0 1px 2px rgba(0, 0, 0, 0.12),
     0 8px 24px -8px rgba(0, 0, 0, 0.38);
 }
-html.glass-brutal.btn-ios .app.wide :is(#library, #eq, .side) :is(.lg, .btn):not(.on)::before {
+html.glass-brutal.btn-ios .app.wide :is(#library, #eq, .side) :is(.lg, .btn):not(:is(button, a, [role='button']))::before {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.2) 14%, rgba(255, 255, 255, 0.05) 36%,
     rgba(255, 255, 255, 0.05) 64%, rgba(255, 255, 255, 0.18) 86%, rgba(255, 255, 255, 0.4) 100%);
 }
+html.glass-brutal.btn-ios .app.wide :is(#library, #eq, .side) :is(button, a, [role='button']):is(.lg, .btn)::before { background: var(--br-metal-brushed); }
 
 /* Settings: the album colour options do nothing in this mood */
 html.glass-brutal .clear-only { display: none; }

@@ -1,5 +1,6 @@
 import { $, fmtTime } from './util.js';
 import { hydrateIcons, setIcon } from './icons.js';
+import { etch } from './etch.js';
 
 // The mini player window (mini.html). It plays nothing itself: the main window's renderer sends the state
 // (miniLink.js, through main.js) and its buttons go back there as commands. It keeps its own clock
@@ -43,6 +44,7 @@ function applyLook({ cls = '', vars = {} }) {
   for (const [n, v] of Object.entries(vars)) html.style.setProperty(n, v);
   lookVars = Object.keys(vars);
   requestAnimationFrame(fit);
+  if (S.track) renderTrack(); // Metal's etched cover comes and goes with the look
 }
 // looping decorations rest while the window isn't focused, as in the main window
 const idle = () => html.classList.toggle('idle', !document.hasFocus());
@@ -68,13 +70,18 @@ function renderTrack() {
   $('#plTitle').textContent = t ? t.title : 'Nothing playing';
   $('#plArtist').textContent = (t && t.artist) || '';
   if (!t || !t.cover) { art.classList.add('ph'); img.removeAttribute('src'); img.dataset.src = ''; return; }
-  if (img.dataset.src === t.cover) return;
-  img.dataset.src = t.cover;
+  // Metal: the cover etched into the aluminium, as in the main window (js/etch.js)
+  const etched = html.classList.contains('metal-etched');
+  const key = t.cover + (etched ? '#etched' : '');
+  if (img.dataset.src === key) return;
+  img.dataset.src = key;
   art.classList.remove('ph');
   img.classList.remove('in');
   img.onload = () => img.classList.add('in');
   img.onerror = () => art.classList.add('ph');
-  img.src = t.cover;
+  if (!etched) { img.src = t.cover; return; }
+  const cover = t.cover;
+  etch(cover, 480).then((u) => { if (img.dataset.src === key) img.src = u; }, () => { if (img.dataset.src === key) img.src = cover; });
 }
 
 // the ring round the play button and the progress bar, redrawn as the song's clock passes each second

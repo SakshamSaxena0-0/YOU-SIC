@@ -1,7 +1,7 @@
 import { debounce, sortKey } from './util.js';
 
 // Themes (Settings > Theme). Every theme but glass is solid and runs on a fixed palette.
-export const THEMES = ['glass', 'cyber', 'subway', 'pixel', 'vector-surrealism', 'liminal', 'midnight', 'chrome'];
+export const THEMES = ['glass', 'cyber', 'subway', 'pixel', 'vector-surrealism', 'liminal', 'midnight', 'metal'];
 export const THEME_COLORS = {
   cyber: { accent: [252, 238, 10], dark: [7, 7, 13] },
   subway: { accent: [111, 227, 200], dark: [7, 18, 20] },
@@ -9,7 +9,7 @@ export const THEME_COLORS = {
   'vector-surrealism': { accent: [239, 125, 69], dark: [10, 6, 16] },
   liminal: { accent: [247, 197, 159], dark: [36, 26, 38] },
   midnight: { accent: [70, 227, 242], dark: [6, 8, 12] },
-  chrome: { accent: [225, 226, 228], dark: [18, 19, 21] },
+  metal: { accent: [207, 151, 127], dark: [48, 47, 46] },
 };
 // Liquid Glass in its Brutal mood (settings.glassMood) is black and white whatever the cover looks like
 export const GLASS_BRUTAL = { accent: [236, 236, 232], dark: [9, 9, 9] };
@@ -23,7 +23,8 @@ export const DEFAULT_SETTINGS = {
   dynamicAccent: true,
   accent: '#ff9f1c',
   blurBg: true,
-  theme: 'glass', // glass (liquid glass over the wallpaper) | cyber (solid neon cyberpunk) | subway (y2k: dim teal, chrome, glass) | pixel (retro 90s desktop windows, pixel art) | vector-surrealism (dark fantasy as a flat surreal vector poster) | liminal (a vintage dream: sunset over a sea of clouds, on old film) | midnight (a city at 3 a.m.: dark polished gunmetal, chrome and cold cyan light) | chrome (satin metal plates on dark brushed gunmetal)
+  theme: 'glass', // glass (liquid glass over the wallpaper) | cyber (solid neon cyberpunk) | subway (y2k: dim teal, chrome, glass) | pixel (retro 90s desktop windows, pixel art) | vector-surrealism (dark fantasy as a flat surreal vector poster) | liminal (a vintage dream: sunset over a sea of clouds, on old film) | midnight (a city at 3 a.m.: dark polished gunmetal, chrome and cold cyan light) | metal (a hi-fi faceplate: brushed aluminium, plates of many metals, copper)
+  metalCover: 'etched', // Metal only: etched (the cover cut into the aluminium as line art) | colour (the cover as it is)
   glassMood: 'brutal', // Liquid Glass only: brutal (black and white, hard light, heavy type) | clear (clear glass tinted by the album)
   refraction: true,
   windowBg: 'wallpaper', // wallpaper | acrylic | solid
@@ -101,6 +102,7 @@ export class Store extends EventTarget {
     // v2: clear iOS glass buttons over the real wallpaper replace the earlier looks
     if (this.settings.theme === 'tlou') this.settings.theme = 'subway'; // the last of us theme was replaced
     if (this.settings.theme === 'console') this.settings.theme = 'pixel'; // so was the console theme
+    if (this.settings.theme === 'chrome') this.settings.theme = 'metal'; // and the chrome theme, by metal
     if ((s.v || 0) < 2) Object.assign(this.settings, { v: 2, buttonStyle: 'ios', windowBg: 'wallpaper' });
     // phones: the glass refraction is heavy on a mobile GPU, so it starts off there (it can be turned on)
     if (!settings && pa.platform === 'android') this.settings.refraction = false;

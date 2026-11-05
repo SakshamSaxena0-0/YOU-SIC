@@ -477,13 +477,15 @@ class App {
   }
 
   // ---------- look ----------
-  // glass is the default look; every other theme (cyber, subway, pixel, vector-surrealism, liminal, midnight, chrome) is solid: no wallpaper, glass or refraction
+  // glass is the default look; every other theme (cyber, subway, pixel, vector-surrealism, liminal, midnight, metal) is solid: no wallpaper, glass or refraction
   get theme() { return THEMES.includes(this.store.settings.theme) ? this.store.settings.theme : 'glass'; }
   get solidTheme() { return this.theme !== 'glass'; }
   // Liquid Glass's Brutal mood: the same glass in black and white (brutal.css, html.glass-brutal)
   get brutal() { return this.theme === 'glass' && this.store.settings.glassMood !== 'clear'; }
   // no borders between the columns: the cover dissolves into its own light (css/seamless.css, ambient.js)
-  get seamless() { return this.brutal || this.theme === 'chrome'; }
+  get seamless() { return this.brutal || this.theme === 'metal'; }
+  // Metal: the cover etched into the aluminium as line art (js/etch.js), unless Settings > Cover says colour
+  get etched() { return this.theme === 'metal' && this.store.settings.metalCover !== 'colour'; }
 
   // Reduce effects is on when the user turned it on, or (until they choose) when Windows asks for less motion.
   get reduceEffects() {
@@ -527,6 +529,11 @@ class App {
     }
     if (html.classList.contains('seamless') !== this.seamless) {
       html.classList.toggle('seamless', this.seamless);
+      this.playerView.refreshColors();
+    }
+    if (html.classList.contains('metal-etched') !== this.etched) {
+      html.classList.toggle('metal-etched', this.etched);
+      this.playerView.refreshArt();
       this.playerView.refreshColors();
     }
     if (!s.dynamicAccent && !solid && !brutal) {
@@ -672,7 +679,10 @@ class App {
         <div class="range-wrap"><input type="range" min="0" max="12" step="1" value="${s.crossfade}" data-r="crossfade" style="--p:${(s.crossfade / 12) * 100}%"><span class="rv">${s.crossfade}s</span></div></div>
       ${tog('resume', 'Resume playback on start', 'Restore the last track, list and position')}
       <div class="set-sec">Look and Feel</div>
-      ${pick('theme', 'Theme', 'Liquid Glass: clear glass over your wallpaper. Cyberpunk: neon HUD. Y2K Subway: dim teal, chrome and glass. Pixel: a retro 90s desktop in pixel art. Vector Surrealism: dark fantasy as a surreal vector poster. Liminal: a vintage dream, sunset over the clouds on old film. Midnight: a city at 3 a.m., dark polished gunmetal and cold cyan light. Chrome: satin metal plates on dark brushed gunmetal', [['glass', 'Liquid Glass'], ['cyber', 'Cyberpunk'], ['subway', 'Y2K Subway'], ['pixel', 'Pixel'], ['vector-surrealism', 'Vector Surrealism'], ['liminal', 'Liminal'], ['midnight', 'Midnight'], ['chrome', 'Chrome']])}
+      ${pick('theme', 'Theme', 'Liquid Glass: clear glass over your wallpaper. Cyberpunk: neon HUD. Y2K Subway: dim teal, chrome and glass. Pixel: a retro 90s desktop in pixel art. Vector Surrealism: dark fantasy as a surreal vector poster. Liminal: a vintage dream, sunset over the clouds on old film. Midnight: a city at 3 a.m., dark polished gunmetal and cold cyan light. Metal: a hi-fi faceplate of brushed aluminium, tiles in many metals, copper keys', [['glass', 'Liquid Glass'], ['cyber', 'Cyberpunk'], ['subway', 'Y2K Subway'], ['pixel', 'Pixel'], ['vector-surrealism', 'Vector Surrealism'], ['liminal', 'Liminal'], ['midnight', 'Midnight'], ['metal', 'Metal']])}
+      <div class="metal-only">
+      ${pick('metalCover', 'Cover', 'Etched: the cover cut into the brushed metal as line art. Colour: the cover as it is', [['etched', 'Etched'], ['colour', 'Colour']])}
+      </div>
       <div class="glass-only">
       ${pick('glassMood', 'Mood', 'Brutal: black and white, deep darkness, hard white light and heavy type. Clear: clear glass tinted by the album art', [['brutal', 'Brutal'], ['clear', 'Clear']])}
       <div class="clear-only">

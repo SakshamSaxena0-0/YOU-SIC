@@ -1,6 +1,6 @@
 // Project checks (npm run check). There is no linter or test suite yet; this covers what can break silently:
 //  1. every JavaScript file parses,
-//  2. the Y2K, Vector Surrealism, Liminal and Midnight component rules use only design tokens (no literal colours),
+//  2. the Y2K, Vector Surrealism, Liminal, Midnight and Metal component rules use only design tokens (no literal colours),
 //  3. every bundled font ships with its licence.
 const { spawnSync } = require('child_process');
 const fs = require('fs');
@@ -53,10 +53,10 @@ for (const a of (fs.readFileSync(path.join(root, 'renderer/css/midnight.tokens.c
   if (!fs.existsSync(path.join(root, a))) fail(`midnight.tokens.css: missing asset ${a}`);
 }
 
-console.log('2e. Chrome tokens');
-const cr = fs.readFileSync(path.join(root, 'renderer/css/chrome.css'), 'utf8');
-const crLit = cr.match(/#[0-9a-fA-F]{3,8}|rgba?\(|hsla?\(/g) || [];
-if (crLit.length) fail(`chrome.css: ${crLit.length} literal colour(s) (use the tokens in chrome.tokens.css): ${crLit.slice(0, 5).join(', ')}`);
+console.log('2e. Metal tokens');
+const mt = fs.readFileSync(path.join(root, 'renderer/css/metal.css'), 'utf8');
+const mtLit = mt.match(/#[0-9a-fA-F]{3,8}\b|rgba?\(|hsla?\(/g) || [];
+if (mtLit.length) fail(`metal.css: ${mtLit.length} literal colour(s) (use the tokens in metal.tokens.css): ${mtLit.slice(0, 5).join(', ')}`);
 else console.log('  no literal colours in component rules');
 
 console.log('3. font licences');

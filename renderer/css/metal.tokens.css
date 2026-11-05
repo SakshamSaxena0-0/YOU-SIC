@@ -1,0 +1,176 @@
+/* ==========================================================================
+   Metal theme (html.theme-metal): design tokens
+   A hi-fi faceplate. The window is one plate of brushed aluminium under a band of dark brushed
+   gunmetal; the library's tiles are plates of brushed metal in many finishes (graphite, silver,
+   rose gold, brass, pewter, platinum, cherry, champagne, titanium, smoke, copper, bronze, oxblood,
+   jade), each in a polished bevelled frame, with its icon in a dark inset well and its name in mono
+   capitals raised off the plate. Copper is the one accent: play, whatever is on, the played part of
+   the song. The cover is etched into the aluminium as line art (js/etch.js; Settings > Cover can
+   show it in colour instead).
+   Every colour, material, radius, font and shadow the theme uses is defined here; css/metal.css (the
+   component rules) only reads these tokens (`npm run check` fails on a literal colour there). See
+   THEME_METAL.md.
+   Fonts: Manrope and JetBrains Mono (app.css), already bundled and declared.
+   ========================================================================== */
+
+html.theme-metal {
+  /* ---- the plate: brushed aluminium, a little warm ---- */
+  --mt-alu-0: #ECEAE5;     /* polished: where the light lands */
+  --mt-alu-1: #D9D7D2;
+  --mt-alu-2: #CAC8C3;     /* the plate in the light */
+  --mt-alu-3: #BAB8B3;
+  --mt-alu-4: #ABA9A4;     /* the plate in shade: the darkest that carries text */
+  --mt-alu-5: #93918C;
+  --mt-alu-6: #7A7874;
+
+  /* ---- the band and dark plates: brushed gunmetal ---- */
+  --mt-gun-1: #74726E;
+  --mt-gun-2: #605F5B;
+  --mt-gun-3: #4E4D4A;
+  --mt-gun-4: #3E3D3B;     /* the band, menus */
+  --mt-gun-5: #302F2E;
+  --mt-gun-6: #242423;
+  --mt-void: #0B0C0C;      /* the frame round the window, the deepest shadow */
+  --mt-white: #FAF9F6;     /* a polished edge catching the light */
+  --mt-red: #C8503F;       /* close, danger */
+
+  /* ---- copper: the accent ---- */
+  --mt-cu-0: #F7D9CB;
+  --mt-cu-1: #E6B8A4;
+  --mt-cu-2: #CF977F;
+  --mt-cu-3: #B07660;
+  --mt-cu-4: #855444;
+  --mt-cu-5: #4D3028;
+
+  /* ---- text ----
+     dark text is printed on the aluminium, light text on the gunmetal (contrast on the darkest plate
+     each sits on: alu-4 and gun-3) */
+  --mt-ink: #111213;       /* 8.0:1 on alu-4, 11.2:1 on alu-2 */
+  --mt-ink-2: #2B2C2E;     /* 6.0:1 on alu-4 */
+  --mt-ink-3: #3E3F41;     /* 4.5:1 on alu-4, 6.3:1 on alu-2: hints, numbers */
+  --mt-text: #F4F3EF;      /* 7.6:1 on gun-3, 5.8:1 on gun-2 (the top of the band) */
+  --mt-text-dim: #D8D6D0;  /* 4.4:1 on gun-2, 5.8:1 on gun-3, 7.5:1 on gun-4 */
+  --mt-text-cu: #3B1F16;   /* dark text engraved in copper: 6.0:1 on cu-2, 8.4:1 on cu-1 */
+  --mt-line: color-mix(in srgb, var(--mt-ink) 14%, transparent);
+  --mt-line-lt: color-mix(in srgb, var(--mt-white) 12%, transparent);
+
+  /* ---- the tile finishes: 0 the polished highlight, 1-3 the brushed face from light to shade, 4 the
+     dark of the frame, 5 the icon's well, ink the name ---- */
+  --mt-graphite-0: #8C8A85; --mt-graphite-1: #6A6964; --mt-graphite-2: #5C5B56; --mt-graphite-3: #4D4C48; --mt-graphite-4: #373634; --mt-graphite-5: #2A2927; --mt-graphite-ink: #DEDAD1;
+  --mt-silver-0: #F3F1EC;   --mt-silver-1: #D4D1CB;   --mt-silver-2: #C3C0B9;   --mt-silver-3: #ACA9A2;   --mt-silver-4: #84827D;   --mt-silver-5: #3A3936;   --mt-silver-ink: #F9F7F2;
+  --mt-rosegold-0: #F8DED4; --mt-rosegold-1: #E0B6A8; --mt-rosegold-2: #CCA092; --mt-rosegold-3: #B3867A; --mt-rosegold-4: #86655B; --mt-rosegold-5: #4A3631; --mt-rosegold-ink: #FFF2EB;
+  --mt-brass-0: #CFBA96;    --mt-brass-1: #A48F71;    --mt-brass-2: #8F7C61;    --mt-brass-3: #786750;    --mt-brass-4: #5A4D3C;    --mt-brass-5: #3A3126;    --mt-brass-ink: #F2D19B;
+  --mt-pewter-0: #D6D3CB;   --mt-pewter-1: #AEAAA1;   --mt-pewter-2: #97938B;   --mt-pewter-3: #7E7B74;   --mt-pewter-4: #5E5C57;   --mt-pewter-5: #353431;   --mt-pewter-ink: #F0EDE6;
+  --mt-platinum-0: #F0F1F1; --mt-platinum-1: #CDCECD; --mt-platinum-2: #BCBDBC; --mt-platinum-3: #A4A5A4; --mt-platinum-4: #7E7F7F; --mt-platinum-5: #363738; --mt-platinum-ink: #FAFBFB;
+  --mt-cherry-0: #AA847F;   --mt-cherry-1: #7D5B57;   --mt-cherry-2: #6F504C;   --mt-cherry-3: #5F4340;   --mt-cherry-4: #46302E;   --mt-cherry-5: #2F201F;   --mt-cherry-ink: #F3B5AD;
+  --mt-champagne-0: #DECBAC; --mt-champagne-1: #B7A387; --mt-champagne-2: #A69075; --mt-champagne-3: #927D64; --mt-champagne-4: #6D5D4A; --mt-champagne-5: #3D342A; --mt-champagne-ink: #F7DEAD;
+  --mt-titanium-0: #ACA9A1; --mt-titanium-1: #87847D; --mt-titanium-2: #78756E; --mt-titanium-3: #68655F; --mt-titanium-4: #4B4945; --mt-titanium-5: #2F2E2B; --mt-titanium-ink: #E6E3DB;
+  --mt-smoke-0: #7C776B;    --mt-smoke-1: #575247;    --mt-smoke-2: #4B463E;    --mt-smoke-3: #403C35;    --mt-smoke-4: #2E2B26;    --mt-smoke-5: #201E1B;    --mt-smoke-ink: #D7CFBF;
+  --mt-copper-0: #BE9A88;   --mt-copper-1: #937160;   --mt-copper-2: #846454;   --mt-copper-3: #745648;   --mt-copper-4: #563F34;   --mt-copper-5: #34261F;   --mt-copper-ink: #F9D4BF;
+  --mt-bronze-0: #9E896A;   --mt-bronze-1: #78674A;   --mt-bronze-2: #695A41;   --mt-bronze-3: #5A4C37;   --mt-bronze-4: #413728;   --mt-bronze-5: #2B241B;   --mt-bronze-ink: #EDD19E;
+  --mt-oxblood-0: #96726C;  --mt-oxblood-1: #6D4D48;  --mt-oxblood-2: #5F433F;  --mt-oxblood-3: #513835;  --mt-oxblood-4: #3B2826;  --mt-oxblood-5: #271B1A;  --mt-oxblood-ink: #EFB3AB;
+  --mt-jade-0: #9FB29C;     --mt-jade-1: #71846E;     --mt-jade-2: #637560;     --mt-jade-3: #556653;     --mt-jade-4: #3D4B3C;     --mt-jade-5: #253125;     --mt-jade-ink: #DAF0D4;
+
+  /* ---- light ---- */
+  --mt-shadow: 0 18px 36px -16px color-mix(in srgb, var(--mt-void) 70%, transparent);
+  --mt-shadow-sm: 0 6px 12px -6px color-mix(in srgb, var(--mt-void) 70%, transparent);
+  --mt-drop: 0 2px 3px -1px color-mix(in srgb, var(--mt-void) 55%, transparent);
+  /* dark text printed into the aluminium: a light lip below it */
+  --mt-engrave: 0 1px 0 color-mix(in srgb, var(--mt-white) 55%, transparent);
+  /* light text raised off dark metal */
+  --mt-emboss: 0 1px 0 color-mix(in srgb, var(--mt-void) 80%, transparent);
+  /* light letters raised off a tile, readable on the brightest finish */
+  --mt-raised: 0 1px 0 color-mix(in srgb, var(--mt-void) 70%, transparent), 0 0 2px color-mix(in srgb, var(--mt-void) 55%, transparent),
+    0 0 7px color-mix(in srgb, var(--mt-void) 30%, transparent);
+
+  /* ---- textures ----
+     brushed: long, thin streaks running side to side, light and dark (one noise, split in two), a
+     small image the browser makes once and repeats */
+  --mt-brush: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='240'><filter id='n' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='0.003 1.05' numOctaves='4' seed='11' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  2.6 0 0 0 -1.32'/></filter><filter id='m' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='0.003 1.05' numOctaves='4' seed='11' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -2.4 0 0 0 1.1'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.3'/><rect width='100%25' height='100%25' filter='url(%23m)' opacity='0.24'/></svg>") 0 0 / 600px 240px;
+  /* the same, finer and fainter, for small parts */
+  --mt-brush-fine: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='120'><filter id='n' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='0.005 1.2' numOctaves='3' seed='4' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  2.4 0 0 0 -1.25'/></filter><filter id='m' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='0.005 1.2' numOctaves='3' seed='4' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -2.2 0 0 0 1'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.26'/><rect width='100%25' height='100%25' filter='url(%23m)' opacity='0.2'/></svg>") 0 0 / 300px 120px;
+  /* turned metal: the rings a lathe leaves on a knob, and the light crossing them */
+  --mt-turned: repeating-radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--mt-white) 7%, transparent) 0 1px, transparent 1px 2.5px,
+    color-mix(in srgb, var(--mt-void) 5%, transparent) 2.5px 3.2px, transparent 3.2px 4px);
+
+  /* ---- materials ---- */
+  /* the band: dark gunmetal, lit from the middle, across the top of the window (the title bar and the
+     column headers) */
+  --mt-band-h: 100px;
+  --mt-band-base: radial-gradient(70% 160% at 55% -30%, color-mix(in srgb, var(--mt-white) 16%, transparent), transparent 70%) 0 0 / 100% var(--mt-band-h) no-repeat,
+    linear-gradient(180deg, var(--mt-gun-2), var(--mt-gun-3) 55%, var(--mt-gun-4)) 0 0 / 100% var(--mt-band-h) no-repeat;
+  /* its machined lower edge (a light line, a dark line) and the shadow it casts on the plate */
+  --mt-band-edge: linear-gradient(180deg, color-mix(in srgb, var(--mt-white) 22%, transparent) 0 1px, color-mix(in srgb, var(--mt-void) 70%, transparent) 1px 2px,
+    color-mix(in srgb, var(--mt-void) 20%, transparent) 2px, transparent 16px) 0 calc(var(--mt-band-h) - 1px) / 100% 18px no-repeat;
+  /* the plate: brushed aluminium, lit from above right, a little shade low and to the left */
+  --mt-plate-base: radial-gradient(60% 55% at 62% 12%, color-mix(in srgb, var(--mt-white) 30%, transparent), transparent 70%),
+    linear-gradient(180deg, transparent 55%, color-mix(in srgb, var(--mt-gun-4) 16%, transparent)),
+    linear-gradient(90deg, var(--mt-alu-4) 0%, var(--mt-alu-3) 14%, var(--mt-alu-2) 34%, var(--mt-alu-1) 56%, var(--mt-alu-2) 76%, var(--mt-alu-3) 100%);
+  --mt-plate: var(--mt-brush), var(--mt-plate-base);
+  /* the whole ground: the band over the plate, one brushing across both */
+  --mt-ground: var(--mt-band-edge), var(--mt-brush), var(--mt-band-base), var(--mt-plate-base);
+  /* a sheet or a menu: a slab of aluminium (sheets) or gunmetal (menus) */
+  --mt-slab: var(--mt-brush), linear-gradient(180deg, var(--mt-alu-1), var(--mt-alu-2) 40%, var(--mt-alu-3));
+  --mt-slab-dark: var(--mt-brush-fine), linear-gradient(180deg, var(--mt-gun-3), var(--mt-gun-4) 45%, var(--mt-gun-5));
+  /* machined aluminium for buttons on the plate: a turned face, light from above */
+  --mt-knob: var(--mt-turned),
+    conic-gradient(from 210deg, var(--mt-alu-2), var(--mt-alu-0) 12%, var(--mt-alu-3) 25%, var(--mt-alu-1) 38%, var(--mt-alu-4) 50%, var(--mt-alu-0) 62%, var(--mt-alu-3) 75%, var(--mt-alu-1) 88%, var(--mt-alu-2));
+  --mt-knob-edge: linear-gradient(180deg, var(--mt-white), var(--mt-alu-3) 40%, var(--mt-alu-6) 75%, var(--mt-alu-5));
+  /* a key of brushed aluminium: flat buttons on the plate */
+  --mt-key: var(--mt-brush-fine), linear-gradient(180deg, var(--mt-alu-0), var(--mt-alu-1) 45%, var(--mt-alu-3));
+  --mt-key-edge: linear-gradient(180deg, var(--mt-white), var(--mt-alu-4) 55%, var(--mt-alu-6));
+  /* copper, polished and turned: play and whatever is on */
+  --mt-cu-face: var(--mt-turned),
+    conic-gradient(from 210deg, var(--mt-cu-2), var(--mt-cu-0) 12%, var(--mt-cu-3) 25%, var(--mt-cu-1) 38%, var(--mt-cu-3) 50%, var(--mt-cu-0) 62%, var(--mt-cu-2) 75%, var(--mt-cu-1) 88%, var(--mt-cu-2));
+  --mt-cu-key: var(--mt-brush-fine), linear-gradient(180deg, var(--mt-cu-0), var(--mt-cu-1) 45%, var(--mt-cu-2));
+  --mt-cu-edge: linear-gradient(180deg, var(--mt-cu-0), var(--mt-cu-3) 50%, var(--mt-cu-4));
+  /* a ring of polished steel round a round button */
+  --mt-bezel-ring: conic-gradient(from 200deg, var(--mt-alu-3), var(--mt-white) 10%, var(--mt-alu-4) 24%, var(--mt-alu-1) 40%, var(--mt-alu-6) 55%,
+    var(--mt-alu-2) 68%, var(--mt-white) 80%, var(--mt-alu-4) 92%, var(--mt-alu-3));
+  /* a groove cut into the plate: search, sliders, switches, the seekbar's well */
+  --mt-cut: inset 0 2px 3px color-mix(in srgb, var(--mt-void) 45%, transparent), inset 0 0 0 1px color-mix(in srgb, var(--mt-void) 30%, transparent),
+    0 1px 0 color-mix(in srgb, var(--mt-white) 55%, transparent);
+  --mt-cut-dark: inset 0 2px 4px color-mix(in srgb, var(--mt-void) 75%, transparent), inset 0 0 0 1px color-mix(in srgb, var(--mt-void) 60%, transparent),
+    0 1px 0 color-mix(in srgb, var(--mt-white) 10%, transparent);
+  /* raised off the plate: a thin dark outline, a bright top edge */
+  --mt-raise: 0 0 0 1px color-mix(in srgb, var(--mt-void) 45%, transparent), inset 0 1px 0 color-mix(in srgb, var(--mt-white) 70%, transparent),
+    inset 0 -1px 0 color-mix(in srgb, var(--mt-void) 18%, transparent);
+  --mt-pressed: inset 0 2px 5px color-mix(in srgb, var(--mt-void) 45%, transparent), 0 0 0 1px color-mix(in srgb, var(--mt-void) 45%, transparent);
+  /* a tile's frame: the face's edge cut in (a dark groove, then a thin light line) */
+  --mt-groove: inset 0 0 0 1px color-mix(in srgb, var(--mt-void) 55%, transparent), inset 0 0 0 2px color-mix(in srgb, var(--mt-white) 14%, transparent),
+    inset 0 0 14px 1px color-mix(in srgb, var(--mt-void) 18%, transparent);
+  --mt-outline: 0 0 0 1px color-mix(in srgb, var(--mt-void) 70%, transparent);
+  /* filled progress: a bar of polished copper */
+  --mt-flow: linear-gradient(180deg, var(--mt-cu-0), var(--mt-cu-2) 55%, var(--mt-cu-3));
+  --mt-flow-v: linear-gradient(90deg, var(--mt-cu-1), var(--mt-cu-2) 55%, var(--mt-cu-3));
+
+  /* ---- shape: machined, a little rounded ---- */
+  --mt-r-sm: 6px;
+  --mt-r: 9px;
+  --mt-r-lg: 12px;
+  --mt-r-pill: 999px;
+  --mt-frame-w: 5px;
+
+  /* ---- motion: quick, then settled ---- */
+  --mt-ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --mt-t: 200ms;
+
+  /* ---- type ---- */
+  --mt-display: 'Manrope', 'Segoe UI', sans-serif;     /* titles: heavy capitals */
+  --mt-ui: 'Manrope', 'Segoe UI', sans-serif;
+  --mt-label: 'JetBrains Mono', 'Cascadia Mono', Consolas, monospace;  /* names on the plates */
+  --mt-num: 'JetBrains Mono', 'Cascadia Mono', Consolas, monospace;
+
+  /* ---- the shared app variables, mapped onto the tokens ---- */
+  --bg: var(--mt-alu-2);
+  --text: var(--mt-ink);
+  --dim: var(--mt-ink-2);
+  --dimmer: var(--mt-ink-3);
+  --line: var(--mt-line);
+  --mono: var(--mt-num);
+  --acc-light: var(--mt-cu-1);
+  --acc-deep: var(--mt-cu-3);
+  --art-scrim: var(--mt-alu-2);
+  background: var(--mt-alu-2);
+  color-scheme: light;
+}

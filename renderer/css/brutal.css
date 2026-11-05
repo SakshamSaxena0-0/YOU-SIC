@@ -104,10 +104,7 @@ html.glass-brutal .badge.hires { color: var(--br-ink); background: var(--br-bone
    border. Wide windows only. */
 .amb { display: none; }
 html.glass-brutal .app.wide { --amb-f: clamp(64px, 7.5vw, 160px); }
-html.glass-brutal .app.wide .amb {
-  display: block; position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none;
-  transition: opacity 0.4s ease;
-}
+html.glass-brutal .app.wide .amb { display: block; position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
 html.glass-brutal .app.wide #aaWrap > .amb-edge { inset: calc(-1 * var(--bt, 0px)) auto calc(-1 * var(--bb, 0px)) auto; width: var(--amb-f); }
 html.glass-brutal .app.wide #aaWrap > .amb-el { left: calc(-1 * var(--bl, 0px)); }
 html.glass-brutal .app.wide #aaWrap > .amb-er { right: calc(-1 * var(--br, 0px)); }
@@ -120,7 +117,34 @@ html.glass-brutal .app.wide #aaWrap :is(.aa-track, .aa-scrim) {
   -webkit-mask-image: var(--m); mask-image: var(--m);
 }
 /* tap the cover and it dims for the song's details: its light dims with it */
-html.glass-brutal .app.wide:has(#aaWrap.info-on) .amb { opacity: 0.42; }
+html.glass-brutal .app.wide:has(#aaWrap.info-on) .amb canvas.show { opacity: 0.25; }
+
+/* ---------- the side panels' matte finish (library / equalizer on the left, lyrics on the right) ---------- */
+/* The panels' ground, a touch lifted and finer-grained, like matte card over the cover's light; their
+   glass a little flatter, with softer rims. It comes in away from the cover (gone at the cover's edge),
+   so the columns still meet without a seam. The cover's column keeps its own finish. */
+html.glass-brutal .app.wide :is(.amb-l, .amb-r)::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='1.15' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.12 -0.038'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>") 0 0 / 160px 160px,
+    linear-gradient(var(--br-matte), var(--br-matte));
+  -webkit-mask-image: linear-gradient(var(--amb-in), transparent, #000 42%); mask-image: linear-gradient(var(--amb-in), transparent, #000 42%);
+}
+html.glass-brutal { --br-matte: rgba(236, 236, 232, 0.019); }
+html.glass-brutal .amb-l { --amb-in: 270deg; } /* from the cover, on its right */
+html.glass-brutal .amb-r { --amb-in: 90deg; }  /* from the cover, on its left */
+html.glass-brutal.btn-ios .app.wide :is(#library, #eq, .side) :is(.lg, .btn):not(.on) {
+  --lg-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.045));
+  box-shadow:
+    inset 0 1px 0.5px rgba(255, 255, 255, 0.2),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.1),
+    0 1px 2px rgba(0, 0, 0, 0.12),
+    0 8px 24px -8px rgba(0, 0, 0, 0.38);
+}
+html.glass-brutal.btn-ios .app.wide :is(#library, #eq, .side) :is(.lg, .btn):not(.on)::before {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.2) 14%, rgba(255, 255, 255, 0.05) 36%,
+    rgba(255, 255, 255, 0.05) 64%, rgba(255, 255, 255, 0.18) 86%, rgba(255, 255, 255, 0.4) 100%);
+}
 
 /* Settings: the album colour options do nothing in this mood */
 html.glass-brutal .clear-only { display: none; }

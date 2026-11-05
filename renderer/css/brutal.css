@@ -81,19 +81,32 @@ html.glass-brutal.btn-ios :is(.lg, .btn)::before {
 }
 
 /* ---------- metal rims on the buttons (only the rim: the glass inside is as before) ---------- */
-/* A ring of polished steel: the light catches it top-left and bottom-right (where the glass is lit
-   everywhere else), with dark bands between, the way a turned metal bezel reflects the room. Drawn as a
-   conic gradient round the button's centre, so every shape gets the same bands. The panels' buttons get
-   it brushed (lower contrast) to suit their matte finish. Glass that isn't a button (the dock, the tab
-   bars, the search field) keeps its glass rim. */
+/* A ring of glossy polished steel, visible all the way round: light steel throughout, a bright glint
+   on every corner (strongest top-left and bottom-right, where the glass is lit everywhere else), soft
+   grey bands along the sides, and a wet-looking sheen along the top edge over it all. The steel is a
+   conic gradient round the button's centre, so every shape gets the same bands; the sheen is a plain
+   top-down gradient. The panels' buttons get a slightly softer steel to suit their matte finish.
+   Glass that isn't a button (the dock, the tab bars, the search field) keeps its glass rim. */
 html.glass-brutal {
-  --br-metal: conic-gradient(#d2d2ce, #6a6a67 8%, #242423 14%, #8a8a87 21%, #e6e6e2 28%, #fff 35%, #a2a29e 42%, #3c3c3b 51%,
-    #1c1c1b 62%, #7c7c79 72%, #dadad6 81%, #fff 87%, #b8b8b4 94%, #d2d2ce);
-  --br-metal-brushed: conic-gradient(#acaca8, #646461 8%, #3a3a39 14%, #737370 21%, #a8a8a4 28%, #cbcbc7 35%, #898986 42%, #4a4a48 51%,
-    #353534 62%, #686865 72%, #a3a39f 81%, #c6c6c2 87%, #9d9d99 94%, #acaca8);
+  --br-gloss: linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.12) 22%, rgba(255, 255, 255, 0) 45%,
+    rgba(255, 255, 255, 0) 78%, rgba(255, 255, 255, 0.28));
+  --br-metal: var(--br-gloss), conic-gradient(#cacac6, #8e8e8a 6%, #f2f2ee 12.5%, #7e7e7a 19%, #a2a29e 25%, #dcdcd8 32%, #fff 37.5%,
+    #d0d0cc 43%, #82827e 50%, #72726e 57%, #e6e6e2 62.5%, #7a7a76 69%, #aaaaa6 75%, #e0e0dc 82%, #fff 87.5%, #e6e6e2 94%, #cacac6);
+  --br-metal-brushed: var(--br-gloss), conic-gradient(#b4b4b0, #858581 6%, #dadad6 12.5%, #777773 19%, #959591 25%, #c6c6c2 32%, #eeeeea 37.5%,
+    #bdbdb9 43%, #7a7a76 50%, #6c6c68 57%, #d0d0cc 62.5%, #737370 69%, #9a9a96 75%, #cbcbc7 82%, #f0f0ec 87.5%, #d2d2ce 94%, #b4b4b0);
   --br-metal-w: 2px;
 }
 html.glass-brutal.btn-ios :is(button, a, [role='button']):is(.lg, .btn)::before { padding: var(--br-metal-w); background: var(--br-metal); }
+/* the mini player button's outline too */
+html.glass-brutal .mini-btn, html.glass-brutal .mini-btn:hover { box-shadow: none; }
+html.glass-brutal .app:not(.vol-inline) .mini-btn { position: relative; }
+html.glass-brutal .mini-btn::before {
+  content: ''; position: absolute; inset: 0; border-radius: inherit; padding: 1.5px; pointer-events: none; opacity: 0.85;
+  background: var(--br-metal);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude;
+  transition: opacity 0.2s;
+}
+html.glass-brutal .mini-btn:hover::before { opacity: 1; }
 
 /* ---------- solid white for what is primary or selected, with black glyphs ---------- */
 html.glass-brutal.btn-ios .ctl-play.lg {

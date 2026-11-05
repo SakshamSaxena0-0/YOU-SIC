@@ -1,10 +1,10 @@
 /* ==========================================================================
    Metal theme (html.theme-metal): design tokens
    A hi-fi faceplate. The window is one plate of brushed aluminium under a band of dark brushed
-   gunmetal; the library's tiles are plates of brushed metal in many finishes (graphite, silver,
+   gunmetal; the library's tiles are thick cards of brushed metal in many finishes (graphite, silver,
    rose gold, brass, pewter, platinum, cherry, champagne, titanium, smoke, copper, bronze, oxblood,
-   jade), each in a polished bevelled frame, with its icon in a dark inset well and its name in mono
-   capitals raised off the plate. Copper is the one accent: play, whatever is on, the played part of
+   jade), each set in a bay with a polished chamfer round it, its icon in a well sunk into the card and
+   its name in mono capitals raised off the face. Copper is the one accent: play, whatever is on, the played part of
    the song. The cover is etched into the aluminium as line art (js/etch.js; Settings > Cover can
    show it in colour instead).
    Every colour, material, radius, font and shadow the theme uses is defined here; css/metal.css (the
@@ -56,7 +56,7 @@ html.theme-metal {
 
   /* ---- the tile finishes: 0 the polished highlight, 1-3 the brushed face from light to shade, 4 the
      dark of the frame, 5 the icon's well, ink the name ---- */
-  --mt-graphite-0: #8C8A85; --mt-graphite-1: #6A6964; --mt-graphite-2: #5C5B56; --mt-graphite-3: #4D4C48; --mt-graphite-4: #373634; --mt-graphite-5: #2A2927; --mt-graphite-ink: #DEDAD1;
+  --mt-graphite-0: #8C8A85; --mt-graphite-1: #6A6964; --mt-graphite-2: #5C5B56; --mt-graphite-3: #4D4C48; --mt-graphite-4: #373634; --mt-graphite-5: #2A2927; --mt-graphite-ink: #DDD2C1;
   --mt-silver-0: #F3F1EC;   --mt-silver-1: #D4D1CB;   --mt-silver-2: #C3C0B9;   --mt-silver-3: #ACA9A2;   --mt-silver-4: #84827D;   --mt-silver-5: #3A3936;   --mt-silver-ink: #F9F7F2;
   --mt-rosegold-0: #F8DED4; --mt-rosegold-1: #E0B6A8; --mt-rosegold-2: #CCA092; --mt-rosegold-3: #B3867A; --mt-rosegold-4: #86655B; --mt-rosegold-5: #4A3631; --mt-rosegold-ink: #FFF2EB;
   --mt-brass-0: #CFBA96;    --mt-brass-1: #A48F71;    --mt-brass-2: #8F7C61;    --mt-brass-3: #786750;    --mt-brass-4: #5A4D3C;    --mt-brass-5: #3A3126;    --mt-brass-ink: #F2D19B;
@@ -89,6 +89,8 @@ html.theme-metal {
   --mt-brush: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='240'><filter id='n' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='0.003 1.05' numOctaves='4' seed='11' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  2.6 0 0 0 -1.32'/></filter><filter id='m' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='0.003 1.05' numOctaves='4' seed='11' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -2.4 0 0 0 1.1'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.3'/><rect width='100%25' height='100%25' filter='url(%23m)' opacity='0.24'/></svg>") 0 0 / 600px 240px;
   /* the same, finer and fainter, for small parts */
   --mt-brush-fine: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='120'><filter id='n' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='0.005 1.2' numOctaves='3' seed='4' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  2.4 0 0 0 -1.25'/></filter><filter id='m' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='0.005 1.2' numOctaves='3' seed='4' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -2.2 0 0 0 1'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.26'/><rect width='100%25' height='100%25' filter='url(%23m)' opacity='0.2'/></svg>") 0 0 / 300px 120px;
+  /* the same, finest and faintest, for the face of a tile's card */
+  --mt-brush-card: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='160'><filter id='n' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='0.006 0.95' numOctaves='2' seed='7' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  2.4 0 0 0 -1.2'/></filter><filter id='m' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='0.006 0.95' numOctaves='2' seed='7' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -2.4 0 0 0 1.2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.09'/><rect width='100%25' height='100%25' filter='url(%23m)' opacity='0.1'/></svg>") 0 0 / 400px 160px;
   /* turned metal: the rings a lathe leaves on a knob, and the light crossing them */
   --mt-turned: repeating-radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--mt-white) 7%, transparent) 0 1px, transparent 1px 2.5px,
     color-mix(in srgb, var(--mt-void) 5%, transparent) 2.5px 3.2px, transparent 3.2px 4px);
@@ -139,6 +141,10 @@ html.theme-metal {
   /* a tile's frame: the face's edge cut in (a dark groove, then a thin light line) */
   --mt-groove: inset 0 0 0 1px color-mix(in srgb, var(--mt-void) 55%, transparent), inset 0 0 0 2px color-mix(in srgb, var(--mt-white) 14%, transparent),
     inset 0 0 14px 1px color-mix(in srgb, var(--mt-void) 18%, transparent);
+  /* a tile's bay: the long shadow it casts on the plate (lifted on hover, pressed in on a click) */
+  --mt-bay-shadow: 0 9px 13px -3px color-mix(in srgb, var(--mt-void) 62%, transparent), 0 2px 3px color-mix(in srgb, var(--mt-void) 40%, transparent);
+  --mt-bay-shadow-up: 0 14px 18px -5px color-mix(in srgb, var(--mt-void) 62%, transparent), 0 3px 5px color-mix(in srgb, var(--mt-void) 40%, transparent);
+  --mt-bay-shadow-down: 0 5px 8px -3px color-mix(in srgb, var(--mt-void) 62%, transparent), 0 1px 2px color-mix(in srgb, var(--mt-void) 40%, transparent);
   --mt-outline: 0 0 0 1px color-mix(in srgb, var(--mt-void) 70%, transparent);
   /* filled progress: a bar of polished copper */
   --mt-flow: linear-gradient(180deg, var(--mt-cu-0), var(--mt-cu-2) 55%, var(--mt-cu-3));
@@ -148,6 +154,7 @@ html.theme-metal {
   --mt-r-sm: 6px;
   --mt-r: 9px;
   --mt-r-lg: 12px;
+  --mt-r-card: 11px;   /* a tile's bay; its card is inset by --mt-frame-w */
   --mt-r-pill: 999px;
   --mt-frame-w: 5px;
 
@@ -173,4 +180,15 @@ html.theme-metal {
   --art-scrim: var(--mt-alu-2);
   background: var(--mt-alu-2);
   color-scheme: light;
+}
+
+/* the tokens that read a tile's own finish (--f0 to --f5, set per tile in css/metal.css), so they are
+   worked out on each tile rather than on the page */
+html.theme-metal .tile {
+  /* the dark cut round a tile's bay */
+  --mt-bay-cut: 0 0 0 1px color-mix(in srgb, var(--f4) 45%, var(--mt-void));
+  /* light letters raised off a card: a dark edge under each one (so they read on the brightest finish),
+     a soft shadow, a faint light along their tops */
+  --mt-card-letter: 0 1px 0 color-mix(in srgb, var(--f4) 35%, var(--mt-void)), 0 1px 3px color-mix(in srgb, var(--f4) 30%, var(--mt-void)),
+    0 -1px 0 color-mix(in srgb, var(--mt-white) 8%, transparent);
 }

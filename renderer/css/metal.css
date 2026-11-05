@@ -1,9 +1,9 @@
 /* ==========================================================================
    Metal theme (html.theme-metal): components
    A hi-fi faceplate: one plate of brushed aluminium under a band of dark brushed gunmetal (the title
-   bar and the column headers). The library's tiles are plates of brushed metal in many finishes, each
-   in a polished bevelled frame, their icons in dark inset wells and their names in mono capitals
-   raised off the plate. Buttons on the plate are machined aluminium (round ones turned on a lathe);
+   bar and the column headers). The library's tiles are thick cards of brushed metal in many finishes,
+   each set in a bay with a polished chamfer round it, their icons in wells sunk into the card and their
+   names in mono capitals raised off the face. Buttons on the plate are machined aluminium (round ones turned on a lathe);
    copper is the one accent: play, whatever is switched on, the played part of the song. Text on the
    plate is printed dark into the metal; text on the band is light. The cover is etched into the
    aluminium as line art (js/etch.js) or, if Settings > Cover says so, shown in colour; either way it
@@ -276,40 +276,55 @@ html.theme-metal .search-bar:focus-within { box-shadow: var(--mt-cut), 0 0 0 1.5
 html.theme-metal .search-bar input { color: var(--mt-ink); font-family: var(--mt-ui); font-weight: 600; }
 html.theme-metal .search-bar input::placeholder { color: var(--mt-ink-3); }
 html.theme-metal .search-ico { color: var(--mt-ink-2); }
-/* category tiles: plates of brushed metal, each in its own finish (below), in a polished bevelled
-   frame: light along its top, darker below, with a groove cut where it meets the face. The face is
-   brushed side to side, lit from above, with a soft sheen across it. The icon sits in a dark inset
-   well; the name and the count are light, raised off the plate. */
+/* category tiles: thick cards of brushed metal, each in its own finish (below), each set in a bay of
+   the same metal, as in the user's reference. From the outside in: a dark cut round the bay; the bay's
+   rim, in shade along the top and lit low and to the right; a dark channel round the card; the card's
+   polished chamfer, brightest along its top; a dark seam; then the face, brushed side to side, darker
+   on the left, lit towards the right, with a soft sheen across it. The bay casts a long shadow on the
+   plate. The icon sits in a well sunk into the card: lit along its top, dark in the middle, its floor
+   catching a little light, with a bright lip below it. The name and the count are light, raised off
+   the face. The bay is the tile itself; the card is its ::before. */
 html.theme-metal .root-grid { gap: 14px; padding: 12px 16px 20px; }
 html.theme-metal .tile {
-  height: 120px; border: var(--mt-frame-w) solid transparent; border-radius: var(--mt-r-lg); color: var(--f-ink); filter: none; padding: 13px 14px;
-  outline: 1px solid color-mix(in srgb, var(--f0) 80%, transparent); outline-offset: -1px;
+  height: 108px; border: 0; border-radius: var(--mt-r-card); color: var(--f-ink); filter: none; padding: 15px 16px; outline: 0;
   background:
-    var(--mt-brush) padding-box,
-    linear-gradient(112deg, transparent 18%, color-mix(in srgb, var(--mt-white) 15%, transparent) 38%, color-mix(in srgb, var(--mt-white) 4%, transparent) 52%, transparent 66%) var(--f-sx, 0%) 0 / 260% 100% padding-box,
-    linear-gradient(180deg, var(--f1), var(--f2) 55%, var(--f3)) padding-box,
-    linear-gradient(180deg, var(--f0), color-mix(in srgb, var(--f0) 55%, var(--f1)) 16%, var(--f2) 46%, var(--f3) 72%, var(--f4) 90%, var(--f2)) border-box;
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--mt-void) 75%, transparent), var(--mt-groove), 0 7px 14px -6px color-mix(in srgb, var(--mt-void) 70%, transparent);
+    linear-gradient(90deg, transparent 60%, color-mix(in srgb, var(--mt-white) 18%, transparent)),
+    linear-gradient(180deg, color-mix(in srgb, var(--f4) 70%, var(--mt-void)), var(--f3) 30%, var(--f2) 70%, var(--f1));
+  box-shadow: var(--mt-bay-cut), var(--mt-bay-shadow);
   transition: filter var(--mt-t) var(--mt-ease), translate var(--mt-t) var(--mt-ease), box-shadow var(--mt-t) var(--mt-ease);
 }
-html.theme-metal .tile:hover { transform: none; translate: 0 -2px; filter: brightness(1.07); box-shadow: 0 0 0 1px color-mix(in srgb, var(--mt-void) 75%, transparent), var(--mt-groove), 0 14px 22px -10px color-mix(in srgb, var(--mt-void) 75%, transparent); }
-html.theme-metal .tile:active { transform: none; translate: 0 1px; filter: brightness(0.95); }
+html.theme-metal .tile:hover { transform: none; translate: 0 -2px; filter: brightness(1.06); box-shadow: var(--mt-bay-cut), var(--mt-bay-shadow-up); }
+html.theme-metal .tile:active { transform: none; translate: 0 1px; filter: brightness(0.96); box-shadow: var(--mt-bay-cut), var(--mt-bay-shadow-down); transition-duration: 60ms; }
 html.theme-metal .tile::after { display: none; }
+html.theme-metal .tile.lg::before {
+  display: block; content: ''; position: absolute; inset: var(--mt-frame-w); z-index: -1; border-radius: calc(var(--mt-r-card) - var(--mt-frame-w));
+  padding: 0; -webkit-mask: none; mask: none; border: 1px solid transparent; pointer-events: none;
+  background:
+    var(--mt-brush-card) padding-box,
+    linear-gradient(180deg, color-mix(in srgb, var(--mt-white) 14%, transparent), transparent 16%, transparent 78%, color-mix(in srgb, var(--mt-void) 16%, transparent)) padding-box,
+    linear-gradient(112deg, transparent 34%, color-mix(in srgb, var(--mt-white) 9%, transparent) 46%, transparent 58%) var(--f-sx, 0%) 0 / 260% 100% padding-box,
+    linear-gradient(90deg, var(--f3), color-mix(in srgb, var(--f3) 85%, var(--f4)) 35%, var(--f3) 55%, var(--f2) 80%, color-mix(in srgb, var(--f1) 70%, var(--f2)) 96%, var(--f2)) padding-box,
+    linear-gradient(180deg, color-mix(in srgb, var(--f0) 35%, var(--mt-white)), var(--f0) 14%, color-mix(in srgb, var(--f0) 70%, var(--f1)) 60%, var(--f0)) border-box;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--f4) 55%, var(--mt-void)), inset 0 0 0 1px color-mix(in srgb, var(--mt-void) 28%, transparent);
+}
 html.theme-metal .tile-title {
-  position: relative; z-index: 1; font-family: var(--mt-label); font-weight: 700; font-size: 12.5px; letter-spacing: 0.05em; line-height: 1.25;
-  text-transform: uppercase; color: var(--f-ink); text-shadow: var(--mt-raised);
+  position: relative; z-index: 1; font-family: var(--mt-label); font-weight: 700; font-size: 12.5px; letter-spacing: 0.035em; line-height: 1.25;
+  text-transform: uppercase; color: color-mix(in srgb, var(--f-ink) 80%, var(--f2)); text-shadow: var(--mt-card-letter);
 }
-/* the icon's well: dark metal sunk into the plate, a soft light along its top, the glyph in the tile's own tint */
 html.theme-metal .tile-ico {
-  width: 40px; height: 40px; top: 10px; left: 10px; border-radius: var(--mt-r); border: 1px solid transparent; color: var(--f-ink);
-  background: radial-gradient(120% 70% at 50% 0%, color-mix(in srgb, var(--mt-white) 20%, transparent), transparent 60%) padding-box,
-    linear-gradient(180deg, color-mix(in srgb, var(--f5) 70%, var(--f3)), var(--f5) 60%) padding-box,
-    linear-gradient(180deg, color-mix(in srgb, var(--f0) 60%, transparent), color-mix(in srgb, var(--f4) 90%, transparent)) border-box;
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--mt-void) 55%, transparent), inset 0 -2px 4px color-mix(in srgb, var(--mt-void) 40%, transparent),
-    0 1px 0 color-mix(in srgb, var(--f0) 45%, transparent), 0 3px 6px -2px color-mix(in srgb, var(--mt-void) 60%, transparent);
+  width: 37px; height: 37px; top: 15px; left: 15px; border-radius: 7px; border: 1px solid color-mix(in srgb, var(--f5) 45%, var(--mt-void));
+  color: color-mix(in srgb, var(--f-ink) 48%, var(--f3));
+  background: linear-gradient(90deg, color-mix(in srgb, var(--mt-void) 35%, transparent), transparent 32%),
+    linear-gradient(180deg, color-mix(in srgb, var(--f1) 45%, var(--f2)), color-mix(in srgb, var(--f3) 70%, var(--f4)) 22%,
+    color-mix(in srgb, var(--f5) 70%, var(--f4)) 40%, color-mix(in srgb, var(--f5) 70%, var(--mt-void)) 60%, color-mix(in srgb, var(--f3) 55%, var(--f4)));
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--f1) 55%, transparent), inset 0 4px 4px -3px color-mix(in srgb, var(--mt-void) 55%, transparent),
+    0 1px 0 color-mix(in srgb, var(--f0) 75%, var(--mt-white)), 0 -1px 0 color-mix(in srgb, var(--mt-void) 20%, transparent);
 }
-html.theme-metal .tile-ico .ico { width: 19px; height: 19px; filter: drop-shadow(0 1px 1px color-mix(in srgb, var(--mt-void) 70%, transparent)); }
-html.theme-metal .tile-count { top: 12px; right: 13px; color: var(--f-ink); font-size: 12.5px; font-weight: 500; opacity: 0.92; text-shadow: var(--mt-raised); }
+html.theme-metal .tile-ico .ico { width: 17px; height: 17px; filter: drop-shadow(0 1px 0 color-mix(in srgb, var(--mt-void) 45%, transparent)); }
+html.theme-metal .tile-count {
+  top: 15px; right: 16px; font-size: 13px; font-weight: 400; opacity: 1;
+  color: color-mix(in srgb, var(--f-ink) 80%, var(--f2)); text-shadow: var(--mt-card-letter);
+}
 /* the finishes, in the order of the tiles (Folders, Folders Hierarchy, All Songs, Albums, Artists, Album
    Artists, Genres, Years, Composers, Playlists, Queue, Recently Added, Recently Played, Most Played,
    Top Rated). Each also sets where its sheen falls, so neighbouring plates catch the light differently. */

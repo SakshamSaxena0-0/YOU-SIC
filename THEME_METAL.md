@@ -5,10 +5,18 @@ A hi-fi faceplate, after the user's mockup of the library as plates of brushed m
 ## The look
 
 - **Ground:** the window is one plate of brushed aluminium under a band of dark brushed gunmetal. The band covers the title bar and the three column headers and ends in a machined edge that casts a soft shadow.
-- **Tiles:** the library's tiles are plates of brushed metal, each in its own finish. In tile order:
+- **Tiles:** the library's tiles are thick cards of brushed metal, each in its own finish. In tile order:
   graphite, silver, rose gold, brass, pewter, platinum, cherry, champagne, titanium, silver, smoke, copper, bronze, oxblood and jade.
-- **Tile frames:** each plate sits in a polished bevelled frame, with a groove where the frame meets the face and a soft sheen that falls differently on each plate.
-- **Tile contents:** icons sit in dark inset wells, tinted with their plate's colour. Names and counts are light mono capitals, raised off the plate.
+- **How a card is built** (after the user's close-up of the Folders tile), from the outside in:
+  - a dark cut round the card's bay;
+  - the bay's rim, in shade along the top and lit low and to the right;
+  - a dark channel round the card;
+  - the card's polished chamfer, brightest along its top;
+  - a dark seam;
+  - the face, brushed finely side to side, darker on the left, lit towards the right, with a soft sheen that falls differently on each card.
+
+  The bay casts a long shadow on the plate. On hover it lifts and the shadow grows; on a click it presses in. The bay is the tile itself and the card is its `::before`.
+- **Tile contents:** each icon sits in a well sunk into the card: lit along its top, dark in the middle, its floor catching a little light, with a bright lip below it. The glyph is tinted with the card's metal. Names and counts are light mono capitals, raised off the face by a dark edge under each letter.
 - **Buttons on the plate:** keys and knobs of machined aluminium. The round knobs carry the rings a lathe leaves.
 - **Copper:** the one accent. It marks play (a turned copper knob in a polished steel bezel), anything switched on, the played part of the song, and the sliders.
 - **Header buttons:** clear rings of polished steel round a light glyph.
@@ -50,7 +58,7 @@ Each cover takes about 0.4 s, in the worker, so the window never stalls. The cov
 
 ## Contrast
 
-Primary text is 8.0:1 on the darkest part of the plate where text sits (`--mt-alu-4`) and 11.2:1 in the light. Secondary text is 6.0:1 there, and hints and numbers are 4.5:1. On the band, light text is 7.6:1 and dim text is 5.8:1 at the band's middle (4.4:1 at its very top, where only the title bar sits). Dark text on copper is 6.0:1 on the darkest copper key. The tile names are light on their plates, as in the mockup, with a dark raised shadow round every letter so they read on the brightest finish.
+Primary text is 8.0:1 on the darkest part of the plate where text sits (`--mt-alu-4`) and 11.2:1 in the light. Secondary text is 6.0:1 there, and hints and numbers are 4.5:1. On the band, light text is 7.6:1 and dim text is 5.8:1 at the band's middle (4.4:1 at its very top, where only the title bar sits). Dark text on copper is 6.0:1 on the darkest copper key. The tile names are light on their cards, as in the mockup: 4.0 to 5.6:1 on the dark finishes and about 3.4:1 on brass and pewter; on the light ones (silver, platinum, rose gold, champagne) a dark edge under every letter carries them.
 
 ## Performance
 

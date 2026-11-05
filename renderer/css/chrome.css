@@ -1,10 +1,10 @@
 /* ==========================================================================
    Chrome theme (html.theme-chrome): components
-   Mirror-polished chrome on dark brushed gunmetal. The library's tiles are chrome plates in thick
-   bevelled bezels, all reflecting the same room (a fixed background, so each plate shows its own part
-   of it, as real mirrors would); their icons sit in inset squares of black chrome and their labels are
-   engraved in mono capitals. Round buttons are black chrome in turned steel rings; play is a dome of
-   bright chrome. The theme has no colour of its own: the album art stays exactly as it is, and in the
+   Satin metal on dark brushed gunmetal: every button is smooth satin steel with a diffuse sheen and a
+   very fine matte grain, never a hard glossy band. The library's tiles are silver plates in thin
+   machined bezels, all softly reflecting the same room (each offset into it by its place in the grid);
+   their icons sit in inset squares of dark satin and their labels are mono capitals. Round buttons are
+   dark satin in turned steel rings; play is a dome of bright satin silver. The theme has no colour of its own: the album art stays exactly as it is, and in the
    wide layout it dissolves into the panels beside it as light (css/seamless.css, ambient.js), with no
    lines between the columns.
    Tokens: css/chrome.tokens.css. Seekbar: waveform.js (_drawCr). Guide: THEME_CHROME.md.
@@ -66,31 +66,31 @@ html.theme-chrome .app.wide .side-header { --cr-dir: 270deg; }
 html.theme-chrome .titlebar { background: transparent; }
 html.theme-chrome .tb-drag { gap: 10px; padding-left: 16px; }
 /* the logo: a small chrome stud */
-html.theme-chrome .tb-logo { width: 12px; height: 12px; border-radius: 50%; background: var(--cr-mirror-dome); box-shadow: var(--cr-outline); }
+html.theme-chrome .tb-logo { width: 12px; height: 12px; border-radius: 50%; background: var(--cr-satin-dome); box-shadow: var(--cr-outline); }
 html.theme-chrome .tb-title { font-family: var(--cr-label); font-weight: 600; font-size: 10.5px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--cr-text-dim); }
 /* window buttons: three small black-chrome studs in steel rings */
 html.theme-chrome .tb-buttons { align-items: center; gap: 8px; padding: 0 14px 0 8px; }
 html.theme-chrome .tb-btn {
   width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid transparent; color: var(--cr-text-dim);
-  background: var(--cr-dome) padding-box, var(--cr-black) padding-box, var(--cr-ring) border-box; box-shadow: var(--cr-outline);
+  background: var(--cr-dome) padding-box, var(--cr-satin-dark) padding-box, var(--cr-ring) border-box; box-shadow: var(--cr-outline);
   transition: color 200ms;
 }
 html.theme-chrome .tb-btn svg { width: 8px; height: 8px; stroke-width: 1.6; }
 html.theme-chrome .tb-btn:hover { color: var(--cr-white); }
 html.theme-chrome .tb-close:hover { color: var(--cr-white); background: var(--cr-dome) padding-box, linear-gradient(180deg, var(--cr-red), color-mix(in srgb, var(--cr-red) 45%, var(--cr-void))) padding-box, var(--cr-ring) border-box; }
 
-/* ---------- 5. buttons: black chrome in a turned steel ring ----------
-   At rest: black chrome (a glossy top half over a dark floor) inside a ring of glossy steel.
+/* ---------- 5. buttons: dark satin metal in a turned steel ring ----------
+   At rest: dark satin (a soft sheen from above, a fine grain) inside a ring of satin steel.
    Hover: the plate brightens a touch and lifts. Press: it sinks into the metal.
-   On / primary: the plate turns to bright mirror chrome with an engraved dark glyph. */
+   On / primary: the plate turns to bright satin silver with an engraved dark glyph. */
 html.theme-chrome :is(.icon-btn.lg, .ctl.lg, .btn, .chip, .ab-btn, .fchip.add, .nb-play) {
-  border: 2px solid transparent; filter: none; color: var(--cr-text);
-  background: var(--cr-gloss) padding-box, var(--cr-black) padding-box, var(--cr-ring) border-box;
+  border: 1.5px solid transparent; filter: none; color: var(--cr-text);
+  background: var(--cr-grain) padding-box, var(--cr-gloss) padding-box, var(--cr-satin-dark) padding-box, var(--cr-ring) border-box;
   box-shadow: var(--cr-outline), var(--cr-shadow-sm);
   transition: color 200ms, filter 200ms, box-shadow var(--cr-t) var(--cr-ease), translate var(--cr-t) var(--cr-ease);
 }
 html.theme-chrome :is(.pl-header, .lib-header, .eq-header, .side-header) .icon-btn.lg, html.theme-chrome :is(.ctl-md, .ctl-sm).lg {
-  background: var(--cr-dome) padding-box, var(--cr-black) padding-box, var(--cr-ring) border-box;
+  background: var(--cr-grain) padding-box, var(--cr-dome) padding-box, var(--cr-satin-dark) padding-box, var(--cr-ring) border-box;
 }
 html.theme-chrome :is(.icon-btn.lg, .ctl.lg, .btn, .chip, .ab-btn, .fchip.add, .nb-play):hover {
   transform: none; filter: brightness(1.12); color: var(--cr-white); translate: 0 -1px; box-shadow: var(--cr-outline), var(--cr-shadow);
@@ -107,7 +107,7 @@ html.theme-chrome .icon-btn:not(.lg):hover { background: color-mix(in srgb, var(
 html.theme-chrome .btn { height: 40px; padding: 0 22px; border-radius: var(--cr-r); font-family: var(--cr-ui); font-weight: 700; font-size: 13.5px; letter-spacing: 0.03em; }
 html.theme-chrome :is(.btn:not(.ghost), .fchip.add, .chip.on, .ctl-sm.on) {
   color: var(--cr-text-ink); text-shadow: var(--cr-engrave);
-  background: var(--cr-mirror-lite) padding-box, var(--cr-ring) border-box;
+  background: var(--cr-grain) padding-box, var(--cr-gloss) padding-box, var(--cr-satin-lite) padding-box, var(--cr-ring) border-box;
 }
 html.theme-chrome :is(.btn:not(.ghost), .fchip.add, .chip.on, .ctl-sm.on):hover { color: var(--cr-ink); }
 html.theme-chrome :is(.btn:not(.ghost), .fchip.add, .chip.on, .ctl-sm.on):hover .ico { filter: none; }
@@ -131,11 +131,11 @@ html.theme-chrome .ctl-sm.on::after {
   display: block; top: auto; bottom: -10px; left: 50%; right: auto; width: 4px; height: 4px; margin: 0 0 0 -2px; border-radius: 50%;
   background: var(--cr-white); box-shadow: 0 0 6px color-mix(in srgb, var(--cr-white) 70%, transparent);
 }
-/* play: a dome of mirror chrome in a thick bezel, the glyph engraved in it */
+/* play: a dome of bright satin silver in a steel ring, the glyph engraved in it */
 html.theme-chrome .play-wrap { width: 114px; height: 114px; }
 html.theme-chrome .ctl-play.lg {
   width: 80px; height: 80px; border-radius: 50%; border: var(--cr-bezel-w) solid transparent; color: var(--cr-ink);
-  background: var(--cr-mirror-dome) padding-box, var(--cr-ring) border-box;
+  background: var(--cr-grain) padding-box, var(--cr-satin-dome) padding-box, var(--cr-ring) border-box;
   box-shadow: var(--cr-outline), var(--cr-groove), 0 18px 32px -12px var(--cr-void);
   animation: none; filter: none; transition: filter 200ms, translate 220ms var(--cr-ease);
 }
@@ -149,10 +149,10 @@ html.theme-chrome .pr-fill { stroke: var(--cr-steel-1); stroke-width: 2.2; filte
   html.theme-chrome .ctl-play.lg { width: 68px; height: 68px; }
 }
 
-/* ---------- 7. the dock: a bar of black chrome in a bezel; the active tab is a bright chrome plate ---------- */
+/* ---------- 7. the dock: a bar of dark satin in a bezel; the active tab is a bright satin plate ---------- */
 html.theme-chrome .pl-nav {
-  border: 2px solid transparent; border-radius: var(--cr-r-lg); padding: 5px; overflow: visible;
-  background: var(--cr-gloss-soft) padding-box, var(--cr-black) padding-box, var(--cr-bezel);
+  border: 1.5px solid transparent; border-radius: var(--cr-r-lg); padding: 5px; overflow: visible;
+  background: var(--cr-grain) padding-box, var(--cr-gloss-soft) padding-box, var(--cr-satin-dark) padding-box, var(--cr-bezel);
   box-shadow: var(--cr-outline), var(--cr-shadow);
 }
 html.theme-chrome .nav-btn { height: 50px; border-radius: var(--cr-r); color: var(--cr-text-dim); filter: none; }
@@ -160,7 +160,7 @@ html.theme-chrome .nav-btn .ico { width: 21px; height: 21px; }
 html.theme-chrome .nav-btn:hover { color: var(--cr-white); }
 html.theme-chrome .nav-btn:active { transform: none; }
 html.theme-chrome .nav-btn.on { color: var(--cr-ink); filter: none; }
-html.theme-chrome .nav-ink { top: 5px; bottom: 5px; border-radius: var(--cr-r); background: var(--cr-mirror-lite); box-shadow: var(--cr-outline), inset 0 1px 0 var(--cr-white); }
+html.theme-chrome .nav-ink { top: 5px; bottom: 5px; border-radius: var(--cr-r); background: var(--cr-grain), var(--cr-gloss), var(--cr-satin-lite); box-shadow: var(--cr-outline), inset 0 1px 1px color-mix(in srgb, var(--cr-white) 60%, transparent); }
 
 /* ---------- 8. player: header, the cover, the title block ---------- */
 html.theme-chrome .pl-cat { border-radius: var(--cr-r); }
@@ -177,7 +177,7 @@ html.theme-chrome .app:not(.wide) .aa-img::before {
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude;
 }
 html.theme-chrome .aa-img::after, html.theme-chrome .aa-img.sheen::after, html.theme-chrome .aa-img.flip-glint::after { display: none; animation: none; }
-html.theme-chrome .aa-img.ph { background: var(--cr-gloss-soft), var(--cr-black); }
+html.theme-chrome .aa-img.ph { background: var(--cr-gloss-soft), var(--cr-satin-dark); }
 html.theme-chrome .aa-img.ph .ico { fill: var(--cr-steel-4); filter: none; }
 /* the back: a slab of dark metal */
 html.theme-chrome .aa-back, html.theme-chrome .aa-back.aa-info {
@@ -203,7 +203,7 @@ html.theme-chrome .pl-artist { color: var(--cr-steel-1); font-weight: 700; font-
 html.theme-chrome .pl-album { color: var(--cr-text-dim); font-size: 13px; }
 /* badges and the format line: engraved into small bright plates / cut into the metal */
 html.theme-chrome .badge { border-radius: var(--cr-r-sm); font-size: 9px; padding: 3px 8px; background: var(--cr-iron-9); color: var(--cr-steel-1); box-shadow: var(--cr-cut); }
-html.theme-chrome .badge.hires { color: var(--cr-ink); background: var(--cr-mirror-lite); box-shadow: var(--cr-outline); text-shadow: var(--cr-engrave); }
+html.theme-chrome .badge.hires { color: var(--cr-ink); background: var(--cr-grain), var(--cr-satin-lite); box-shadow: var(--cr-outline); text-shadow: var(--cr-engrave); }
 html.theme-chrome .pl-meta { border-radius: var(--cr-r-sm); background: var(--cr-iron-9); color: var(--cr-text-dim); box-shadow: var(--cr-cut); font-size: 11px; padding: 3px 10px; }
 html.theme-chrome .pl-meta:hover { color: var(--cr-text); }
 html.theme-chrome .rating .star { color: var(--cr-iron-5); }
@@ -212,7 +212,7 @@ html.theme-chrome .star:hover { color: var(--cr-white); transform: translateY(-1
 html.theme-chrome .pl-info.enter > *, html.theme-chrome .pl-info.enter-r > *, html.theme-chrome .pl-info.enter-l > * { animation: cr-fade 500ms var(--cr-ease) both; }
 @keyframes cr-fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 html.theme-chrome .seek-times { font-size: 11px; color: var(--cr-text-dim); margin-top: 6px; }
-html.theme-chrome .seek-bubble { background: var(--cr-mirror-lite); color: var(--cr-ink); border-radius: var(--cr-r-sm); box-shadow: var(--cr-outline), var(--cr-shadow-sm); border: 0; padding: 4px 10px; }
+html.theme-chrome .seek-bubble { background: var(--cr-satin-lite); color: var(--cr-ink); border-radius: var(--cr-r-sm); box-shadow: var(--cr-outline), var(--cr-shadow-sm); border: 0; padding: 4px 10px; }
 html.theme-chrome .mini-btn { color: var(--cr-text-dim); box-shadow: none; position: relative; }
 html.theme-chrome .app.vol-inline .mini-btn { position: absolute; }
 html.theme-chrome .mini-btn::before {
@@ -233,18 +233,19 @@ html.theme-chrome .search-bar:focus-within { box-shadow: var(--cr-cut), 0 0 0 1p
 html.theme-chrome .search-bar input { color: var(--cr-text); font-family: var(--cr-ui); }
 html.theme-chrome .search-bar input::placeholder { color: var(--cr-text-dim); }
 html.theme-chrome .search-ico { color: var(--cr-text-dim); }
-/* category tiles: plates of mirror chrome in thick bezels. The face is chrome's sky-over-floor; over it
-   lies the room (fixed to the window, so the reflection runs on from tile to tile). The icon sits in
-   an inset square of black chrome; the count is engraved in the bright upper half and the label
-   raised off the dark lower half. */
+/* category tiles: plates of satin silver in thin machined bezels. The face falls off smoothly from light
+   to shade; over it lies the room, reflected softly (each tile offset into it by its place in the grid,
+   so the reflection runs on from tile to tile: some plates mostly lit, some mostly in shade), and over
+   everything a very fine matte grain. The icon sits in an inset square of dark satin; the count and
+   the label are light, with a soft dark shadow so they read wherever the reflection falls. */
 html.theme-chrome .root-grid { gap: 14px; padding: 8px 16px 20px; }
 html.theme-chrome .tile {
   height: 120px; border: var(--cr-bezel-w) solid transparent; border-radius: var(--cr-r-lg); color: var(--cr-text); filter: none; padding: 13px 14px;
-  background: var(--cr-room), var(--cr-mirror) padding-box, var(--cr-bezel);
+  background: var(--cr-grain) padding-box, var(--cr-room), var(--cr-gloss) padding-box, var(--cr-satin) padding-box, var(--cr-bezel);
   --cr-rx: 0px; --cr-ry: 0px;
   --cr-at: calc(-1 * var(--cr-rx)) calc(-1 * var(--cr-ry));
-  background-position: var(--cr-at), var(--cr-at), var(--cr-at), var(--cr-at), var(--cr-at), 0 0, 0 0;
-  box-shadow: var(--cr-outline), var(--cr-groove), var(--cr-shadow-sm);
+  background-position: 0 0, var(--cr-at), var(--cr-at), var(--cr-at), var(--cr-at), var(--cr-at), var(--cr-at), 0 0, 0 0, 0 0;
+  box-shadow: var(--cr-rim-out), var(--cr-groove), var(--cr-shadow-sm);
   transition: filter var(--cr-t) var(--cr-ease), translate var(--cr-t) var(--cr-ease), box-shadow var(--cr-t) var(--cr-ease);
 }
 /* where each tile sits in the room (three columns of ~150px, rows of ~134px; other layouts just get
@@ -255,7 +256,7 @@ html.theme-chrome .tile:nth-child(n+4) { --cr-ry: 134px; }
 html.theme-chrome .tile:nth-child(n+7) { --cr-ry: 268px; }
 html.theme-chrome .tile:nth-child(n+10) { --cr-ry: 402px; }
 html.theme-chrome .tile:nth-child(n+13) { --cr-ry: 536px; }
-html.theme-chrome .tile:hover { transform: none; translate: 0 -2px; filter: brightness(1.07); box-shadow: var(--cr-outline), var(--cr-groove), var(--cr-shadow); }
+html.theme-chrome .tile:hover { transform: none; translate: 0 -2px; filter: brightness(1.07); box-shadow: var(--cr-rim-out), var(--cr-groove), var(--cr-shadow); }
 html.theme-chrome .tile:active { transform: none; translate: 0 1px; filter: brightness(0.94); }
 html.theme-chrome .tile::after { display: none; }
 html.theme-chrome .tile-title {
@@ -263,8 +264,8 @@ html.theme-chrome .tile-title {
   text-transform: uppercase; color: var(--cr-text); text-shadow: 0 1px 1px var(--cr-void), 0 0 5px color-mix(in srgb, var(--cr-void) 70%, transparent);
 }
 html.theme-chrome .tile-ico {
-  width: 40px; height: 40px; top: 10px; left: 10px; border-radius: var(--cr-r); border: 1.5px solid transparent; color: var(--cr-white);
-  background: var(--cr-gloss) padding-box, var(--cr-black) padding-box, var(--cr-ring) border-box;
+  width: 40px; height: 40px; top: 10px; left: 10px; border-radius: var(--cr-r); border: 1px solid transparent; color: var(--cr-white);
+  background: var(--cr-grain) padding-box, var(--cr-gloss) padding-box, var(--cr-satin-dark) padding-box, var(--cr-ring) border-box;
   box-shadow: var(--cr-outline), 0 4px 8px -3px color-mix(in srgb, var(--cr-void) 80%, transparent);
 }
 html.theme-chrome .tile-ico .ico { width: 19px; height: 19px; }
@@ -272,7 +273,7 @@ html.theme-chrome .tile-count { top: 12px; right: 13px; color: var(--cr-white); 
 /* folder chips */
 html.theme-chrome .fchip:not(.add) {
   border: 1.5px solid transparent; border-radius: var(--cr-r); color: var(--cr-text);
-  background: var(--cr-gloss-soft) padding-box, var(--cr-black) padding-box, var(--cr-ring) border-box; box-shadow: var(--cr-outline);
+  background: var(--cr-grain) padding-box, var(--cr-gloss-soft) padding-box, var(--cr-satin-dark) padding-box, var(--cr-ring) border-box; box-shadow: var(--cr-outline);
 }
 html.theme-chrome .fchip:not(.add) .ico { color: var(--cr-steel-2); }
 html.theme-chrome .empty-lib .ico { color: var(--cr-steel-1); }
@@ -293,7 +294,7 @@ html.theme-chrome .r-more { width: 30px; height: 30px; border-radius: 50%; color
 html.theme-chrome .r-more:hover { background: var(--cr-iron-9); color: var(--cr-white); }
 html.theme-chrome .it-art { border-radius: var(--cr-r-sm); background-color: var(--cr-iron-7); box-shadow: var(--cr-outline), 0 0 0 2px color-mix(in srgb, var(--cr-steel-2) 30%, transparent); }
 html.theme-chrome .it-art.round { border-radius: 50%; }
-html.theme-chrome .it-art.ph { background: var(--cr-black); color: var(--cr-steel-4); }
+html.theme-chrome .it-art.ph { background: var(--cr-satin-dark); color: var(--cr-steel-4); }
 html.theme-chrome .row:hover .it-art { scale: 1; }
 /* the playing row: a bright steel edge and a lit strip */
 html.theme-chrome .row.track.playing {
@@ -318,21 +319,21 @@ html.theme-chrome .g-sub { color: var(--cr-text-dim); }
 /* album / artist header */
 html.theme-chrome .ah-art { border-radius: var(--cr-r); box-shadow: var(--cr-outline), 0 0 0 3px var(--cr-steel-2), 0 0 0 4px var(--cr-void), 0 24px 44px -18px var(--cr-void); }
 html.theme-chrome .ah-art:not(.ph)::before { display: none; }
-html.theme-chrome .ah-art.ph { background: var(--cr-black); }
+html.theme-chrome .ah-art.ph { background: var(--cr-satin-dark); }
 html.theme-chrome .ah-title { color: var(--cr-text); }
 html.theme-chrome .ah-artist { color: var(--cr-steel-1); }
 html.theme-chrome .ah-meta { color: var(--cr-text-dim); }
 /* the narrow layout's mini player bar: like the dock */
 html.theme-chrome .navbar {
-  border: 2px solid transparent; border-radius: var(--cr-r-lg); color: var(--cr-text);
-  background: var(--cr-gloss-soft) padding-box, var(--cr-black) padding-box, var(--cr-bezel); box-shadow: var(--cr-outline), var(--cr-shadow);
+  border: 1.5px solid transparent; border-radius: var(--cr-r-lg); color: var(--cr-text);
+  background: var(--cr-grain) padding-box, var(--cr-gloss-soft) padding-box, var(--cr-satin-dark) padding-box, var(--cr-bezel); box-shadow: var(--cr-outline), var(--cr-shadow);
 }
 html.theme-chrome .nb-progress { height: 2px; background: var(--cr-flow); box-shadow: none; }
 html.theme-chrome .nb-art { border-radius: var(--cr-r-sm); }
 html.theme-chrome .nb-title { color: var(--cr-text); font-weight: 600; }
 html.theme-chrome .nb-artist { color: var(--cr-text-dim); }
 html.theme-chrome .navbar .icon-btn:not(.lg) { color: var(--cr-text); }
-html.theme-chrome .nb-play.lg { border-radius: 50%; color: var(--cr-ink); background: var(--cr-mirror-dome) padding-box, var(--cr-ring) border-box; }
+html.theme-chrome .nb-play.lg { border-radius: 50%; color: var(--cr-ink); background: var(--cr-grain) padding-box, var(--cr-satin-dome) padding-box, var(--cr-ring) border-box; }
 html.theme-chrome .nb-play.lg:hover { color: var(--cr-ink); }
 html.theme-chrome .scan-bar { border-radius: var(--cr-r); background: var(--cr-slab); color: var(--cr-text); box-shadow: var(--cr-outline), var(--cr-edge); border: 0; }
 html.theme-chrome .scan-fill { background: var(--cr-flow); }
@@ -341,7 +342,7 @@ html.theme-chrome .scan-fill { background: var(--cr-flow); }
 html.theme-chrome .eq-tabs { background: var(--cr-iron-9); border: 0; border-radius: var(--cr-r); box-shadow: var(--cr-cut); }
 html.theme-chrome .eq-tab { color: var(--cr-text-dim); font-family: var(--cr-label); font-weight: 700; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; border-radius: var(--cr-r-sm); }
 html.theme-chrome .eq-tab.active { color: var(--cr-ink); text-shadow: var(--cr-engrave); }
-html.theme-chrome .eq-tab-ink { background: var(--cr-mirror-lite); border-radius: var(--cr-r-sm); box-shadow: var(--cr-outline), inset 0 1px 0 var(--cr-white); }
+html.theme-chrome .eq-tab-ink { background: var(--cr-grain), var(--cr-gloss), var(--cr-satin-lite); border-radius: var(--cr-r-sm); box-shadow: var(--cr-outline), inset 0 1px 1px color-mix(in srgb, var(--cr-white) 60%, transparent); }
 /* the graph: a dark screen set into the metal, in a chrome frame */
 html.theme-chrome .eq-graph {
   border: 2px solid transparent; border-radius: var(--cr-r-lg); margin: 8px 18px;
@@ -353,7 +354,7 @@ html.theme-chrome .band.nonzero .b-val, html.theme-chrome .band.active .b-val { 
 html.theme-chrome .b-freq { color: var(--cr-text-dim); }
 html.theme-chrome .b-track::before { width: 4px; margin-left: -2px; border-radius: 2px; background: var(--cr-iron-9); box-shadow: var(--cr-cut); }
 html.theme-chrome .b-fill { width: 2px; margin-left: -1px; border-radius: 2px; background: var(--cr-flow-v); box-shadow: none; }
-html.theme-chrome .b-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--cr-mirror-dome); box-shadow: var(--cr-outline), var(--cr-shadow-sm); }
+html.theme-chrome .b-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--cr-satin-dome); box-shadow: var(--cr-outline), var(--cr-shadow-sm); }
 html.theme-chrome .b-thumb::after { display: none; }
 html.theme-chrome .band.active .b-thumb { filter: brightness(1.1); }
 /* knobs: spun steel with a chrome dome; the ticks light white */
@@ -396,7 +397,7 @@ html.theme-chrome #volVal { color: var(--cr-text); }
 html.theme-chrome .toast { border-radius: var(--cr-r); background: var(--cr-gloss-soft), var(--cr-slab); color: var(--cr-text); border: 0; box-shadow: var(--cr-outline), var(--cr-edge), var(--cr-shadow); font-family: var(--cr-ui); font-weight: 600; }
 html.theme-chrome .toast::after { background: var(--cr-flow); box-shadow: none; }
 html.theme-chrome .tip {
-  background: var(--cr-mirror-lite); color: var(--cr-ink); border-radius: var(--cr-r-sm); border: 0; box-shadow: var(--cr-outline), var(--cr-shadow-sm);
+  background: var(--cr-satin-lite); color: var(--cr-ink); border-radius: var(--cr-r-sm); border: 0; box-shadow: var(--cr-outline), var(--cr-shadow-sm);
   font-family: var(--cr-ui); font-weight: 700; font-size: 12px; padding: 5px 10px;
 }
 /* settings */
@@ -407,7 +408,7 @@ html.theme-chrome .set-hint { color: var(--cr-text-dim); }
 html.theme-chrome .rv { color: var(--cr-text); }
 html.theme-chrome .folder-row { border-radius: var(--cr-r); background: var(--cr-iron-9); border: 0; box-shadow: var(--cr-cut); color: var(--cr-text); }
 html.theme-chrome .folder-row > .ico { color: var(--cr-steel-2); }
-html.theme-chrome .shortcuts span:nth-child(odd) { border-radius: var(--cr-r-sm); background: var(--cr-mirror-lite); color: var(--cr-ink); box-shadow: var(--cr-outline); font-family: var(--cr-num); font-weight: 700; font-size: 11px; }
+html.theme-chrome .shortcuts span:nth-child(odd) { border-radius: var(--cr-r-sm); background: var(--cr-satin-lite); color: var(--cr-ink); box-shadow: var(--cr-outline); font-family: var(--cr-num); font-weight: 700; font-size: 11px; }
 html.theme-chrome .about { color: var(--cr-text-dim); }
 html.theme-chrome .info-table td { border-color: var(--cr-line); color: var(--cr-text); }
 html.theme-chrome .info-table td:first-child { color: var(--cr-text-dim); }
@@ -419,13 +420,13 @@ html.theme-chrome input[type='range'] {
   height: 5px; border-radius: 3px; box-shadow: var(--cr-cut);
   background: linear-gradient(90deg, var(--cr-steel-4), var(--cr-steel-1) var(--p, 50%), var(--cr-iron-9) var(--p, 50%));
 }
-html.theme-chrome input[type='range']::-webkit-slider-thumb { width: 16px; height: 16px; border-radius: 50%; background: var(--cr-mirror-dome); box-shadow: var(--cr-outline), var(--cr-shadow-sm); }
+html.theme-chrome input[type='range']::-webkit-slider-thumb { width: 16px; height: 16px; border-radius: 50%; background: var(--cr-satin-dome); box-shadow: var(--cr-outline), var(--cr-shadow-sm); }
 html.theme-chrome input[type='range']:hover::-webkit-slider-thumb { filter: brightness(1.1); }
 /* toggles: a slot in the metal; on, the slot fills with bright steel and the chrome ball slides across */
 html.theme-chrome .switch { width: 46px; height: 26px; border-radius: var(--cr-r-pill); background: var(--cr-iron-9); box-shadow: var(--cr-cut); transition: background-color 200ms, box-shadow 200ms; }
-html.theme-chrome .switch::after { top: 3px; left: 3px; width: 20px; height: 20px; background: var(--cr-mirror-dome); box-shadow: var(--cr-outline); transition: transform var(--cr-t) var(--cr-ease); }
-html.theme-chrome .switch:checked { background: var(--cr-mirror-lite); box-shadow: var(--cr-outline), inset 0 1px 2px color-mix(in srgb, var(--cr-void) 40%, transparent); }
-html.theme-chrome .switch:checked::after { transform: translateX(20px); background: var(--cr-gloss), var(--cr-black); }
+html.theme-chrome .switch::after { top: 3px; left: 3px; width: 20px; height: 20px; background: var(--cr-satin-dome); box-shadow: var(--cr-outline); transition: transform var(--cr-t) var(--cr-ease); }
+html.theme-chrome .switch:checked { background: var(--cr-grain), var(--cr-satin-lite); box-shadow: var(--cr-outline), inset 0 1px 2px color-mix(in srgb, var(--cr-void) 40%, transparent); }
+html.theme-chrome .switch:checked::after { transform: translateX(20px); background: var(--cr-gloss), var(--cr-satin-dark); }
 /* scrollbar: a thin strip of steel */
 html.theme-chrome ::-webkit-scrollbar { width: 8px; height: 8px; }
 html.theme-chrome :is(::-webkit-scrollbar-track, ::-webkit-scrollbar-corner) { background: transparent; }

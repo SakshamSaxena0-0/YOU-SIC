@@ -375,9 +375,9 @@ export class Waveform {
     g.lineWidth = 1.5; g.strokeStyle = c.cyan; g.stroke();
   }
 
-  // Chrome theme: bars of polished steel standing on a mirror. What has played is bright chrome (a sky
-  // over a hard horizon, like the tiles); what is still to come is dark iron; the mirror below shows a
-  // faint reflection of both. The playhead is a hairline with a chrome stud on it.
+  // Chrome theme: bars of satin steel standing on a mirror. What has played is bright satin silver (a
+  // smooth fall from light to shade); what is still to come is dark iron; the mirror below shows a faint
+  // reflection of both. The playhead is a hairline with a satin steel stud on it.
   _drawCr(g, w, h, prog) {
     const c = this.cr;
     const step = w / BARS, bw = Math.max(1, step * 0.5), line = Math.round(h * 0.64) + 0.5;
@@ -392,7 +392,7 @@ export class Waveform {
     g.fillStyle = c.iron; g.fill(uT);
     g.globalAlpha = 0.25; g.fill(uB); g.globalAlpha = 1;
     const pg = g.createLinearGradient(0, 2, 0, line);
-    pg.addColorStop(0, c.white); pg.addColorStop(0.42, c.s2); pg.addColorStop(0.5, c.s4); pg.addColorStop(0.53, c.s3); pg.addColorStop(1, c.s1);
+    pg.addColorStop(0, c.s1); pg.addColorStop(0.5, c.s2); pg.addColorStop(1, c.s3);
     g.fillStyle = pg; g.fill(pT);
     const rg = g.createLinearGradient(0, line, 0, h);
     rg.addColorStop(0, c.s2); rg.addColorStop(1, c.void);
@@ -404,7 +404,7 @@ export class Waveform {
     g.fillStyle = c.white; g.fillRect(Math.round(px) - 0.5, 1, 1, h - 2);
     const r = this.dragging ? 6.5 : 5;
     const sg = g.createLinearGradient(0, line - r, 0, line + r);
-    sg.addColorStop(0, c.white); sg.addColorStop(0.45, c.s2); sg.addColorStop(0.5, c.s4); sg.addColorStop(1, c.s1);
+    sg.addColorStop(0, c.s1); sg.addColorStop(0.6, c.s3); sg.addColorStop(1, c.s4);
     g.beginPath(); g.arc(px, line, r, 0, Math.PI * 2); g.fillStyle = sg; g.fill();
     g.lineWidth = 1; g.strokeStyle = c.void; g.stroke();
   }

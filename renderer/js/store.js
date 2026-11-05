@@ -23,7 +23,7 @@ export const DEFAULT_SETTINGS = {
   dynamicAccent: true,
   accent: '#ff9f1c',
   blurBg: true,
-  theme: 'glass', // glass (liquid glass over the wallpaper) | cyber (solid neon cyberpunk) | subway (y2k: dim teal, chrome, glass) | pixel (retro 90s desktop windows, pixel art) | vector-surrealism (dark fantasy as a flat surreal vector poster) | liminal (a vintage dream: sunset over a sea of clouds, on old film) | midnight (a city at 3 a.m.: dark polished gunmetal, chrome and cold cyan light) | chrome (mirror-polished chrome plates on dark brushed gunmetal)
+  theme: 'glass', // glass (liquid glass over the wallpaper) | cyber (solid neon cyberpunk) | subway (y2k: dim teal, chrome, glass) | pixel (retro 90s desktop windows, pixel art) | vector-surrealism (dark fantasy as a flat surreal vector poster) | liminal (a vintage dream: sunset over a sea of clouds, on old film) | midnight (a city at 3 a.m.: dark polished gunmetal, chrome and cold cyan light) | chrome (satin metal plates on dark brushed gunmetal)
   glassMood: 'brutal', // Liquid Glass only: brutal (black and white, hard light, heavy type) | clear (clear glass tinted by the album)
   refraction: true,
   windowBg: 'wallpaper', // wallpaper | acrylic | solid

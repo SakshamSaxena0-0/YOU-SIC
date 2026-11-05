@@ -15,7 +15,7 @@ export class PlayerView {
     this.metaMode = 0;
     this.showRemain = true;
     this.bgFlip = 0;
-    this.ambient = new Ambient([[$('#library'), 'l'], [$('#eq'), 'l'], [$('#side'), 'r']]);
+    this.ambient = new Ambient([[$('#library'), 'l'], [$('#eq'), 'l'], [$('#side'), 'r']], $('#aaWrap'), $('#aaTrack'));
     this.lastPrev = null; this.lastNext = null;
     this.cards = {
       prev: $('[data-slot=prev]'), cur: $('[data-slot=cur]'), next: $('[data-slot=next]'),
@@ -170,6 +170,7 @@ export class PlayerView {
     const set = (k, v) => wrap.style.setProperty(k, `${Math.max(0, Math.round(v))}px`);
     set('--bt', w.top - p.top); set('--bb', p.bottom - w.bottom);
     set('--bl', w.left - p.left); set('--br', right - w.right);
+    this.ambient.refit();
   }
 
   _bindArt() {

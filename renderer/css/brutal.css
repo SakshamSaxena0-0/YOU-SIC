@@ -4,8 +4,9 @@
    pushed down to a dark grey texture under heavier grain (raw concrete), hard white rims and hairline
    rules between the columns, heavy uppercase titles and raw mono labels, squarer slabs, and whatever is
    selected or primary turned to solid white with black glyphs. The album colours are replaced by a
-   fixed bone white and black (store.js GLASS_BRUTAL); the covers keep their colours, and those colours
-   glow softly into the panels on either side of the cover (ambient.js).
+   fixed bone white and black (store.js GLASS_BRUTAL); the covers keep their colours. In the wide layout
+   there are no borders between the columns: the cover's edges dissolve into its own light, which runs
+   on into the panels on either side (ambient.js).
    ========================================================================== */
 html.glass-brutal {
   --br-ink: #000;
@@ -25,24 +26,31 @@ html.glass-brutal {
   --dim: rgba(236, 236, 232, 0.6);
   --dimmer: rgba(236, 236, 232, 0.4);
   --line: var(--br-rule);
-  --art-scrim: var(--br-ink);
+  --art-scrim: var(--br-coal);
   --hairline: linear-gradient(180deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.12) 40%, rgba(255, 255, 255, 0.3));
   --glass-strong: linear-gradient(180deg, rgba(20, 20, 20, 0.96), rgba(6, 6, 6, 0.97));
 }
 
 /* ---------- darkness: no colour wash, the wallpaper a dark grey texture, concrete grain ---------- */
-html.glass-brutal .bg { background: var(--br-ink); }
-html.glass-brutal .bg-layer { display: none; }
-html.glass-brutal.glass-window:not(.wall-window) .bg { background: var(--br-panel); } /* Blur (acrylic): darken what Windows shows */
+/* one flat ground under every column, so nothing changes where they meet: coal, or over the desktop
+   (Blur) and the wallpaper the same dark veil. The right-hand panel lies over the player's ground, so
+   it adds none of its own. */
+html.glass-brutal :is(.bg, .library, .eq) { background: var(--br-coal); }
+html.glass-brutal :is(.bg-layer, .bg-shade) { display: none; }
+html.glass-brutal.glass-window :is(.bg, .library, .eq) { background: var(--br-panel); }
+html.glass-brutal .app.wide .side { background: none; }
 html.glass-brutal .wall { filter: grayscale(1) brightness(0.3) contrast(1.4); }
 html.glass-brutal .grain { opacity: 0.075; }
-html.glass-brutal .library { background: var(--br-coal); }
-html.glass-brutal.glass-window .library, html.glass-brutal.glass-window .app.wide .side { background: var(--br-panel); }
 
-/* ---------- structure: hairline rules between the columns and under the headers ---------- */
-html.glass-brutal .app.wide :is(#library, #eq) { box-shadow: 1px 0 0 var(--br-rule-hi), 24px 0 60px -24px var(--br-shade); }
-html.glass-brutal .app.wide .side { box-shadow: inset 1px 0 0 var(--br-rule-hi); }
+/* ---------- structure: no lines between the columns (the cover dissolves into them, below); a
+   hairline under the headers, fading out towards the cover ---------- */
+html.glass-brutal .app.wide :is(#library, #eq, .side) { box-shadow: none; }
 html.glass-brutal :is(.lib-header, .side-header) { box-shadow: 0 1px 0 var(--br-rule); }
+html.glass-brutal .app.wide :is(.lib-header, .side-header) {
+  box-shadow: none;
+  background: linear-gradient(var(--br-dir, 90deg), var(--br-rule), var(--br-rule) 55%, transparent) left bottom / 100% 1px no-repeat;
+}
+html.glass-brutal .app.wide .side-header { --br-dir: 270deg; }
 
 /* ---------- type: heavy uppercase titles, raw mono labels ---------- */
 html.glass-brutal :is(#plTitle, .lib-title, .ah-title, .sheet-title) { text-transform: uppercase; font-weight: 800; letter-spacing: -0.02em; }
@@ -89,12 +97,30 @@ html.glass-brutal .switch:checked { background: var(--br-solid); box-shadow: ins
 html.glass-brutal .switch:checked::after { background: var(--br-ink); }
 html.glass-brutal .badge.hires { color: var(--br-ink); background: var(--br-bone); box-shadow: none; }
 
-/* ---------- ambient light: the cover's edge colours glow into the library and the lyrics panel ---------- */
-/* (ambient.js) under each panel's content, over its background; wide windows only */
+/* ---------- seamless columns: the cover dissolves into its own light (ambient.js) ---------- */
+/* The cover (and its scrim) fade out over --amb-f at both sides. Under that fade lies the light of the
+   cover's edge (.amb-edge), and the same light runs on into the panel beside it (.amb-l, .amb-r, under
+   each panel's content), so where the cover's column ends there is only light on both sides: no
+   border. Wide windows only. */
 .amb { display: none; }
-html.glass-brutal .app.wide .amb { display: block; position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+html.glass-brutal .app.wide { --amb-f: clamp(64px, 7.5vw, 160px); }
+html.glass-brutal .app.wide .amb {
+  display: block; position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+html.glass-brutal .app.wide #aaWrap > .amb-edge { inset: calc(-1 * var(--bt, 0px)) auto calc(-1 * var(--bb, 0px)) auto; width: var(--amb-f); }
+html.glass-brutal .app.wide #aaWrap > .amb-el { left: calc(-1 * var(--bl, 0px)); }
+html.glass-brutal .app.wide #aaWrap > .amb-er { right: calc(-1 * var(--br, 0px)); }
 .amb canvas { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 0.9s ease; }
 .amb canvas.show { opacity: 0.6; }
+html.glass-brutal .app.wide #aaWrap :is(.aa-track, .aa-scrim) {
+  --m: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.1) calc(var(--amb-f) * 0.2), rgba(0, 0, 0, 0.5) calc(var(--amb-f) * 0.5),
+    rgba(0, 0, 0, 0.9) calc(var(--amb-f) * 0.8), #000 var(--amb-f), #000 calc(100% - var(--amb-f)), rgba(0, 0, 0, 0.9) calc(100% - var(--amb-f) * 0.8),
+    rgba(0, 0, 0, 0.5) calc(100% - var(--amb-f) * 0.5), rgba(0, 0, 0, 0.1) calc(100% - var(--amb-f) * 0.2), transparent);
+  -webkit-mask-image: var(--m); mask-image: var(--m);
+}
+/* tap the cover and it dims for the song's details: its light dims with it */
+html.glass-brutal .app.wide:has(#aaWrap.info-on) .amb { opacity: 0.42; }
 
 /* Settings: the album colour options do nothing in this mood */
 html.glass-brutal .clear-only { display: none; }

@@ -484,8 +484,8 @@ class App {
   get brutal() { return this.theme === 'glass' && this.store.settings.glassMood !== 'clear'; }
   // no borders between the columns: the cover dissolves into its own light (css/seamless.css, ambient.js)
   get seamless() { return this.brutal; }
-  // Metal: the cover etched into the aluminium as line art (js/etch.js), if Settings > Cover says so
-  get etched() { return this.theme === 'metal' && this.store.settings.metalCover === 'etched'; }
+  // Metal's dark mode (Settings > Mode): the same faceplate in dark brushed steel (html.metal-dark)
+  get metalDark() { return this.theme === 'metal' && this.store.settings.metalMode === 'dark'; }
 
   // Reduce effects is on when the user turned it on, or (until they choose) when Windows asks for less motion.
   get reduceEffects() {
@@ -531,10 +531,9 @@ class App {
       html.classList.toggle('seamless', this.seamless);
       this.playerView.refreshColors();
     }
-    if (html.classList.contains('metal-etched') !== this.etched) {
-      html.classList.toggle('metal-etched', this.etched);
-      this.playerView.refreshArt();
-      this.playerView.refreshColors();
+    if (html.classList.contains('metal-dark') !== this.metalDark) {
+      html.classList.toggle('metal-dark', this.metalDark);
+      this.playerView.wave.setTheme(theme); // the seekbar is drawn in the plate's colours
     }
     if (!s.dynamicAccent && !solid && !brutal) {
       const rgb = hexToRgb(s.accent);
@@ -681,7 +680,7 @@ class App {
       <div class="set-sec">Look and Feel</div>
       ${pick('theme', 'Theme', 'Liquid Glass: clear glass over your wallpaper. Cyberpunk: neon HUD. Y2K Subway: dim teal, chrome and glass. Pixel: a retro 90s desktop in pixel art. Vector Surrealism: dark fantasy as a surreal vector poster. Liminal: a vintage dream, sunset over the clouds on old film. Midnight: a city at 3 a.m., dark polished gunmetal and cold cyan light. Metal: a hi-fi faceplate of brushed aluminium, tiles in many metals, copper keys', [['glass', 'Liquid Glass'], ['cyber', 'Cyberpunk'], ['subway', 'Y2K Subway'], ['pixel', 'Pixel'], ['vector-surrealism', 'Vector Surrealism'], ['liminal', 'Liminal'], ['midnight', 'Midnight'], ['metal', 'Metal']])}
       <div class="metal-only">
-      ${pick('metalCover', 'Cover', 'Colour: the cover as it is. Etched: the cover cut into the brushed metal as line art', [['colour', 'Colour'], ['etched', 'Etched']])}
+      ${pick('metalMode', 'Mode', 'Light: brushed aluminium under a gunmetal band. Dark: the same faceplate in dark brushed steel', [['light', 'Light'], ['dark', 'Dark']])}
       </div>
       <div class="glass-only">
       ${pick('glassMood', 'Mood', 'Brutal: black and white, deep darkness, hard white light and heavy type. Clear: clear glass tinted by the album art', [['brutal', 'Brutal'], ['clear', 'Clear']])}

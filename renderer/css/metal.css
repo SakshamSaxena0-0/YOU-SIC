@@ -6,8 +6,8 @@
    names in mono capitals raised off the face. Buttons on the plate are machined aluminium (round ones
    turned on a lathe); copper is the one accent: play, whatever is switched on, the played part of the
    song. Text on the plate is printed dark into the metal; text on the band is light. The cover is
-   shown as it is, as in every theme (Settings > Cover can etch it into the aluminium as line art
-   instead, js/etch.js).
+   shown as it is, as in every theme. Settings > Mode > Dark makes it the same faceplate in dark
+   brushed steel (html.metal-dark: the tokens change, these rules don't).
    Tokens: css/metal.tokens.css. Seekbar: waveform.js (_drawMt). Guide: THEME_METAL.md.
    Nothing loops: the theme costs nothing while idle.
    ========================================================================== */
@@ -121,7 +121,7 @@ html.theme-metal .chip { border-radius: var(--mt-r-sm); font-family: var(--mt-ui
 /* their indicator: a small lamp set into the key that lights copper */
 html.theme-metal :is(.eq-toggles .chip:not(.preset-chip), .reverb-presets .chip)::after {
   background: var(--mt-alu-5); border-radius: 50%;
-  box-shadow: inset 0 1px 1px color-mix(in srgb, var(--mt-void) 60%, transparent), 0 1px 0 color-mix(in srgb, var(--mt-white) 60%, transparent);
+  box-shadow: inset 0 1px 1px color-mix(in srgb, var(--mt-void) 60%, transparent), 0 1px 0 color-mix(in srgb, var(--mt-white) calc(60% * var(--mt-lit)), transparent);
 }
 html.theme-metal :is(.eq-toggles .chip.on, .reverb-presets .chip.on)::after { background: var(--mt-cu-5); box-shadow: 0 1px 0 color-mix(in srgb, var(--mt-cu-0) 70%, transparent); }
 html.theme-metal .preset-chip i .ico { color: inherit; }
@@ -132,9 +132,9 @@ html.theme-metal .controls { gap: clamp(10px, 2.8vw, 22px); }
 html.theme-metal :is(.ctl-md, .ctl-sm).lg {
   border-radius: 50%; border: 3px solid transparent; color: var(--mt-ink);
   background: var(--mt-knob) padding-box, var(--mt-bezel-ring) border-box;
-  box-shadow: var(--mt-outline), inset 0 0 0 1px color-mix(in srgb, var(--mt-void) 28%, transparent), inset 0 1px 1px 1px color-mix(in srgb, var(--mt-white) 50%, transparent), 0 8px 14px -7px color-mix(in srgb, var(--mt-void) 75%, transparent);
+  box-shadow: var(--mt-outline), inset 0 0 0 1px color-mix(in srgb, var(--mt-void) 28%, transparent), inset 0 1px 1px 1px color-mix(in srgb, var(--mt-white) calc(50% * var(--mt-lit)), transparent), 0 8px 14px -7px color-mix(in srgb, var(--mt-void) 75%, transparent);
 }
-html.theme-metal :is(.ctl-md, .ctl-sm).lg .ico { filter: drop-shadow(0 1px 0 color-mix(in srgb, var(--mt-white) 70%, transparent)); }
+html.theme-metal :is(.ctl-md, .ctl-sm).lg .ico { filter: drop-shadow(0 1px 0 color-mix(in srgb, var(--mt-white) calc(70% * var(--mt-lit)), transparent)); }
 html.theme-metal .ctl-md.lg { width: 54px; height: 54px; }
 html.theme-metal .ctl-md.lg .ico { width: 23px; height: 23px; }
 html.theme-metal .ctl-sm.lg { width: 42px; height: 42px; color: var(--mt-ink-2); }
@@ -180,7 +180,7 @@ html.theme-metal .nav-btn .ico { width: 21px; height: 21px; }
 html.theme-metal .nav-btn:hover { color: var(--mt-white); }
 html.theme-metal .nav-btn:active { transform: none; }
 html.theme-metal .nav-btn.on { color: var(--mt-ink); filter: none; }
-html.theme-metal .nav-btn.on .ico { filter: drop-shadow(0 1px 0 color-mix(in srgb, var(--mt-white) 70%, transparent)); }
+html.theme-metal .nav-btn.on .ico { filter: drop-shadow(0 1px 0 color-mix(in srgb, var(--mt-white) calc(70% * var(--mt-lit)), transparent)); }
 html.theme-metal .nav-ink { top: 5px; bottom: 5px; border-radius: var(--mt-r); background: var(--mt-key); box-shadow: var(--mt-raise), var(--mt-drop); }
 
 /* ---------- 8. player: header (on the band), the cover, the title block (on the plate) ---------- */
@@ -193,8 +193,7 @@ html.theme-metal .pl-cat-pos { font-size: 11px; color: var(--mt-text-dim); }
    starts at the band's machined edge (the band runs whole across the window and casts its shadow on the
    cover's top) and, behind the title block and the controls, fades into the plate just as far as the
    other themes fade it into their scrim (a mask, so the brushed metal shows through unchanged). Admire
-   art shows all of it. Etched (Settings > Cover; js/etch.js), it is line art cut into the plate.
-   Narrow: a square plate in a polished bezel. */
+   art shows all of it. Narrow: a square cover in a polished bezel. */
 html.theme-metal .app.wide #aaWrap .aa-scrim {
   background: linear-gradient(180deg, transparent var(--mt-band-h), color-mix(in srgb, var(--mt-void) 60%, transparent) var(--mt-band-h),
     color-mix(in srgb, var(--mt-void) 22%, transparent) calc(var(--mt-band-h) + 2px), transparent calc(var(--mt-band-h) + 16px));
@@ -208,7 +207,7 @@ html.theme-metal .app.wide #aaWrap .aa-track {
 html.theme-metal .app.wide.art-only #aaWrap .aa-track { -webkit-mask-image: none; mask-image: none; }
 html.theme-metal .app.wide #aaWrap .aa-img { background-color: transparent; }
 html.theme-metal .app.wide #aaWrap .aa-img.ph { background: none; }
-html.theme-metal .app.wide #aaWrap .aa-img.ph .ico { fill: color-mix(in srgb, var(--mt-ink) 22%, transparent); filter: drop-shadow(0 1px 0 color-mix(in srgb, var(--mt-white) 60%, transparent)); }
+html.theme-metal .app.wide #aaWrap .aa-img.ph .ico { fill: color-mix(in srgb, var(--mt-ink) 22%, transparent); filter: drop-shadow(0 1px 0 color-mix(in srgb, var(--mt-white) calc(60% * var(--mt-lit)), transparent)); }
 /* tap the cover: the art steps back and the song's details come up on a gunmetal nameplate */
 html.theme-metal .app.wide #aaWrap.info-on .aa-track { filter: none; opacity: 0.3; transition: opacity 0.4s ease; }
 html.theme-metal .aa-img { border-radius: var(--mt-r-lg); background-color: var(--mt-alu-3); box-shadow: var(--mt-outline), 0 26px 50px -24px color-mix(in srgb, var(--mt-void) 80%, transparent); }
@@ -218,13 +217,6 @@ html.theme-metal .app:not(.wide) .aa-img::before {
   -webkit-mask: linear-gradient(var(--mt-void) 0 0) content-box, linear-gradient(var(--mt-void) 0 0); -webkit-mask-composite: xor; mask-composite: exclude;
 }
 html.theme-metal .aa-img::after, html.theme-metal .aa-img.sheen::after, html.theme-metal .aa-img.flip-glint::after { display: none; animation: none; }
-/* narrow, etched: the cuts sit on a square of brushed aluminium, with its brushing over them */
-html.theme-metal .app:not(.wide) .aa-img.etched { background-color: var(--mt-alu-2); }
-html.theme-metal .app:not(.wide) .aa-img.etched::after {
-  display: block; content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; animation: none; opacity: 1;
-  background: var(--mt-brush), radial-gradient(80% 70% at 65% 15%, color-mix(in srgb, var(--mt-white) 26%, transparent), transparent 70%),
-    linear-gradient(160deg, transparent 40%, color-mix(in srgb, var(--mt-gun-4) 14%, transparent));
-}
 html.theme-metal .aa-img.ph { background: var(--mt-plate); }
 html.theme-metal .aa-img.ph .ico { fill: color-mix(in srgb, var(--mt-ink) 25%, transparent); filter: none; }
 /* the back: a nameplate of dark gunmetal in a polished frame */
@@ -258,7 +250,7 @@ html.theme-metal .badge.hires { color: var(--mt-text-cu); background: var(--mt-c
 html.theme-metal .pl-meta { border-radius: var(--mt-r-sm); background: color-mix(in srgb, var(--mt-alu-5) 30%, transparent); color: var(--mt-ink-2); box-shadow: var(--mt-cut); font-size: 11px; padding: 3px 10px; }
 html.theme-metal .pl-meta:hover { color: var(--mt-ink); }
 html.theme-metal .rating .star { color: color-mix(in srgb, var(--mt-ink) 30%, transparent); }
-html.theme-metal .star.on { color: var(--mt-cu-3); filter: drop-shadow(0 1px 0 color-mix(in srgb, var(--mt-white) 60%, transparent)); }
+html.theme-metal .star.on { color: var(--mt-cu-3); filter: drop-shadow(0 1px 0 color-mix(in srgb, var(--mt-white) calc(60% * var(--mt-lit)), transparent)); }
 html.theme-metal .star:hover { color: var(--mt-cu-3); transform: translateY(-1px); }
 html.theme-metal .pl-info.enter > *, html.theme-metal .pl-info.enter-r > *, html.theme-metal .pl-info.enter-l > * { animation: mt-fade 480ms var(--mt-ease) both; }
 @keyframes mt-fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
@@ -363,8 +355,8 @@ html.theme-metal .empty-lib h3 { font-size: 24px; }
 html.theme-metal .item-list { display: flex; flex-direction: column; gap: 3px; padding: 6px 12px 12px; }
 html.theme-metal .row { gap: 12px; padding: 0 12px 0 10px; border-radius: var(--mt-r); background: transparent; color: var(--mt-ink); transition: background-color 200ms, box-shadow 200ms; }
 html.theme-metal .row:hover {
-  scale: 1; background: linear-gradient(180deg, color-mix(in srgb, var(--mt-white) 45%, transparent), color-mix(in srgb, var(--mt-white) 18%, transparent));
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--mt-void) 14%, transparent), inset 0 1px 0 color-mix(in srgb, var(--mt-white) 80%, transparent), 0 2px 4px -2px color-mix(in srgb, var(--mt-void) 35%, transparent);
+  scale: 1; background: linear-gradient(180deg, color-mix(in srgb, var(--mt-white) calc(45% * var(--mt-lit)), transparent), color-mix(in srgb, var(--mt-white) calc(18% * var(--mt-lit)), transparent));
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--mt-void) 14%, transparent), inset 0 1px 0 color-mix(in srgb, var(--mt-white) calc(80% * var(--mt-lit)), transparent), 0 2px 4px -2px color-mix(in srgb, var(--mt-void) 35%, transparent);
 }
 html.theme-metal .row::after { display: none; }
 @media (hover: hover) { html.theme-metal .screen :has(> .row:hover) > .row:not(:hover) { opacity: 1; } }
@@ -382,8 +374,8 @@ html.theme-metal .it-art.ph { background: var(--mt-knob); color: var(--mt-ink-3)
 html.theme-metal .row:hover .it-art { scale: 1; }
 /* the playing row: a copper strip down its edge and a warm polish */
 html.theme-metal .row.track.playing {
-  background: linear-gradient(90deg, color-mix(in srgb, var(--mt-cu-1) 40%, transparent), color-mix(in srgb, var(--mt-white) 16%, transparent) 75%);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--mt-cu-4) 30%, transparent), inset 0 1px 0 color-mix(in srgb, var(--mt-white) 60%, transparent);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--mt-cu-1) 40%, transparent), color-mix(in srgb, var(--mt-white) calc(16% * var(--mt-lit)), transparent) 75%);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--mt-cu-4) 30%, transparent), inset 0 1px 0 color-mix(in srgb, var(--mt-white) calc(60% * var(--mt-lit)), transparent);
 }
 html.theme-metal .row.track.playing :is(.r-title, .t-num) { color: var(--mt-text-cu); }
 html.theme-metal .row.track.playing .r-sub { color: var(--mt-ink-2); }
@@ -453,9 +445,9 @@ html.theme-metal .k-tick.zero { stroke: var(--mt-ink); }
 html.theme-metal .k-cap {
   background: var(--mt-knob);
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--mt-void) 55%, transparent), 0 0 0 3px var(--mt-alu-0), 0 0 0 4px color-mix(in srgb, var(--mt-void) 40%, transparent),
-    inset 0 1px 1px color-mix(in srgb, var(--mt-white) 70%, transparent), 0 10px 16px -8px color-mix(in srgb, var(--mt-void) 70%, transparent);
+    inset 0 1px 1px color-mix(in srgb, var(--mt-white) calc(70% * var(--mt-lit)), transparent), 0 10px 16px -8px color-mix(in srgb, var(--mt-void) 70%, transparent);
 }
-html.theme-metal .k-cap::after { background: var(--mt-cu-3); box-shadow: 0 1px 0 color-mix(in srgb, var(--mt-white) 60%, transparent); width: 3px; margin-left: -1.5px; }
+html.theme-metal .k-cap::after { background: var(--mt-cu-3); box-shadow: 0 1px 0 color-mix(in srgb, var(--mt-white) calc(60% * var(--mt-lit)), transparent); width: 3px; margin-left: -1.5px; }
 html.theme-metal .k-shine { display: none; }
 html.theme-metal .k-value { color: var(--mt-ink); text-shadow: var(--mt-engrave); }
 html.theme-metal .knob.nonzero .k-value { color: var(--mt-text-cu); }
@@ -467,7 +459,7 @@ html.theme-metal .scrim { background: color-mix(in srgb, var(--mt-void) 45%, tra
 html.theme-metal .sheet { background: var(--mt-slab); color: var(--mt-ink); border: 0; }
 html.theme-metal :is(.ctxmenu, .vol-pop) { background: var(--mt-slab-dark); color: var(--mt-text); border: 0; }
 html.theme-metal .sheet { border-radius: var(--mt-r-lg) var(--mt-r-lg) 0 0; box-shadow: var(--mt-outline), inset 0 1px 0 var(--mt-white), 0 -20px 60px -20px color-mix(in srgb, var(--mt-void) 80%, transparent); }
-@media (min-width: 700px) { html.theme-metal .sheet { border-radius: var(--mt-r-lg); box-shadow: var(--mt-outline), inset 0 0 0 1px color-mix(in srgb, var(--mt-white) 60%, transparent), inset 0 2px 0 var(--mt-white), 0 40px 80px -30px color-mix(in srgb, var(--mt-void) 85%, transparent); } }
+@media (min-width: 700px) { html.theme-metal .sheet { border-radius: var(--mt-r-lg); box-shadow: var(--mt-outline), inset 0 0 0 1px color-mix(in srgb, var(--mt-white) calc(60% * var(--mt-lit)), transparent), inset 0 2px 0 color-mix(in srgb, var(--mt-white) calc(100% * var(--mt-lit)), transparent), 0 40px 80px -30px color-mix(in srgb, var(--mt-void) 85%, transparent); } }
 html.theme-metal .sheet-grip { background: var(--mt-alu-5); box-shadow: var(--mt-cut); }
 html.theme-metal .sheet-title { font-size: 26px; }
 html.theme-metal .sheet-text { color: var(--mt-ink-2); }

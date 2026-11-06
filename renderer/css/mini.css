@@ -148,11 +148,10 @@ html.theme-midnight .mini-mat {
   box-shadow: var(--mn-rim), 0 12px 24px -12px color-mix(in srgb, var(--mn-void) 95%, transparent);
 }
 html.theme-midnight .mini-art { border-radius: 10px; }
-/* Metal: a plate of brushed aluminium in a polished frame; the cover etched into it, or in colour */
+/* Metal: a plate of brushed metal (aluminium, or dark steel in dark mode) in a polished frame */
 html.theme-metal .mini-mat {
   border: 2px solid transparent; border-radius: var(--mt-r-lg);
   background: var(--mt-plate) padding-box, var(--mt-knob-edge) border-box;
   box-shadow: var(--mt-outline), 0 12px 24px -12px color-mix(in srgb, var(--mt-void) 85%, transparent);
 }
 html.theme-metal .mini-art { border-radius: var(--mt-r); box-shadow: 0 0 0 1px color-mix(in srgb, var(--mt-void) 55%, transparent), 0 0 0 3px var(--mt-alu-0), 0 0 0 4px color-mix(in srgb, var(--mt-void) 35%, transparent); }
-html.theme-metal.metal-etched .mini-art:not(.ph) { background: var(--mt-plate); }

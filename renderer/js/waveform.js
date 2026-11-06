@@ -149,7 +149,8 @@ export class Waveform {
       const cs = getComputedStyle(document.documentElement);
       const v = (k) => cs.getPropertyValue(k).trim();
       this.mt = { cu0: v('--mt-cu-0'), cu1: v('--mt-cu-1'), cu2: v('--mt-cu-2'), cu3: v('--mt-cu-3'), cu4: v('--mt-cu-4'), ink: v('--mt-ink'),
-        white: v('--mt-white'), alu0: v('--mt-alu-0'), alu3: v('--mt-alu-3'), alu6: v('--mt-alu-6'), void: v('--mt-void') };
+        white: v('--mt-white'), alu0: v('--mt-alu-0'), alu3: v('--mt-alu-3'), alu6: v('--mt-alu-6'), void: v('--mt-void'),
+        dark: document.documentElement.classList.contains('metal-dark') };
     }
     this.invalidate();
   }
@@ -378,7 +379,8 @@ export class Waveform {
 
   // Metal theme: the waveform cut into the aluminium. Unplayed bars are grooves (dark, a light lip under
   // each); played ones are filled with polished copper. A faint reflection lies below the line. The
-  // playhead is a hairline of steel with a turned steel stud on the line.
+  // playhead is a hairline of steel with a turned steel stud on the line. In dark mode the grooves are
+  // deeper shade and their lips catch less light.
   _drawMt(g, w, h, prog) {
     const c = this.mt;
     const step = w / BARS, bw = Math.max(1.2, step * 0.56), line = Math.round(h * 0.64) + 0.5;
@@ -392,9 +394,9 @@ export class Waveform {
       if (!played) lip.rect(x, line - 1, bw, 1);
     }
     // the grooves: dark, with the light catching their lower lip
-    g.fillStyle = c.ink; g.globalAlpha = 0.34; g.fill(uT);
-    g.globalAlpha = 0.12; g.fill(uB);
-    g.fillStyle = c.white; g.globalAlpha = 0.55; g.fill(lip); g.globalAlpha = 1;
+    g.fillStyle = c.dark ? c.void : c.ink; g.globalAlpha = c.dark ? 0.5 : 0.34; g.fill(uT);
+    g.globalAlpha = c.dark ? 0.28 : 0.12; g.fill(uB);
+    g.fillStyle = c.white; g.globalAlpha = c.dark ? 0.1 : 0.55; g.fill(lip); g.globalAlpha = 1;
     // the copper
     const pg = g.createLinearGradient(0, 2, 0, line);
     pg.addColorStop(0, c.cu0); pg.addColorStop(0.45, c.cu2); pg.addColorStop(1, c.cu3);
@@ -404,8 +406,8 @@ export class Waveform {
     rg.addColorStop(0, c.cu2); rg.addColorStop(1, c.alu3);
     g.globalAlpha = 0.35; g.fillStyle = rg; g.fill(pB); g.globalAlpha = 1;
     // the line itself: a fine cut
-    g.fillStyle = c.ink; g.globalAlpha = 0.22; g.fillRect(0, line, w, 1);
-    g.fillStyle = c.white; g.globalAlpha = 0.6; g.fillRect(0, line + 1, w, 1); g.globalAlpha = 1;
+    g.fillStyle = c.dark ? c.void : c.ink; g.globalAlpha = c.dark ? 0.55 : 0.22; g.fillRect(0, line, w, 1);
+    g.fillStyle = c.white; g.globalAlpha = c.dark ? 0.1 : 0.6; g.fillRect(0, line + 1, w, 1); g.globalAlpha = 1;
     if (this.hover >= 0 && !this.dragging) { g.fillStyle = c.ink; g.globalAlpha = 0.35; g.fillRect(this.hover * w - 0.5, 2, 1, h - 4); g.globalAlpha = 1; }
     const px = prog * w;
     g.fillStyle = c.ink; g.globalAlpha = 0.75; g.fillRect(Math.round(px) - 0.5, 1, 1, h - 2); g.globalAlpha = 1;

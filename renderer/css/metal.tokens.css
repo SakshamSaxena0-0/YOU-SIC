@@ -5,8 +5,10 @@
    rose gold, brass, pewter, platinum, cherry, champagne, titanium, smoke, copper, bronze, oxblood,
    jade), each set in a bay with a polished chamfer round it, its icon in a well sunk into the card and
    its name in mono capitals raised off the face. Copper is the one accent: play, whatever is on, the played part of
-   the song. The cover is shown as it is, as in every theme (Settings > Cover can etch it into the
-   aluminium as line art instead, js/etch.js).
+   the song. The cover is shown as it is, as in every theme.
+   Two modes (Settings > Mode): light, brushed aluminium (this block), and dark, the same faceplate in
+   dark brushed steel (html.metal-dark, the block at the end: it redefines the plate's ramp, its text,
+   the band and the light, and everything else is worked out from those).
    Every colour, material, radius, font and shadow the theme uses is defined here; css/metal.css (the
    component rules) only reads these tokens (`npm run check` fails on a literal colour there). See
    THEME_METAL.md.
@@ -85,8 +87,8 @@ html.theme-metal {
 
   /* ---- textures ----
      brushed: long, thin streaks running side to side, light and dark (one noise, split in two), a
-     small image the browser makes once and repeats */
-  --mt-brush: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='240'><filter id='n' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='0.003 1.05' numOctaves='4' seed='11' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  2.6 0 0 0 -1.32'/></filter><filter id='m' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='0.003 1.05' numOctaves='4' seed='11' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -2.4 0 0 0 1.1'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.3'/><rect width='100%25' height='100%25' filter='url(%23m)' opacity='0.24'/></svg>") 0 0 / 600px 240px;
+     small image the browser makes once and repeats. Kept faint: stronger, it read as scan lines. */
+  --mt-brush: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='240'><filter id='n' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='0.003 1.05' numOctaves='4' seed='11' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  2.6 0 0 0 -1.32'/></filter><filter id='m' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='0.003 1.05' numOctaves='4' seed='11' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -2.4 0 0 0 1.1'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.19'/><rect width='100%25' height='100%25' filter='url(%23m)' opacity='0.15'/></svg>") 0 0 / 600px 240px;
   /* the same, finer and fainter, for small parts */
   --mt-brush-fine: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='120'><filter id='n' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='0.005 1.2' numOctaves='3' seed='4' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  2.4 0 0 0 -1.25'/></filter><filter id='m' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='0.005 1.2' numOctaves='3' seed='4' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -2.2 0 0 0 1'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.26'/><rect width='100%25' height='100%25' filter='url(%23m)' opacity='0.2'/></svg>") 0 0 / 300px 120px;
   /* the same, finest and faintest, for the face of a tile's card */
@@ -131,11 +133,11 @@ html.theme-metal {
     var(--mt-alu-2) 68%, var(--mt-white) 80%, var(--mt-alu-4) 92%, var(--mt-alu-3));
   /* a groove cut into the plate: search, sliders, switches, the seekbar's well */
   --mt-cut: inset 0 2px 3px color-mix(in srgb, var(--mt-void) 45%, transparent), inset 0 0 0 1px color-mix(in srgb, var(--mt-void) 30%, transparent),
-    0 1px 0 color-mix(in srgb, var(--mt-white) 55%, transparent);
+    0 1px 0 color-mix(in srgb, var(--mt-white) calc(55% * var(--mt-lit)), transparent);
   --mt-cut-dark: inset 0 2px 4px color-mix(in srgb, var(--mt-void) 75%, transparent), inset 0 0 0 1px color-mix(in srgb, var(--mt-void) 60%, transparent),
     0 1px 0 color-mix(in srgb, var(--mt-white) 10%, transparent);
   /* raised off the plate: a thin dark outline, a bright top edge */
-  --mt-raise: 0 0 0 1px color-mix(in srgb, var(--mt-void) 45%, transparent), inset 0 1px 0 color-mix(in srgb, var(--mt-white) 70%, transparent),
+  --mt-raise: 0 0 0 1px color-mix(in srgb, var(--mt-void) 45%, transparent), inset 0 1px 0 color-mix(in srgb, var(--mt-white) calc(70% * var(--mt-lit)), transparent),
     inset 0 -1px 0 color-mix(in srgb, var(--mt-void) 18%, transparent);
   --mt-pressed: inset 0 2px 5px color-mix(in srgb, var(--mt-void) 45%, transparent), 0 0 0 1px color-mix(in srgb, var(--mt-void) 45%, transparent);
   /* a tile's frame: the face's edge cut in (a dark groove, then a thin light line) */
@@ -145,6 +147,8 @@ html.theme-metal {
   --mt-bay-shadow: 0 9px 13px -3px color-mix(in srgb, var(--mt-void) 62%, transparent), 0 2px 3px color-mix(in srgb, var(--mt-void) 40%, transparent);
   --mt-bay-shadow-up: 0 14px 18px -5px color-mix(in srgb, var(--mt-void) 62%, transparent), 0 3px 5px color-mix(in srgb, var(--mt-void) 40%, transparent);
   --mt-bay-shadow-down: 0 5px 8px -3px color-mix(in srgb, var(--mt-void) 62%, transparent), 0 1px 2px color-mix(in srgb, var(--mt-void) 40%, transparent);
+  /* how much light the plate's bright lips and glints catch: 1 on aluminium; dark steel catches little */
+  --mt-lit: 1;
   --mt-outline: 0 0 0 1px color-mix(in srgb, var(--mt-void) 70%, transparent);
   /* filled progress: a bar of polished copper */
   --mt-flow: linear-gradient(180deg, var(--mt-cu-0), var(--mt-cu-2) 55%, var(--mt-cu-3));
@@ -181,6 +185,54 @@ html.theme-metal {
   --art-scrim: var(--mt-alu-2);
   background: var(--mt-alu-2);
   color-scheme: light;
+}
+
+
+/* ==========================================================================
+   Dark mode (Settings > Mode > Dark; html.metal-dark, set by app.js): the same faceplate in dark brushed
+   steel. The plate's ramp (alu-0 still the polished highlight, alu-6 the deepest shade), its text (now
+   light), the band (darker still) and the light are redefined here; the plate, keys, knobs, sheets and
+   menus are worked out from them, and the tiles keep their own metals.
+   Contrast (measured): ink 7.7:1 on the plate's lightest part (alu-1), 12.1:1 on alu-4; ink-2 5.8:1 and
+   ink-3 4.6:1 on alu-1; light text on the band 13:1.
+   ========================================================================== */
+html.theme-metal.metal-dark {
+  --mt-alu-0: #7C7A75;     /* polished: where the light lands */
+  --mt-alu-1: #4A4946;     /* the plate in the light */
+  --mt-alu-2: #3D3C3A;
+  --mt-alu-3: #343331;
+  --mt-alu-4: #2C2B2A;     /* the plate in shade */
+  --mt-alu-5: #232322;
+  --mt-alu-6: #1B1B1A;
+  --mt-gun-1: #403F3C;
+  --mt-gun-2: #2A2928;
+  --mt-gun-3: #222221;
+  --mt-gun-4: #1B1B1A;     /* the band, menus */
+  --mt-gun-5: #151514;
+  --mt-gun-6: #0F0F0F;
+  --mt-ink: #EFEDE8;       /* light text on the dark plate: 7.7:1 on alu-1, 12.1:1 on alu-4 */
+  --mt-ink-2: #D3D0C9;     /* 5.8:1 on alu-1 */
+  --mt-ink-3: #BDBAB3;     /* 4.6:1 on alu-1: hints, numbers */
+  --mt-lit: 0.16;
+  /* light text raised off dark steel: a dark edge under it */
+  --mt-engrave: 0 1px 0 color-mix(in srgb, var(--mt-void) 75%, transparent);
+  /* the brushing: the light streaks fainter than on aluminium (light lines on dark metal stand out more) */
+  --mt-brush: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='240'><filter id='n' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='0.003 1.05' numOctaves='4' seed='11' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  2.6 0 0 0 -1.32'/></filter><filter id='m' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='0.003 1.05' numOctaves='4' seed='11' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -2.4 0 0 0 1.1'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.09'/><rect width='100%25' height='100%25' filter='url(%23m)' opacity='0.2'/></svg>") 0 0 / 600px 240px;
+  --mt-brush-fine: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='120'><filter id='n' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='0.005 1.2' numOctaves='3' seed='4' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  2.4 0 0 0 -1.25'/></filter><filter id='m' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='0.005 1.2' numOctaves='3' seed='4' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -2.2 0 0 0 1'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.12'/><rect width='100%25' height='100%25' filter='url(%23m)' opacity='0.22'/></svg>") 0 0 / 300px 120px;
+  /* the plate: lit from above right, a little shade low and to the left */
+  --mt-plate-base: radial-gradient(60% 55% at 62% 12%, color-mix(in srgb, var(--mt-white) 8%, transparent), transparent 70%),
+    linear-gradient(180deg, transparent 55%, color-mix(in srgb, var(--mt-void) 22%, transparent)),
+    linear-gradient(90deg, var(--mt-alu-4) 0%, var(--mt-alu-3) 14%, var(--mt-alu-2) 34%, var(--mt-alu-1) 56%, var(--mt-alu-2) 76%, var(--mt-alu-3) 100%);
+  /* keys of dark steel, a little lighter than the plate; their edges and the bezels catch less light */
+  --mt-key: var(--mt-brush-fine), linear-gradient(180deg, color-mix(in srgb, var(--mt-alu-0) 30%, var(--mt-alu-1)), var(--mt-alu-1) 45%, var(--mt-alu-3));
+  --mt-key-edge: linear-gradient(180deg, var(--mt-alu-0), var(--mt-alu-4) 55%, var(--mt-alu-6));
+  --mt-knob-edge: linear-gradient(180deg, var(--mt-alu-0), var(--mt-alu-3) 40%, var(--mt-alu-6) 75%, var(--mt-alu-5));
+  --mt-cut: inset 0 2px 3px color-mix(in srgb, var(--mt-void) 70%, transparent), inset 0 0 0 1px color-mix(in srgb, var(--mt-void) 45%, transparent),
+    0 1px 0 color-mix(in srgb, var(--mt-white) 7%, transparent);
+  --mt-raise: 0 0 0 1px color-mix(in srgb, var(--mt-void) 65%, transparent), inset 0 1px 0 color-mix(in srgb, var(--mt-white) 16%, transparent),
+    inset 0 -1px 0 color-mix(in srgb, var(--mt-void) 30%, transparent);
+  --mt-line: color-mix(in srgb, var(--mt-ink) 12%, transparent);
+  color-scheme: dark;
 }
 
 /* the tokens that read a tile's own finish (--f0 to --f5, set per tile in css/metal.css), so they are

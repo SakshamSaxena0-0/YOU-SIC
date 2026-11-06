@@ -24,7 +24,7 @@ export const DEFAULT_SETTINGS = {
   accent: '#ff9f1c',
   blurBg: true,
   theme: 'glass', // glass (liquid glass over the wallpaper) | cyber (solid neon cyberpunk) | subway (y2k: dim teal, chrome, glass) | pixel (retro 90s desktop windows, pixel art) | vector-surrealism (dark fantasy as a flat surreal vector poster) | liminal (a vintage dream: sunset over a sea of clouds, on old film) | midnight (a city at 3 a.m.: dark polished gunmetal, chrome and cold cyan light) | metal (a hi-fi faceplate: brushed aluminium, plates of many metals, copper)
-  metalCover: 'colour', // Metal only: colour (the cover as it is) | etched (the cover cut into the aluminium as line art)
+  metalMode: 'light', // Metal only: light (brushed aluminium) | dark (the same faceplate in dark brushed steel)
   glassMood: 'brutal', // Liquid Glass only: brutal (black and white, hard light, heavy type) | clear (clear glass tinted by the album)
   refraction: true,
   windowBg: 'wallpaper', // wallpaper | acrylic | solid
@@ -104,8 +104,8 @@ export class Store extends EventTarget {
     if (this.settings.theme === 'console') this.settings.theme = 'pixel'; // so was the console theme
     if (this.settings.theme === 'chrome') this.settings.theme = 'metal'; // and the chrome theme, by metal
     if ((s.v || 0) < 2) Object.assign(this.settings, { v: 2, buttonStyle: 'ios', windowBg: 'wallpaper' });
-    // v3: Metal's cover was etched by default; the cover is shown as it is now (etching is a choice)
-    if ((s.v || 0) < 3) Object.assign(this.settings, { v: 3, metalCover: 'colour' });
+    // Metal's old Cover setting (colour | etched) is gone: the cover is always shown as it is
+    delete this.settings.metalCover;
     // phones: the glass refraction is heavy on a mobile GPU, so it starts off there (it can be turned on)
     if (!settings && pa.platform === 'android') this.settings.refraction = false;
     this.setLibrary(lib);

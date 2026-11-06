@@ -4,7 +4,6 @@ import { extractColors } from './palette.js';
 import { Waveform } from './waveform.js';
 import { THEME_COLORS, GLASS_BRUTAL } from './store.js';
 import { Ambient } from './ambient.js';
-import { etch, etchedNow } from './etch.js';
 
 const PLACEHOLDER = 'placeholder';
 
@@ -99,30 +98,10 @@ export class PlayerView {
 
   _setImg(card, url) {
     const img = card.querySelector('.aa-img');
-    // Metal: the cover etched into the aluminium (made once per cover in a worker, js/etch.js; the
-    // neighbouring covers are etched ahead, so a swipe finds them ready)
-    const etched = !!url && this.app.etched;
-    const key = (url || PLACEHOLDER) + (etched ? '#etched' : '');
-    if (img.dataset.url === key) return;
-    img.dataset.url = key;
-    img.classList.toggle('etched', etched);
-    if (etched) {
-      img.classList.remove('ph'); img.innerHTML = '';
-      const show = (u) => { if (img.dataset.url === key) img.style.backgroundImage = `url("${u}")`; };
-      const ready = etchedNow(url);
-      if (ready) show(ready);
-      else { img.style.backgroundImage = ''; etch(url).then(show, () => show(url)); }
-      return;
-    }
+    if (img.dataset.url === (url || PLACEHOLDER)) return;
+    img.dataset.url = url || PLACEHOLDER;
     if (url) { img.style.backgroundImage = `url("${url}")`; img.classList.remove('ph'); img.innerHTML = ''; }
     else { img.style.backgroundImage = ''; img.classList.add('ph'); img.innerHTML = icon('music_note'); }
-  }
-
-  // the theme or Settings > Cover changed how covers are drawn: draw the three again
-  refreshArt() {
-    const t = this.player.track;
-    this._setImg(this.cards.cur, t ? coverUrl(t.cover) : '');
-    this.syncNeighbors();
   }
 
 
@@ -439,7 +418,6 @@ export class PlayerView {
     const s = this.store.settings;
     const root = document.documentElement;
     // the Brutal mood keeps its palette but lets the cover's own colours glow into the panels beside it
-    // (Metal's cover fades into the bare aluminium instead: coloured light on brushed metal reads as a stain)
     this.ambient.set(this.app.brutal ? url : '');
     let accent = hexToRgb(s.accent), dark = [16, 16, 20];
     // solid themes (and Liquid Glass's Brutal mood) run on a fixed palette, whatever the cover looks like

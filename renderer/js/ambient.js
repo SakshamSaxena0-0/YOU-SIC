@@ -1,4 +1,4 @@
-// Ambient light (Liquid Glass's Brutal mood, wide windows): no border between the cover and the panels
+// Ambient light (Liquid Glass's Brutal mood and Metal, wide windows): no border between the cover and the panels
 // beside it (the library on the left, lyrics on the right). The cover's left and right edges fade out
 // (brutal.css masks them); under that fade, and on into each panel, lies the light of those edges: the
 // colours along the edge, averaged into one soft column, fading away from the cover. The piece under the
@@ -25,6 +25,13 @@ function scrim(y, g) {
   const top = climb([[0, 0.9], [g.tb + 58, 0.8], [g.tb + 120, 0.36], [g.tb + 200, 0]]);
   const bot = climb([[0, 0.94], [g.bb - 30, 0.82], [g.bb + 50, 0.45], [g.bb + 150, 0]]);
   return 1 - (1 - lerp(top, y)) * (1 - lerp(bot, g.h - y));
+}
+// how much light there is at y. Metal has no scrim: the cover starts at the band's edge and fades into the
+// plate behind the title and the controls (its mask, metal.css .aa-track --mv), and the light does the same.
+function light(y, g) {
+  if (!g.band) return FLOOR + (1 - FLOOR) * (1 - scrim(y, g));
+  if (y < g.band) return 0;
+  return lerp(climb([[g.h - g.bb - 150, 1], [g.h - g.bb - 50, 0.55], [g.h - g.bb + 30, 0.16], [g.h, 0.05]]), y);
 }
 
 // the cover's visible edge on one side, averaged down to one column of H colours (a little brighter)
@@ -64,7 +71,7 @@ function paint(c, col, side, kind, g) {
   const down = x.createLinearGradient(0, 0, 0, H);
   for (let i = 0; i <= 24; i++) {
     const t = i / 24;
-    down.addColorStop(t, `rgba(0,0,0,${(FLOOR + (1 - FLOOR) * (1 - scrim(t * g.h, g))).toFixed(3)})`);
+    down.addColorStop(t, `rgba(0,0,0,${light(t * g.h, g).toFixed(3)})`);
   }
   x.fillStyle = down;
   x.fillRect(0, 0, w, H);
@@ -96,8 +103,9 @@ export class Ambient {
     const g = {
       w: t ? t.offsetWidth : 0, h: t ? t.offsetHeight : 0, f: edge ? edge.box.offsetWidth : 0,
       tb: css(document.documentElement, '--tb'), bb: this.wrap ? css(this.wrap, '--bb') : 0,
+      band: document.documentElement.classList.contains('theme-metal') ? css(document.documentElement, '--mt-band-h') : 0,
     };
-    g.key = [g.w, g.h, g.f, g.tb, g.bb].map(Math.round).join();
+    g.key = [g.w, g.h, g.f, g.tb, g.bb, g.band].map(Math.round).join();
     return g;
   }
 

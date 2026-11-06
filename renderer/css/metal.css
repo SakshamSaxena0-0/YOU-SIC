@@ -204,7 +204,19 @@ html.theme-metal .app.wide #aaWrap .aa-track {
     color-mix(in srgb, var(--mt-void) 16%, transparent) calc(100% - var(--bb, 0px) + 30px), color-mix(in srgb, var(--mt-void) 5%, transparent));
   -webkit-mask-image: var(--mv); mask-image: var(--mv);
 }
+/* no borders between the columns, as in Liquid Glass's Brutal mood (seamless.css, ambient.js): the cover
+   fades out at both sides into its own light, which runs on across the plate under the panels beside it.
+   Both stop at the band's edge, and the band casts its shadow on the light as it does on the plate. */
+html.theme-metal.seamless .app.wide #aaWrap .aa-track {
+  -webkit-mask-image: var(--m), var(--mv); -webkit-mask-composite: source-in; mask-image: var(--m), var(--mv); mask-composite: intersect;
+}
+html.theme-metal.seamless .app.wide .amb { clip-path: inset(var(--mt-band-h) 0 0 0); }
+html.theme-metal.seamless .app.wide .amb::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(180deg, transparent var(--mt-band-h), color-mix(in srgb, var(--mt-void) 20%, transparent) calc(var(--mt-band-h) + 2px), transparent calc(var(--mt-band-h) + 16px));
+}
 html.theme-metal .app.wide.art-only #aaWrap .aa-track { -webkit-mask-image: none; mask-image: none; }
+html.theme-metal.seamless .app.wide.art-only #aaWrap .aa-track { -webkit-mask-image: var(--m); mask-image: var(--m); }
 html.theme-metal .app.wide #aaWrap .aa-img { background-color: transparent; }
 html.theme-metal .app.wide #aaWrap .aa-img.ph { background: none; }
 html.theme-metal .app.wide #aaWrap .aa-img.ph .ico { fill: color-mix(in srgb, var(--mt-ink) 22%, transparent); filter: drop-shadow(0 1px 0 color-mix(in srgb, var(--mt-white) calc(60% * var(--mt-lit)), transparent)); }
@@ -280,7 +292,9 @@ html.theme-metal .search-ico { color: var(--mt-ink-2); }
    on the left, lit towards the right, with a soft sheen across it. The bay casts a long shadow on the
    plate. The icon sits in a well sunk into the card: lit along its top, dark in the middle, its floor
    catching a little light, with a bright lip below it. The name and the count are light, raised off
-   the face. The bay is the tile itself; the card is its ::before. The edges are kept thin (a 2px rim,
+   the face. The card is polished (the user asked for a little more shine): its chamfer is bright at the
+   top and glints along the bottom, a fine light line runs under it, the face's upper half reflects the
+   light like a mirror down to a faint horizon, and the sheen has a bright core that slides on hover. The bay is the tile itself; the card is its ::before. The edges are kept thin (a 2px rim,
    a 1px channel, a 1px chamfer): the user found a thicker frame heavy. */
 html.theme-metal .root-grid { gap: 14px; padding: 12px 16px 20px; }
 html.theme-metal .tile {
@@ -299,12 +313,17 @@ html.theme-metal .tile.lg::before {
   padding: 0; -webkit-mask: none; mask: none; border: 1px solid transparent; pointer-events: none;
   background:
     var(--mt-brush-card) padding-box,
-    linear-gradient(180deg, color-mix(in srgb, var(--mt-white) 14%, transparent), transparent 16%, transparent 78%, color-mix(in srgb, var(--mt-void) 16%, transparent)) padding-box,
-    linear-gradient(112deg, transparent 34%, color-mix(in srgb, var(--mt-white) 9%, transparent) 46%, transparent 58%) var(--f-sx, 0%) 0 / 260% 100% padding-box,
+    var(--mt-card-polish) padding-box,
+    linear-gradient(112deg, transparent 32%, color-mix(in srgb, var(--mt-white) 7%, transparent) 41%, color-mix(in srgb, var(--mt-white) 20%, transparent) 46%,
+      color-mix(in srgb, var(--mt-white) 7%, transparent) 51%, transparent 60%) var(--f-sx, 0%) 0 / 260% 100% padding-box,
     linear-gradient(90deg, var(--f3), color-mix(in srgb, var(--f3) 85%, var(--f4)) 35%, var(--f3) 55%, var(--f2) 80%, color-mix(in srgb, var(--f1) 70%, var(--f2)) 96%, var(--f2)) padding-box,
-    linear-gradient(180deg, color-mix(in srgb, var(--f0) 35%, var(--mt-white)), var(--f0) 14%, color-mix(in srgb, var(--f0) 70%, var(--f1)) 60%, var(--f0)) border-box;
+    linear-gradient(180deg, color-mix(in srgb, var(--f0) 12%, var(--mt-white)), color-mix(in srgb, var(--f0) 55%, var(--mt-white)) 12%, var(--f0) 26%,
+      color-mix(in srgb, var(--f0) 70%, var(--f1)) 62%, color-mix(in srgb, var(--f0) 70%, var(--mt-white))) border-box;
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--f4) 55%, var(--mt-void)), inset 0 0 0 1px color-mix(in srgb, var(--mt-void) 18%, transparent);
+  transition: background-position 320ms var(--mt-ease);
 }
+/* lifted, the polished face turns a little in the light: its sheen slides along it */
+html.theme-metal .tile.lg:hover::before { background-position: 0 0, 0 0, calc(var(--f-sx, 0%) + 16%) 0, 0 0, 0 0; }
 html.theme-metal .tile-title {
   position: relative; z-index: 1; font-family: var(--mt-label); font-weight: 700; font-size: 12.5px; letter-spacing: 0.035em; line-height: 1.25;
   text-transform: uppercase; color: color-mix(in srgb, var(--f-ink) 80%, var(--f2)); text-shadow: var(--mt-card-letter);

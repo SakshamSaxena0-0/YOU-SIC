@@ -15,6 +15,8 @@ A hi-fi faceplate, after the user's mockup of the library as plates of brushed m
   - a dark seam;
   - the face, brushed finely side to side, darker on the left, lit towards the right, with a soft sheen that falls differently on each card.
 
+  The cards are polished, because the user asked for a little more shine. The chamfer is bright along the top and glints along the bottom. A fine light line runs under it. The upper half of the face reflects the light, down to a faint horizon. The sheen has a bright core and slides along the card on hover. The flat keys on the plate have the same polish: their upper half catches the light (`--mt-gloss`).
+
   The bay casts a long shadow on the plate. On hover it lifts and the shadow grows; on a click it presses in. The bay is the tile itself and the card is its `::before`.
 - **Tile contents:** each icon sits in a well sunk into the card: lit along its top, dark in the middle, its floor catching a little light, with a bright lip below it. The glyph is tinted with the card's metal. Names and counts are light mono capitals, raised off the face by a dark edge under each letter.
 - **Buttons on the plate:** keys and knobs of machined aluminium. The round knobs carry the rings a lathe leaves.
@@ -22,7 +24,8 @@ A hi-fi faceplate, after the user's mockup of the library as plates of brushed m
 - **Header buttons:** clear rings of polished steel round a light glyph.
 - **Text:** on the plate it is printed dark into the metal; on the band it is light.
 - **The cover:** shown as it is, as in every theme. The theme doesn't change it: the user's rule is that a theme never alters the album art.
-  - **Wide layout:** it fills the middle column edge to edge, as in the other themes. It starts at the band's machined edge, so the band stays whole across the window and casts its shadow on the cover's top. Behind the title block and the controls it fades into the plate exactly as far as the other themes fade it into their scrim, and **Admire art** shows all of it.
+  - **Wide layout:** it fills the middle column, as in the other themes. It starts at the band's machined edge, so the band stays whole across the window and casts its shadow on the cover's top. Behind the title block and the controls it fades into the plate exactly as far as the other themes fade it into their scrim, and **Admire art** shows all of it.
+  - **No borders between the columns,** as in Liquid Glass's Brutal mood (the user asked for the same): the cover fades out at both sides into its own light, which runs on across the plate under the library and the lyrics, so the columns meet without a seam. The light is the colour along each edge of the cover, drawn once per song (`ambient.js`). It stops at the band's edge and follows the cover's fade down the window. The masks are in `seamless.css`; Metal adds its own vertical profile.
   - **Narrow layout:** a square cover in a polished bezel.
   - An etched (line-art) cover was tried and removed: the user's rule is that the theme leaves album art alone.
 - **Brushing:** kept faint. The user found the stronger streaks annoying, so the light and dark streaks are now at 0.19 and 0.15 opacity (they were 0.3 and 0.24).
@@ -49,6 +52,7 @@ To pick it, open **Settings → Look and feel → Theme → Metal**. Its id is `
 | --- | --- |
 | Design tokens (palette, the 13 finishes, textures, materials, shapes, motion, fonts; the dark mode block at the end) | `renderer/css/metal.tokens.css` |
 | Component rules (they only read the tokens; `npm run check` fails on a literal colour) | `renderer/css/metal.css` |
+| Seamless columns: the cover's side fades and its light in the panels | `renderer/css/seamless.css`; `renderer/js/ambient.js`; on while `html.seamless` (app.js `seamless`) |
 | Seekbar: grooves cut in the aluminium, copper for what has played | `renderer/js/waveform.js`, `_drawMt()` |
 | Mini player window | `renderer/css/mini.css` (`.mini-mat`) |
 | Registration | `renderer/js/store.js` (`THEMES`, `THEME_COLORS`, `metalMode`) and the Theme and Mode pickers in `renderer/js/app.js` |

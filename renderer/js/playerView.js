@@ -417,8 +417,8 @@ export class PlayerView {
   async _applyColors(url) {
     const s = this.store.settings;
     const root = document.documentElement;
-    // the Brutal mood keeps its palette but lets the cover's own colours glow into the panels beside it
-    this.ambient.set(this.app.brutal ? url : '');
+    // the Brutal mood and Metal keep their palettes but let the cover's own colours glow into the panels beside it
+    this.ambient.set(this.app.seamless ? url : '');
     let accent = hexToRgb(s.accent), dark = [16, 16, 20];
     // solid themes (and Liquid Glass's Brutal mood) run on a fixed palette, whatever the cover looks like
     const fixed = THEME_COLORS[s.theme] || (this.app.brutal ? GLASS_BRUTAL : null);

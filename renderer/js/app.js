@@ -482,8 +482,9 @@ class App {
   get solidTheme() { return this.theme !== 'glass'; }
   // Liquid Glass's Brutal mood: the same glass in black and white (brutal.css, html.glass-brutal)
   get brutal() { return this.theme === 'glass' && this.store.settings.glassMood !== 'clear'; }
-  // no borders between the columns: the cover dissolves into its own light (css/seamless.css, ambient.js)
-  get seamless() { return this.brutal; }
+  // no borders between the columns: the cover dissolves into its own light (css/seamless.css, ambient.js).
+  // Liquid Glass's Brutal mood and Metal
+  get seamless() { return this.brutal || this.theme === 'metal'; }
   // Metal's dark mode (Settings > Mode): the same faceplate in dark brushed steel (html.metal-dark)
   get metalDark() { return this.theme === 'metal' && this.store.settings.metalMode === 'dark'; }
 
@@ -503,6 +504,7 @@ class App {
       html0.classList.toggle('theme-solid', solid);
       this.playerView.wave.setTheme(theme);
       this.playerView.refreshFx();
+      this.playerView.ambient.refit(); // each theme shapes the cover's light its own way (ambient.js light)
       refreshLiquid();
       requestAnimationFrame(() => this._fitVolBar()); // each theme sizes and spaces the controls its own way
     }

@@ -21,9 +21,10 @@ A hi-fi faceplate, after the user's mockup of the library as plates of brushed m
 - **Copper:** the one accent. It marks play (a turned copper knob in a polished steel bezel), anything switched on, the played part of the song, and the sliders.
 - **Header buttons:** clear rings of polished steel round a light glyph.
 - **Text:** on the plate it is printed dark into the metal; on the band it is light.
-- **The cover:** etched into the aluminium as line art, with outlines plus horizontal engraving lines across its dark parts. Each cut is a dark groove with a thin bright lip.
-  - **Settings → Look and feel → Cover → Colour** shows the cover as it is instead.
-  - Either way, in the wide layout it fades into the plate at every side, under the band, above the title block and into both panels. There is no edge and no coloured glow.
+- **The cover:** shown as it is, as in every theme. The theme doesn't change it: the user's rule is that a theme never alters the album art.
+  - **Wide layout:** it fills the middle column edge to edge, as in the other themes. It starts at the band's machined edge, so the band stays whole across the window and casts its shadow on the cover's top. Behind the title block and the controls it fades into the plate exactly as far as the other themes fade it into their scrim, and **Admire art** shows all of it.
+  - **Narrow layout:** a square cover in a polished bezel.
+  - **Etched (optional):** **Settings → Look and feel → Cover → Etched** cuts the cover into the aluminium as line art, with outlines plus horizontal engraving lines across its dark parts. Each cut is a dark groove with a thin bright lip. It is off unless chosen. It was the default at first, until the user said half the cover was hidden.
 
 To pick it, open **Settings → Look and feel → Theme → Metal**. Its id is `metal` and its root class is `html.theme-metal`. With the etched cover on, `html.metal-etched` is set as well.
 
@@ -36,7 +37,6 @@ To pick it, open **Settings → Look and feel → Theme → Metal**. Its id is `
 | The etched cover: queue and cache (blob URLs, the last 12 covers) | `renderer/js/etch.js` |
 | The etched cover: the image work, done in a worker | `renderer/js/etch.worker.js` |
 | Where covers are drawn etched | `PlayerView._setImg` / `refreshArt` (`renderer/js/playerView.js`); `renderTrack` in `renderer/js/mini.js` |
-| Seamless columns (the cover's side fades) | `renderer/css/seamless.css`; on while `html.seamless` (app.js `seamless`) |
 | Seekbar: grooves cut in the aluminium, copper for what has played | `renderer/js/waveform.js`, `_drawMt()` |
 | Mini player window | `renderer/css/mini.css` (`.mini-mat`) |
 | Registration | `renderer/js/store.js` (`THEMES`, `THEME_COLORS`, `metalCover`) and the Theme and Cover pickers in `renderer/js/app.js` |

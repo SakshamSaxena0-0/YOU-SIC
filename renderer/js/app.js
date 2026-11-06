@@ -483,9 +483,9 @@ class App {
   // Liquid Glass's Brutal mood: the same glass in black and white (brutal.css, html.glass-brutal)
   get brutal() { return this.theme === 'glass' && this.store.settings.glassMood !== 'clear'; }
   // no borders between the columns: the cover dissolves into its own light (css/seamless.css, ambient.js)
-  get seamless() { return this.brutal || this.theme === 'metal'; }
-  // Metal: the cover etched into the aluminium as line art (js/etch.js), unless Settings > Cover says colour
-  get etched() { return this.theme === 'metal' && this.store.settings.metalCover !== 'colour'; }
+  get seamless() { return this.brutal; }
+  // Metal: the cover etched into the aluminium as line art (js/etch.js), if Settings > Cover says so
+  get etched() { return this.theme === 'metal' && this.store.settings.metalCover === 'etched'; }
 
   // Reduce effects is on when the user turned it on, or (until they choose) when Windows asks for less motion.
   get reduceEffects() {
@@ -681,7 +681,7 @@ class App {
       <div class="set-sec">Look and Feel</div>
       ${pick('theme', 'Theme', 'Liquid Glass: clear glass over your wallpaper. Cyberpunk: neon HUD. Y2K Subway: dim teal, chrome and glass. Pixel: a retro 90s desktop in pixel art. Vector Surrealism: dark fantasy as a surreal vector poster. Liminal: a vintage dream, sunset over the clouds on old film. Midnight: a city at 3 a.m., dark polished gunmetal and cold cyan light. Metal: a hi-fi faceplate of brushed aluminium, tiles in many metals, copper keys', [['glass', 'Liquid Glass'], ['cyber', 'Cyberpunk'], ['subway', 'Y2K Subway'], ['pixel', 'Pixel'], ['vector-surrealism', 'Vector Surrealism'], ['liminal', 'Liminal'], ['midnight', 'Midnight'], ['metal', 'Metal']])}
       <div class="metal-only">
-      ${pick('metalCover', 'Cover', 'Etched: the cover cut into the brushed metal as line art. Colour: the cover as it is', [['etched', 'Etched'], ['colour', 'Colour']])}
+      ${pick('metalCover', 'Cover', 'Colour: the cover as it is. Etched: the cover cut into the brushed metal as line art', [['colour', 'Colour'], ['etched', 'Etched']])}
       </div>
       <div class="glass-only">
       ${pick('glassMood', 'Mood', 'Brutal: black and white, deep darkness, hard white light and heavy type. Clear: clear glass tinted by the album art', [['brutal', 'Brutal'], ['clear', 'Clear']])}

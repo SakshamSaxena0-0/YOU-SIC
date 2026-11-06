@@ -1,11 +1,10 @@
 /* ==========================================================================
-   Seamless columns (html.seamless: Liquid Glass's Brutal mood and the Metal theme; app.js seamless)
+   Seamless columns (html.seamless: Liquid Glass's Brutal mood; app.js seamless)
    ========================================================================== */
 /* The cover (and its scrim) fade out over --amb-f at both sides. Under that fade lies the light of the
    cover's edge (.amb-edge), and the same light runs on into the panel beside it (.amb-l, .amb-r, under
    each panel's content), so where the cover's column ends there is only light on both sides: no
-   border. Wide windows only. (Metal uses the fades without the light: its cover fades into the bare
-   aluminium, css/metal.css.) */
+   border. Wide windows only. */
 .amb { display: none; }
 html.seamless .app.wide { --amb-f: clamp(64px, 7.5vw, 160px); }
 html.seamless .app.wide .amb { display: block; position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }

@@ -5,8 +5,8 @@
    rose gold, brass, pewter, platinum, cherry, champagne, titanium, smoke, copper, bronze, oxblood,
    jade), each set in a bay with a polished chamfer round it, its icon in a well sunk into the card and
    its name in mono capitals raised off the face. Copper is the one accent: play, whatever is on, the played part of
-   the song. The cover is etched into the aluminium as line art (js/etch.js; Settings > Cover can
-   show it in colour instead).
+   the song. The cover is shown as it is, as in every theme (Settings > Cover can etch it into the
+   aluminium as line art instead, js/etch.js).
    Every colour, material, radius, font and shadow the theme uses is defined here; css/metal.css (the
    component rules) only reads these tokens (`npm run check` fails on a literal colour there). See
    THEME_METAL.md.
@@ -154,7 +154,8 @@ html.theme-metal {
   --mt-r-sm: 6px;
   --mt-r: 9px;
   --mt-r-lg: 12px;
-  --mt-r-card: 11px;   /* a tile's bay; its card is inset by --mt-frame-w */
+  --mt-r-card: 11px;   /* a tile's bay */
+  --mt-bay-w: 3px;     /* how far a tile's card sits inside its bay: a 2px rim, then a 1px channel */
   --mt-r-pill: 999px;
   --mt-frame-w: 5px;
 
@@ -186,7 +187,7 @@ html.theme-metal {
    worked out on each tile rather than on the page */
 html.theme-metal .tile {
   /* the dark cut round a tile's bay */
-  --mt-bay-cut: 0 0 0 1px color-mix(in srgb, var(--f4) 45%, var(--mt-void));
+  --mt-bay-cut: 0 0 0 1px color-mix(in srgb, var(--f4) 65%, var(--mt-void));
   /* light letters raised off a card: a dark edge under each one (so they read on the brightest finish),
      a soft shadow, a faint light along their tops */
   --mt-card-letter: 0 1px 0 color-mix(in srgb, var(--f4) 35%, var(--mt-void)), 0 1px 3px color-mix(in srgb, var(--f4) 30%, var(--mt-void)),

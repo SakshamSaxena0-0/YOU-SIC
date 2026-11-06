@@ -3,11 +3,11 @@
    A hi-fi faceplate: one plate of brushed aluminium under a band of dark brushed gunmetal (the title
    bar and the column headers). The library's tiles are thick cards of brushed metal in many finishes,
    each set in a bay with a polished chamfer round it, their icons in wells sunk into the card and their
-   names in mono capitals raised off the face. Buttons on the plate are machined aluminium (round ones turned on a lathe);
-   copper is the one accent: play, whatever is switched on, the played part of the song. Text on the
-   plate is printed dark into the metal; text on the band is light. The cover is etched into the
-   aluminium as line art (js/etch.js) or, if Settings > Cover says so, shown in colour; either way it
-   fades into the plate with no edge (css/seamless.css).
+   names in mono capitals raised off the face. Buttons on the plate are machined aluminium (round ones
+   turned on a lathe); copper is the one accent: play, whatever is switched on, the played part of the
+   song. Text on the plate is printed dark into the metal; text on the band is light. The cover is
+   shown as it is, as in every theme (Settings > Cover can etch it into the aluminium as line art
+   instead, js/etch.js).
    Tokens: css/metal.tokens.css. Seekbar: waveform.js (_drawMt). Guide: THEME_METAL.md.
    Nothing loops: the theme costs nothing while idle.
    ========================================================================== */
@@ -189,18 +189,23 @@ html.theme-metal .pl-cat:hover { background: color-mix(in srgb, var(--mt-white) 
 html.theme-metal .pl-cat-label { font-size: 9px; color: var(--mt-text-dim); text-shadow: var(--mt-emboss); }
 html.theme-metal .pl-cat-name { font-size: 17px; font-weight: 800; color: var(--mt-text); text-shadow: var(--mt-emboss); }
 html.theme-metal .pl-cat-pos { font-size: 11px; color: var(--mt-text-dim); }
-/* the cover. Wide: it fills its column and fades into the plate at every side, under the band and
-   above the title block as well as into the panels (masks, no scrim, so the metal shows through
-   unchanged). Etched (js/etch.js), it is line art cut into that same plate: everything but the cuts is
-   clear. Narrow: a square plate in a polished bezel. */
-html.theme-metal .app.wide #aaWrap .aa-scrim { display: none; }
-html.theme-metal .app.wide #aaWrap .aa-track {
-  --mv: linear-gradient(180deg, transparent calc(var(--bt, 0px) + 4px), color-mix(in srgb, var(--mt-void) 35%, transparent) calc(var(--bt, 0px) + 46px),
-    var(--mt-void) calc(var(--bt, 0px) + 120px), var(--mt-void) calc(100% - var(--bb, 0px) - 170px),
-    color-mix(in srgb, var(--mt-void) 40%, transparent) calc(100% - var(--bb, 0px) - 70px), transparent calc(100% - var(--bb, 0px) + 6px));
-  -webkit-mask-image: var(--m, linear-gradient(var(--mt-void), var(--mt-void))), var(--mv); mask-image: var(--m, linear-gradient(var(--mt-void), var(--mt-void))), var(--mv);
-  -webkit-mask-composite: source-in; mask-composite: intersect;
+/* the cover. Wide: as in every theme, it fills its column edge to edge and is drawn as it is. It
+   starts at the band's machined edge (the band runs whole across the window and casts its shadow on the
+   cover's top) and, behind the title block and the controls, fades into the plate just as far as the
+   other themes fade it into their scrim (a mask, so the brushed metal shows through unchanged). Admire
+   art shows all of it. Etched (Settings > Cover; js/etch.js), it is line art cut into the plate.
+   Narrow: a square plate in a polished bezel. */
+html.theme-metal .app.wide #aaWrap .aa-scrim {
+  background: linear-gradient(180deg, transparent var(--mt-band-h), color-mix(in srgb, var(--mt-void) 60%, transparent) var(--mt-band-h),
+    color-mix(in srgb, var(--mt-void) 22%, transparent) calc(var(--mt-band-h) + 2px), transparent calc(var(--mt-band-h) + 16px));
 }
+html.theme-metal .app.wide #aaWrap .aa-track {
+  --mv: linear-gradient(180deg, transparent calc(var(--mt-band-h) - 1px), var(--mt-void) calc(var(--mt-band-h) + 1px),
+    var(--mt-void) calc(100% - var(--bb, 0px) - 150px), color-mix(in srgb, var(--mt-void) 55%, transparent) calc(100% - var(--bb, 0px) - 50px),
+    color-mix(in srgb, var(--mt-void) 16%, transparent) calc(100% - var(--bb, 0px) + 30px), color-mix(in srgb, var(--mt-void) 5%, transparent));
+  -webkit-mask-image: var(--mv); mask-image: var(--mv);
+}
+html.theme-metal .app.wide.art-only #aaWrap .aa-track { -webkit-mask-image: none; mask-image: none; }
 html.theme-metal .app.wide #aaWrap .aa-img { background-color: transparent; }
 html.theme-metal .app.wide #aaWrap .aa-img.ph { background: none; }
 html.theme-metal .app.wide #aaWrap .aa-img.ph .ico { fill: color-mix(in srgb, var(--mt-ink) 22%, transparent); filter: drop-shadow(0 1px 0 color-mix(in srgb, var(--mt-white) 60%, transparent)); }
@@ -283,7 +288,8 @@ html.theme-metal .search-ico { color: var(--mt-ink-2); }
    on the left, lit towards the right, with a soft sheen across it. The bay casts a long shadow on the
    plate. The icon sits in a well sunk into the card: lit along its top, dark in the middle, its floor
    catching a little light, with a bright lip below it. The name and the count are light, raised off
-   the face. The bay is the tile itself; the card is its ::before. */
+   the face. The bay is the tile itself; the card is its ::before. The edges are kept thin (a 2px rim,
+   a 1px channel, a 1px chamfer): the user found a thicker frame heavy. */
 html.theme-metal .root-grid { gap: 14px; padding: 12px 16px 20px; }
 html.theme-metal .tile {
   height: 108px; border: 0; border-radius: var(--mt-r-card); color: var(--f-ink); filter: none; padding: 15px 16px; outline: 0;
@@ -297,7 +303,7 @@ html.theme-metal .tile:hover { transform: none; translate: 0 -2px; filter: brigh
 html.theme-metal .tile:active { transform: none; translate: 0 1px; filter: brightness(0.96); box-shadow: var(--mt-bay-cut), var(--mt-bay-shadow-down); transition-duration: 60ms; }
 html.theme-metal .tile::after { display: none; }
 html.theme-metal .tile.lg::before {
-  display: block; content: ''; position: absolute; inset: var(--mt-frame-w); z-index: -1; border-radius: calc(var(--mt-r-card) - var(--mt-frame-w));
+  display: block; content: ''; position: absolute; inset: var(--mt-bay-w); z-index: -1; border-radius: calc(var(--mt-r-card) - var(--mt-bay-w));
   padding: 0; -webkit-mask: none; mask: none; border: 1px solid transparent; pointer-events: none;
   background:
     var(--mt-brush-card) padding-box,
@@ -305,7 +311,7 @@ html.theme-metal .tile.lg::before {
     linear-gradient(112deg, transparent 34%, color-mix(in srgb, var(--mt-white) 9%, transparent) 46%, transparent 58%) var(--f-sx, 0%) 0 / 260% 100% padding-box,
     linear-gradient(90deg, var(--f3), color-mix(in srgb, var(--f3) 85%, var(--f4)) 35%, var(--f3) 55%, var(--f2) 80%, color-mix(in srgb, var(--f1) 70%, var(--f2)) 96%, var(--f2)) padding-box,
     linear-gradient(180deg, color-mix(in srgb, var(--f0) 35%, var(--mt-white)), var(--f0) 14%, color-mix(in srgb, var(--f0) 70%, var(--f1)) 60%, var(--f0)) border-box;
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--f4) 55%, var(--mt-void)), inset 0 0 0 1px color-mix(in srgb, var(--mt-void) 28%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--f4) 55%, var(--mt-void)), inset 0 0 0 1px color-mix(in srgb, var(--mt-void) 18%, transparent);
 }
 html.theme-metal .tile-title {
   position: relative; z-index: 1; font-family: var(--mt-label); font-weight: 700; font-size: 12.5px; letter-spacing: 0.035em; line-height: 1.25;

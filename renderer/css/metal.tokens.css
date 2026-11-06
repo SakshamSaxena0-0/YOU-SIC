@@ -1,11 +1,13 @@
 /* ==========================================================================
    Metal theme (html.theme-metal): design tokens
    A hi-fi faceplate. The window is one plate of brushed aluminium under a band of dark brushed
-   gunmetal; the library's tiles are thick cards of brushed metal in many finishes (graphite, silver,
-   rose gold, brass, pewter, platinum, cherry, champagne, titanium, smoke, copper, bronze, oxblood,
-   jade), each set in a bay with a polished chamfer round it, its icon in a well sunk into the card and
-   its name in mono capitals raised off the face. Copper is the one accent: play, whatever is on, the played part of
-   the song. The cover is shown as it is, as in every theme.
+   gunmetal; the library's tiles are thick cards of metal, each set in a bay with a polished chamfer
+   round it, its icon in a well sunk into the card and its name in mono capitals raised off the face.
+   Thirteen finishes are defined (graphite, silver, rose gold, brass, pewter, platinum, cherry,
+   champagne, titanium, smoke, copper, bronze, oxblood, jade), but every tile and every button is
+   graphite, the Folders tile's finish (the user's choice: the --mt-btn-* block at the end). Copper is
+   the one accent: whatever is on, the played part of the song, the sliders. The cover is shown as it
+   is, as in every theme. The brushing is switched off (the last block but one).
    Two modes (Settings > Mode): light, brushed aluminium (this block), and dark, the same faceplate in
    dark brushed steel (html.metal-dark, the block at the end: it redefines the plate's ramp, its text,
    the band and the light, and everything else is worked out from those).
@@ -262,3 +264,44 @@ html.theme-metal .tile {
    band, the keys, the menus and the tiles. The brushing tokens above are kept; to bring the brushed
    look back, delete this block. ---- */
 html.theme-metal, html.theme-metal.metal-dark { --mt-brush: none; --mt-brush-fine: none; --mt-brush-card: none; }
+
+/* ---- one metal for every button (the user's choice, 2026-11-06): every tile and every button is
+   graphite, the finish of the Folders tile, in both modes. Copper still shows what is on (a copper
+   glyph, label, inlay or lamp on the graphite) and still fills the seekbar, the sliders and the ring
+   round play. The other finishes and the aluminium keys above are kept: the buttons read these
+   --mt-btn-* tokens, and the tiles take them in the last rule of section 9 in css/metal.css. ---- */
+html.theme-metal {
+  --mt-btn-0: var(--mt-graphite-0); --mt-btn-1: var(--mt-graphite-1); --mt-btn-2: var(--mt-graphite-2); --mt-btn-3: var(--mt-graphite-3);
+  --mt-btn-4: var(--mt-graphite-4); --mt-btn-5: var(--mt-graphite-5); --mt-btn-ink: var(--mt-graphite-ink);
+  /* the card's clear coat, scaled to a key: the upper half catching the light down to a crisp horizon,
+     the lower half the shade, a thin rim of reflected light along the bottom */
+  --mt-btn-gloss: linear-gradient(180deg, color-mix(in srgb, var(--mt-white) 34%, transparent), color-mix(in srgb, var(--mt-white) 15%, transparent) 20%,
+    color-mix(in srgb, var(--mt-white) 8%, transparent) 46%, transparent 47%, color-mix(in srgb, var(--mt-void) 14%, transparent) 49%,
+    color-mix(in srgb, var(--mt-void) 5%, transparent) 80%, transparent 88%, transparent calc(100% - 3px), color-mix(in srgb, var(--mt-white) 22%, transparent));
+  /* a flat key of graphite */
+  --mt-btn-key: var(--mt-btn-gloss), linear-gradient(180deg, var(--mt-btn-1), var(--mt-btn-2) 45%, var(--mt-btn-3));
+  /* its polished chamfer, as on the card: brightest along the top, a glint along the bottom */
+  --mt-btn-edge: linear-gradient(180deg, color-mix(in srgb, var(--mt-btn-0) 30%, var(--mt-white)), var(--mt-btn-0) 30%, var(--mt-btn-4) 72%,
+    color-mix(in srgb, var(--mt-btn-0) 70%, var(--mt-white)));
+  /* a round button: turned graphite, with the light landing on its top */
+  --mt-btn-knob: radial-gradient(75% 50% at 50% 0%, color-mix(in srgb, var(--mt-white) 18%, transparent), transparent 75%), var(--mt-turned),
+    conic-gradient(from 210deg, var(--mt-btn-2), color-mix(in srgb, var(--mt-btn-0) 75%, var(--mt-btn-1)) 12%, var(--mt-btn-3) 25%, var(--mt-btn-1) 38%,
+      var(--mt-btn-3) 50%, color-mix(in srgb, var(--mt-btn-0) 75%, var(--mt-btn-1)) 62%, var(--mt-btn-3) 75%, var(--mt-btn-1) 88%, var(--mt-btn-2));
+  /* the polished graphite ring round a round button */
+  --mt-btn-ring: conic-gradient(from 200deg, var(--mt-btn-2), color-mix(in srgb, var(--mt-btn-0) 45%, var(--mt-white)) 10%, var(--mt-btn-3) 24%,
+    var(--mt-btn-0) 40%, var(--mt-btn-4) 55%, var(--mt-btn-1) 68%, color-mix(in srgb, var(--mt-btn-0) 45%, var(--mt-white)) 80%, var(--mt-btn-3) 92%, var(--mt-btn-2));
+  /* raised: a thin dark outline, a polished top edge (for keys drawn without a border) */
+  --mt-btn-raise: 0 0 0 1px color-mix(in srgb, var(--mt-void) 55%, transparent), inset 0 1px 0 color-mix(in srgb, var(--mt-btn-0) 55%, var(--mt-white)),
+    inset 0 -1px 0 color-mix(in srgb, var(--mt-void) 25%, transparent);
+  /* light letters and glyphs raised off the graphite, a little brighter than the card's names (so they
+     read on the gloss too: 4.1:1 on its brightest part behind the letters, 6.7:1 below the horizon), a dark
+     edge under them and a fine one all round */
+  --mt-btn-text: color-mix(in srgb, var(--mt-btn-ink) 45%, var(--mt-white));
+  --mt-btn-letter: 0 1px 0 color-mix(in srgb, var(--mt-btn-4) 35%, var(--mt-void)), 0 1px 3px color-mix(in srgb, var(--mt-btn-4) 30%, var(--mt-void)),
+    0 0 1.5px color-mix(in srgb, var(--mt-btn-4) 45%, var(--mt-void));
+  --mt-btn-glyph: drop-shadow(0 1px 0 color-mix(in srgb, var(--mt-void) 60%, transparent));
+  /* what is on: a copper glyph or label (3.2:1 to 6:1 on the key, so the inlay carries it too), and a
+     copper inlay round the key */
+  --mt-btn-on: color-mix(in srgb, var(--mt-cu-0) 85%, var(--mt-cu-1));
+  --mt-btn-inlay: inset 0 0 0 1px color-mix(in srgb, var(--mt-cu-2) 80%, transparent);
+}

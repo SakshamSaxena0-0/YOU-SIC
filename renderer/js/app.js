@@ -680,9 +680,9 @@ class App {
         <div class="range-wrap"><input type="range" min="0" max="12" step="1" value="${s.crossfade}" data-r="crossfade" style="--p:${(s.crossfade / 12) * 100}%"><span class="rv">${s.crossfade}s</span></div></div>
       ${tog('resume', 'Resume playback on start', 'Restore the last track, list and position')}
       <div class="set-sec">Look and Feel</div>
-      ${pick('theme', 'Theme', 'Liquid Glass: clear glass over your wallpaper. Cyberpunk: neon HUD. Y2K Subway: dim teal, chrome and glass. Pixel: a retro 90s desktop in pixel art. Vector Surrealism: dark fantasy as a surreal vector poster. Liminal: a vintage dream, sunset over the clouds on old film. Midnight: a city at 3 a.m., dark polished gunmetal and cold cyan light. Metal: a hi-fi faceplate of brushed aluminium, tiles in many metals, copper keys', [['glass', 'Liquid Glass'], ['cyber', 'Cyberpunk'], ['subway', 'Y2K Subway'], ['pixel', 'Pixel'], ['vector-surrealism', 'Vector Surrealism'], ['liminal', 'Liminal'], ['midnight', 'Midnight'], ['metal', 'Metal']])}
+      ${pick('theme', 'Theme', 'Liquid Glass: clear glass over your wallpaper. Cyberpunk: neon HUD. Y2K Subway: dim teal, chrome and glass. Pixel: a retro 90s desktop in pixel art. Vector Surrealism: dark fantasy as a surreal vector poster. Liminal: a vintage dream, sunset over the clouds on old film. Midnight: a city at 3 a.m., dark polished gunmetal and cold cyan light. Metal: a hi-fi faceplate of satin aluminium, tiles in many metals, copper keys', [['glass', 'Liquid Glass'], ['cyber', 'Cyberpunk'], ['subway', 'Y2K Subway'], ['pixel', 'Pixel'], ['vector-surrealism', 'Vector Surrealism'], ['liminal', 'Liminal'], ['midnight', 'Midnight'], ['metal', 'Metal']])}
       <div class="metal-only">
-      ${pick('metalMode', 'Mode', 'Light: brushed aluminium under a gunmetal band. Dark: the same faceplate in dark brushed steel', [['light', 'Light'], ['dark', 'Dark']])}
+      ${pick('metalMode', 'Mode', 'Light: satin aluminium under a gunmetal band. Dark: the same faceplate in dark satin steel', [['light', 'Light'], ['dark', 'Dark']])}
       </div>
       <div class="glass-only">
       ${pick('glassMood', 'Mood', 'Brutal: black and white, deep darkness, hard white light and heavy type. Clear: clear glass tinted by the album art', [['brutal', 'Brutal'], ['clear', 'Clear']])}

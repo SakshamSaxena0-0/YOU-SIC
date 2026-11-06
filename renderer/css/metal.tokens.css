@@ -257,3 +257,8 @@ html.theme-metal .tile {
   --mt-card-letter: 0 1px 0 color-mix(in srgb, var(--f4) 35%, var(--mt-void)), 0 1px 3px color-mix(in srgb, var(--f4) 30%, var(--mt-void)),
     0 -1px 0 color-mix(in srgb, var(--mt-white) 8%, transparent);
 }
+
+/* ---- no brushing (the user's choice, 2026-11-06): the metal is smooth satin everywhere: the plate, the
+   band, the keys, the menus and the tiles. The brushing tokens above are kept; to bring the brushed
+   look back, delete this block. ---- */
+html.theme-metal, html.theme-metal.metal-dark { --mt-brush: none; --mt-brush-fine: none; --mt-brush-card: none; }

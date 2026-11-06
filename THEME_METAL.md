@@ -34,7 +34,7 @@ A hi-fi faceplate, after the user's mockup of the library as plates of brushed m
   - **No borders between the columns,** as in Liquid Glass's Brutal mood (the user asked for the same): the cover fades out at both sides into its own light, which runs on across the plate under the library and the lyrics, so the columns meet without a seam. The light is the colour along each edge of the cover, drawn once per song (`ambient.js`). It stops at the band's edge and follows the cover's fade down the window. The masks are in `seamless.css`; Metal adds its own vertical profile.
   - **Narrow layout:** a square cover in a polished bezel.
   - An etched (line-art) cover was tried and removed: the user's rule is that the theme leaves album art alone.
-- **Brushing:** kept faint. The user found the stronger streaks annoying, so the light and dark streaks are now at 0.19 and 0.15 opacity (they were 0.3 and 0.24).
+- **Brushing: off.** The user found the streaks annoying even when faint, tried the theme without them and chose smooth satin metal. The last block of `metal.tokens.css` turns the brushing off everywhere (the plate, the band, the keys, the menus and the tiles). The brushing tokens are still defined, so deleting that block brings the brushed look back, at 0.19 and 0.15 opacity for the light and dark streaks.
 
 To pick it, open **Settings → Look and feel → Theme → Metal**. Its id is `metal` and its root class is `html.theme-metal`.
 

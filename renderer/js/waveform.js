@@ -150,7 +150,7 @@ export class Waveform {
       const v = (k) => cs.getPropertyValue(k).trim();
       this.mt = { cu0: v('--mt-cu-0'), cu1: v('--mt-cu-1'), cu2: v('--mt-cu-2'), cu3: v('--mt-cu-3'), cu4: v('--mt-cu-4'), ink: v('--mt-ink'),
         white: v('--mt-white'), alu0: v('--mt-alu-0'), alu3: v('--mt-alu-3'), alu6: v('--mt-alu-6'), void: v('--mt-void'),
-        btn0: v('--mt-btn-0'), btn2: v('--mt-btn-2'), btn4: v('--mt-btn-4'),
+        btn1: v('--mt-btn-1'), btn2: v('--mt-btn-2'), btn3: v('--mt-btn-3'),
         dark: document.documentElement.classList.contains('metal-dark') };
     }
     this.invalidate();
@@ -414,8 +414,8 @@ export class Waveform {
     g.fillStyle = c.ink; g.globalAlpha = 0.75; g.fillRect(Math.round(px) - 0.5, 1, 1, h - 2); g.globalAlpha = 1;
     const r = this.dragging ? 7 : 5.5;
     const sg = g.createLinearGradient(0, line - r, 0, line + r);
-    // the knob: graphite, like every button
-    sg.addColorStop(0, c.btn0); sg.addColorStop(0.5, c.btn2); sg.addColorStop(1, c.btn4);
+    // the knob: matte graphite, like every button
+    sg.addColorStop(0, c.btn1); sg.addColorStop(0.55, c.btn2); sg.addColorStop(1, c.btn3);
     g.beginPath(); g.arc(px, line, r, 0, Math.PI * 2); g.fillStyle = sg; g.fill();
     g.lineWidth = 1; g.strokeStyle = c.void; g.globalAlpha = 0.55; g.stroke(); g.globalAlpha = 1;
     g.beginPath(); g.arc(px, line, r * 0.38, 0, Math.PI * 2); g.fillStyle = c.cu3; g.fill();

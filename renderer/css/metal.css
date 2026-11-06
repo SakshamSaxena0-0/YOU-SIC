@@ -292,9 +292,10 @@ html.theme-metal .search-ico { color: var(--mt-ink-2); }
    on the left, lit towards the right, with a soft sheen across it. The bay casts a long shadow on the
    plate. The icon sits in a well sunk into the card: lit along its top, dark in the middle, its floor
    catching a little light, with a bright lip below it. The name and the count are light, raised off
-   the face. The card is polished (the user asked for a little more shine): its chamfer is bright at the
-   top and glints along the bottom, a fine light line runs under it, the face's upper half reflects the
-   light like a mirror down to a faint horizon, and the sheen has a bright core that slides on hover. The bay is the tile itself; the card is its ::before. The edges are kept thin (a 2px rim,
+   the face. The card is glossy (the user asked for more shine, twice): its chamfer is bright at the top
+   and glints along the bottom, and over the metal lies a clear coat (--mt-card-polish): a light line
+   under the chamfer, the upper half reflecting the light down to a sharp horizon, the lower half the
+   shade, a rim of light along the bottom. The sheen has a bright core and slides on hover. The bay is the tile itself; the card is its ::before. The edges are kept thin (a 2px rim,
    a 1px channel, a 1px chamfer): the user found a thicker frame heavy. */
 html.theme-metal .root-grid { gap: 14px; padding: 12px 16px 20px; }
 html.theme-metal .tile {
@@ -314,8 +315,8 @@ html.theme-metal .tile.lg::before {
   background:
     var(--mt-brush-card) padding-box,
     var(--mt-card-polish) padding-box,
-    linear-gradient(112deg, transparent 32%, color-mix(in srgb, var(--mt-white) 7%, transparent) 41%, color-mix(in srgb, var(--mt-white) 20%, transparent) 46%,
-      color-mix(in srgb, var(--mt-white) 7%, transparent) 51%, transparent 60%) var(--f-sx, 0%) 0 / 260% 100% padding-box,
+    linear-gradient(112deg, transparent 31%, color-mix(in srgb, var(--mt-white) 11%, transparent) 40%, color-mix(in srgb, var(--mt-white) 34%, transparent) 45.5%,
+      color-mix(in srgb, var(--mt-white) 34%, transparent) 46.5%, color-mix(in srgb, var(--mt-white) 11%, transparent) 52%, transparent 61%) var(--f-sx, 0%) 0 / 260% 100% padding-box,
     linear-gradient(90deg, var(--f3), color-mix(in srgb, var(--f3) 85%, var(--f4)) 35%, var(--f3) 55%, var(--f2) 80%, color-mix(in srgb, var(--f1) 70%, var(--f2)) 96%, var(--f2)) padding-box,
     linear-gradient(180deg, color-mix(in srgb, var(--f0) 12%, var(--mt-white)), color-mix(in srgb, var(--f0) 55%, var(--mt-white)) 12%, var(--f0) 26%,
       color-mix(in srgb, var(--f0) 70%, var(--f1)) 62%, color-mix(in srgb, var(--f0) 70%, var(--mt-white))) border-box;
@@ -340,7 +341,9 @@ html.theme-metal .tile-ico {
 html.theme-metal .tile-ico .ico { width: 17px; height: 17px; filter: drop-shadow(0 1px 0 color-mix(in srgb, var(--mt-void) 45%, transparent)); }
 html.theme-metal .tile-count {
   top: 15px; right: 16px; font-size: 13px; font-weight: 400; opacity: 1;
-  color: color-mix(in srgb, var(--f-ink) 80%, var(--f2)); text-shadow: var(--mt-card-letter);
+  color: color-mix(in srgb, var(--f-ink) 80%, var(--f2));
+  /* the count sits in the gloss, the brightest part of the face: a dark edge all round carries it */
+  text-shadow: var(--mt-card-letter), 0 0 1.5px color-mix(in srgb, var(--f4) 45%, var(--mt-void));
 }
 /* the finishes, in the order of the tiles (Folders, Folders Hierarchy, All Songs, Albums, Artists, Album
    Artists, Genres, Years, Composers, Playlists, Queue, Recently Added, Recently Played, Most Played,

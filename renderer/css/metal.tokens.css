@@ -127,9 +127,11 @@ html.theme-metal {
   --mt-cu-face: var(--mt-turned),
     conic-gradient(from 210deg, var(--mt-cu-2), var(--mt-cu-0) 12%, var(--mt-cu-3) 25%, var(--mt-cu-1) 38%, var(--mt-cu-3) 50%, var(--mt-cu-0) 62%, var(--mt-cu-2) 75%, var(--mt-cu-1) 88%, var(--mt-cu-2));
   --mt-cu-key: var(--mt-gloss), var(--mt-brush-fine), linear-gradient(180deg, var(--mt-cu-0), var(--mt-cu-1) 45%, var(--mt-cu-2));
-  /* polish on a flat key: its upper half catches the light, down to a crisp horizon */
-  --mt-gloss: linear-gradient(180deg, color-mix(in srgb, var(--mt-white) calc(6% + 22% * var(--mt-lit)), transparent),
-    color-mix(in srgb, var(--mt-white) calc(2% + 6% * var(--mt-lit)), transparent) 46%, transparent 50%);
+  /* gloss on a flat key: its upper half catches the light down to a crisp horizon, the lower half the
+     shade, with a thin rim of reflected light along the bottom */
+  --mt-gloss: linear-gradient(180deg, color-mix(in srgb, var(--mt-white) calc(12% + 40% * var(--mt-lit)), transparent),
+    color-mix(in srgb, var(--mt-white) calc(5% + 16% * var(--mt-lit)), transparent) 46%, transparent 47%,
+    color-mix(in srgb, var(--mt-void) calc(10% + 6% * var(--mt-lit)), transparent) 49%, color-mix(in srgb, var(--mt-void) 4%, transparent) 80%, transparent 88%, transparent calc(100% - 3px), color-mix(in srgb, var(--mt-white) calc(6% + 18% * var(--mt-lit)), transparent));
   --mt-cu-edge: linear-gradient(180deg, var(--mt-cu-0), var(--mt-cu-3) 50%, var(--mt-cu-4));
   /* a ring of polished steel round a round button */
   --mt-bezel-ring: conic-gradient(from 200deg, var(--mt-alu-3), var(--mt-white) 10%, var(--mt-alu-4) 24%, var(--mt-alu-1) 40%, var(--mt-alu-6) 55%,
@@ -241,11 +243,13 @@ html.theme-metal.metal-dark {
 /* the tokens that read a tile's own finish (--f0 to --f5, set per tile in css/metal.css), so they are
    worked out on each tile rather than on the page */
 html.theme-metal .tile {
-  /* the card's polish: a fine light line under the chamfer, the upper half of the face reflecting the
-     light down to a faint horizon, a shade along the bottom */
-  --mt-card-polish: linear-gradient(180deg, color-mix(in srgb, var(--mt-white) 34%, transparent) 0 1px, color-mix(in srgb, var(--mt-white) 19%, transparent) 1px,
-    color-mix(in srgb, var(--mt-white) 7%, transparent) 42%, transparent 49%, color-mix(in srgb, var(--mt-void) 5%, transparent) 52%, transparent 68%,
-    transparent 80%, color-mix(in srgb, var(--mt-void) 16%, transparent));
+  /* the card's gloss, like a clear coat over the metal: a crisp light line under the chamfer, the upper
+     half of the face reflecting the light down to a sharp horizon, the lower half reflecting the shade,
+     and a thin rim of reflected light along the bottom */
+  --mt-card-polish: linear-gradient(180deg, color-mix(in srgb, var(--mt-white) 62%, transparent) 0 1px, color-mix(in srgb, var(--mt-white) 38%, transparent) 1px,
+    color-mix(in srgb, var(--mt-white) 24%, transparent) 26%, color-mix(in srgb, var(--mt-white) 15%, transparent) 47%, transparent 47.6%,
+    color-mix(in srgb, var(--mt-void) 11%, transparent) 49%, color-mix(in srgb, var(--mt-void) 5%, transparent) 74%, transparent 86%,
+    transparent calc(100% - 5px), color-mix(in srgb, var(--mt-white) 24%, transparent));
   /* the dark cut round a tile's bay */
   --mt-bay-cut: 0 0 0 1px color-mix(in srgb, var(--f4) 65%, var(--mt-void));
   /* light letters raised off a card: a dark edge under each one (so they read on the brightest finish),

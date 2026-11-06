@@ -15,7 +15,13 @@ A hi-fi faceplate, after the user's mockup of the library as plates of brushed m
   - a dark seam;
   - the face, brushed finely side to side, darker on the left, lit towards the right, with a soft sheen that falls differently on each card.
 
-  The cards are polished, because the user asked for a little more shine. The chamfer is bright along the top and glints along the bottom. A fine light line runs under it. The upper half of the face reflects the light, down to a faint horizon. The sheen has a bright core and slides along the card on hover. The flat keys on the plate have the same polish: their upper half catches the light (`--mt-gloss`).
+  The cards are glossy, because the user asked for more shine twice. The chamfer is bright along the top and glints along the bottom. Over the metal lies a clear coat (`--mt-card-polish`):
+  - a fine light line under the chamfer;
+  - the upper half of the face reflecting the light, down to a sharp horizon;
+  - the lower half reflecting the shade;
+  - a thin rim of reflected light along the bottom.
+
+  The sheen has a bright core and slides along the card on hover. The counts sit in the brightest part of the gloss, so they get a dark edge all round. The flat keys on the plate (and the copper ones) have the same clear coat, with a horizon and a lit rim (`--mt-gloss`).
 
   The bay casts a long shadow on the plate. On hover it lifts and the shadow grows; on a click it presses in. The bay is the tile itself and the card is its `::before`.
 - **Tile contents:** each icon sits in a well sunk into the card: lit along its top, dark in the middle, its floor catching a little light, with a bright lip below it. The glyph is tinted with the card's metal. Names and counts are light mono capitals, raised off the face by a dark edge under each letter.

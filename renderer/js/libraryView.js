@@ -462,12 +462,14 @@ export class LibraryView {
         if (pool.has(i)) continue;
         const t = tracks[i];
         const el = document.createElement('div');
-        el.className = 'tile lg track' + (cur && cur.id === t.id ? ' playing' : '');
+        const url = t.cover ? coverUrl(t.cover, true) : '';
+        el.className = 'tile lg track' + (url ? ' has-art' : '') + (cur && cur.id === t.id ? ' playing' : '');
         el.dataset.lg = 'static';
         el.dataset.i = i;
         el.style.cssText = `position:absolute;left:${g.padL + (i % g.cols) * (g.w + g.gap)}px;top:${g.padT + Math.floor(i / g.cols) * rowH}px;width:${g.w}px;height:${g.h}px`;
-        const url = t.cover ? coverUrl(t.cover, true) : '';
-        el.innerHTML = `<span class="tile-ico${url ? ' has-art' : ''}">${url ? `<span class="it-art" style="background-image:url('${url}')"></span>` : icon('music_note')}<span class="eqbars"><i></i><i></i><i></i></span></span>
+        // a song with a cover: the tile is filled with it (the user's choice), the playing bars in a corner
+        const eq = '<span class="eqbars"><i></i><i></i><i></i></span>';
+        el.innerHTML = `${url ? `<span class="tile-art" style="background-image:url('${url}')"></span><span class="tile-eq">${eq}</span>` : `<span class="tile-ico">${icon('music_note')}${eq}</span>`}
           <span class="tile-title">${esc(t.title)}</span><span class="tile-sub">${esc(t.artist || t.album || '')}</span>
           <span class="tile-count">${this._trackRight(page, t)}</span><button class="icon-btn small r-more">${icon('more_vert')}</button>`;
         host.appendChild(el);

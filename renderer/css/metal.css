@@ -366,6 +366,12 @@ html.theme-metal .tile-sub {
 }
 html.theme-metal .tile.track .r-more { color: var(--mt-em-text); }
 html.theme-metal .tile.track.playing .tile-title { color: var(--mt-cu-1); }
+/* a song tile filled with its cover (the user's choice): the cover sits inside the bezel's outer frame, and
+   is shown as it is, so hover and press don't brighten or darken it (the press still pushes it in) */
+html.theme-metal .tile.track.has-art .tile-art { inset: var(--mt-bay-w); border-radius: calc(var(--mt-r-card) - var(--mt-bay-w)); }
+html.theme-metal .tile.track.has-art:is(:hover, :active) { filter: none; }
+html.theme-metal .tile.track.has-art:active { scale: 0.985; }
+html.theme-metal .tile.track.has-art .r-more { color: var(--mt-white); }
 /* the Folders list: each folder is a milled plate built exactly like the library's buttons (the user
    asked for the same on the list, after magenta, platinum and royal blue), in coffee brown (the user's
    choice; the buttons stay emerald), with the same tokens

@@ -2,7 +2,7 @@
    Metal theme (html.theme-metal): design tokens
    A hi-fi faceplate. The window is one plate of brushed aluminium under a band of dark brushed
    gunmetal; the library's tiles are thick cards of metal, each set in a bay with a soft machined edge
-   round it, its icon in a well sunk into the card and its name in mono capitals engraved in it.
+   round it, its icon in a well sunk into the card and its name printed on it in light capitals.
    Thirteen finishes are defined (graphite, silver, rose gold, brass, pewter, platinum, cherry,
    champagne, titanium, smoke, copper, bronze, oxblood, jade), but every tile and every button is
    graphite, the Folders tile's finish (the user's choice: the --mt-btn-* block at the end). Copper is
@@ -16,6 +16,10 @@
    THEME_METAL.md.
    Fonts: Manrope and JetBrains Mono (app.css), already bundled and declared.
    ========================================================================== */
+
+/* the lettering on the buttons and tiles: Barlow Semi Condensed, a DIN-like face (OFL, bundled; the
+   licence is renderer/fonts/OFL-BarlowSemiCondensed.txt) */
+@font-face { font-family: 'Barlow Semi Condensed'; src: url('../fonts/barlow-semi-condensed-latin-600-normal.woff2') format('woff2'); font-weight: 600 700; font-display: block; }
 
 html.theme-metal {
   /* ---- the plate: brushed aluminium, a little warm ---- */
@@ -247,11 +251,9 @@ html.theme-metal.metal-dark {
 html.theme-metal .tile {
   /* the dark cut round a tile's bay */
   --mt-bay-cut: 0 0 0 1px color-mix(in srgb, var(--f4) 65%, var(--mt-void));
-  /* the names and counts are cut in the card like the labels on the keys (see the engraving below),
-     in the card's own metal */
-  --mt-cut-hi: color-mix(in srgb, var(--mt-white) 55%, var(--f-ink));
-  --mt-cut-face: var(--f-ink);
-  --mt-cut-shade: color-mix(in srgb, var(--mt-void) 88%, var(--f5));
+  /* the names and counts are printed like the labels on the keys (see the lettering below), in the
+     ink of the card's own metal */
+  --mt-card-text: color-mix(in srgb, var(--f-ink) 76%, var(--f0));
 }
 
 /* ---- no brushing (the user's choice, 2026-11-06): the metal is smooth satin everywhere: the plate, the
@@ -265,7 +267,7 @@ html.theme-metal, html.theme-metal.metal-dark { --mt-brush: none; --mt-brush-fin
    round play. The other finishes and the aluminium keys above are kept: the buttons read these
    --mt-btn-* tokens, and the tiles take them in the last rule of section 9 in css/metal.css.
    Matte (the user's choice, after trying them glossy): no clear coat, no glints, no sheen, only soft
-   light from above; and the labels are engraved in the metal, like the lettering on a metal card. ---- */
+   light from above. ---- */
 html.theme-metal {
   --mt-btn-0: var(--mt-graphite-0); --mt-btn-1: var(--mt-graphite-1); --mt-btn-2: var(--mt-graphite-2); --mt-btn-3: var(--mt-graphite-3);
   --mt-btn-4: var(--mt-graphite-4); --mt-btn-5: var(--mt-graphite-5); --mt-btn-ink: var(--mt-graphite-ink);
@@ -281,21 +283,14 @@ html.theme-metal {
   /* raised: a thin dark outline, a soft lighter top edge (for keys drawn without a border) */
   --mt-btn-raise: 0 0 0 1px color-mix(in srgb, var(--mt-void) 55%, transparent), inset 0 1px 0 color-mix(in srgb, var(--mt-btn-0) 45%, transparent),
     inset 0 -1px 0 color-mix(in srgb, var(--mt-void) 20%, transparent);
-  /* the lettering (css/metal.css, section 5): light letters with a dark edge under them, the user's
-     choice (2026-11-07) after trying dark letters with a light edge under them. The label's fill, a layer
-     of the key's background clipped to its letters, shows only as a lighter line along the top of each
-     letter (--mt-cut-hi); the text is transparent and its shadow, drawn over that fill half a pixel
-     lower, is the letter itself (--mt-cut-face); a second shadow under it is the dark edge
-     (--mt-cut-shade). */
-  --mt-cut-hi: color-mix(in srgb, var(--mt-white) 55%, var(--mt-btn-ink));
-  --mt-cut-face: var(--mt-btn-ink);
-  --mt-cut-shade: color-mix(in srgb, var(--mt-void) 88%, var(--mt-btn-5));
-  /* the glyphs on the keys and knobs are drawn the same way: light, with the dark edge under them */
-  --mt-btn-text: var(--mt-cut-face);
-  --mt-btn-glyph: drop-shadow(0 1px 0 var(--mt-cut-shade));
-  /* what is on: the lettering is copper (a copper glyph on a knob), with a copper inlay round the key */
-  --mt-cut-hi-cu: var(--mt-cu-0);
-  --mt-cut-face-cu: var(--mt-cu-1);
+  /* the lettering on every button and tile, after the user's close-up of the Folders tile: printed on
+     the metal in a light, warm grey (--mt-btn-text), with a soft dark shadow under it (--mt-btn-letter),
+     in a DIN-like semi-condensed face (--mt-btn-font). The glyphs on the keys and knobs are the same. */
+  --mt-btn-font: 'Barlow Semi Condensed', 'Bahnschrift', 'Segoe UI', sans-serif;
+  --mt-btn-text: color-mix(in srgb, var(--mt-btn-ink) 76%, var(--mt-btn-0));
+  --mt-btn-letter: 0 1px 1.5px color-mix(in srgb, var(--mt-void) 70%, transparent);
+  --mt-btn-glyph: drop-shadow(0 1px 1px color-mix(in srgb, var(--mt-void) 60%, transparent));
+  /* what is on: copper lettering (a copper glyph on a knob), with a copper inlay round the key */
   --mt-btn-on: var(--mt-cu-1);
   --mt-btn-inlay: inset 0 0 0 1px color-mix(in srgb, var(--mt-cu-2) 80%, transparent);
 }

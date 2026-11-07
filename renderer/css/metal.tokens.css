@@ -254,9 +254,16 @@ html.theme-metal.metal-dark {
 html.theme-metal {
   --mt-plat-text: color-mix(in srgb, var(--mt-platinum-5) 85%, var(--mt-void));
   --mt-plat-letter: 0 1px 0 color-mix(in srgb, var(--mt-white) 55%, transparent);
-  /* and their metal is a little see-through (the user's choice), so the plate and the cover's light show
-     faintly through it */
-  --mt-fold-card-a: 0.85;
+  --mt-plat-glyph: drop-shadow(0 1px 0 color-mix(in srgb, var(--mt-white) 55%, transparent));
+  /* and their metal is see-through (the user's choice), so the plate and the cover's light show through */
+  --mt-fold-card-a: 0.6;
+}
+/* dark mode: over the dark plate the see-through platinum reads mid-grey, where dark lettering is only
+   about 2.5:1, so it is printed light with a soft shadow under it instead (about 4.3:1) */
+html.theme-metal.metal-dark {
+  --mt-plat-text: color-mix(in srgb, var(--mt-platinum-ink) 94%, var(--mt-platinum-2));
+  --mt-plat-letter: var(--mt-btn-letter);
+  --mt-plat-glyph: var(--mt-btn-glyph);
 }
 html.theme-metal :is(.tile, .lib-page[data-node='folders'] .row.item) {
   /* the dark cut round a tile's bay */

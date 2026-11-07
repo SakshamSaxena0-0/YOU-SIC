@@ -343,9 +343,9 @@ html.theme-metal .tile .tile-count {
 /* the Folders list: each folder is a card built like the Folders tile (the user asked for the tile's look
    on the list), in platinum (the user's choice, after magenta): the bay with its cut and rim, the channel,
    the card with its soft machined bevel and matte face, the long cast shadow, the lift on hover and the
-   press; the names in the tiles' face, bold, printed dark since platinum is light. The folder's cover is
+   press; the names in the tiles' face, bold and in their own case (never forced to capitals: the user's rule), printed dark since platinum is light (light in dark mode, where the see-through card reads mid-grey). The folder's cover is
    shown as it is, set into a well like the tiles' icons. The metal is a little see-through
-   (--mt-fold-card-a), so the bay is drawn as a ring (the row's ::before) round the card (its ::after)
+   (--mt-fold-card-a, 0.6), so the bay is drawn as a ring (the row's ::before) round the card (its ::after)
    rather than under it, and the two never overlap. Rows only use ::before on a playing track, and Metal
    hides their ::after hover glow. */
 html.theme-metal .lib-page[data-node='folders'] .item-list { gap: 10px; padding: 10px 16px 18px; }
@@ -383,14 +383,14 @@ html.theme-metal .lib-page[data-node='folders'] .row.item::after {
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--f4) 55%, var(--mt-void)), inset 0 0 0 1px color-mix(in srgb, var(--mt-void) 18%, transparent);
 }
 html.theme-metal .lib-page[data-node='folders'] .row.item .r-title {
-  font-family: var(--mt-btn-font); font-weight: 700; font-size: 13px; letter-spacing: 0.05em; text-transform: uppercase;
+  font-family: var(--mt-btn-font); font-weight: 700; font-size: 14px; letter-spacing: 0.02em; text-transform: none; /* as written: the user wants names in their own case */
   color: var(--mt-plat-text); text-shadow: var(--mt-plat-letter);
 }
 html.theme-metal .lib-page[data-node='folders'] .row.item .r-sub {
   font-family: var(--mt-btn-font); font-weight: 700; font-size: 12px; letter-spacing: 0.02em; margin-top: 2px;
-  color: color-mix(in srgb, var(--mt-plat-text) 78%, var(--f3)); text-shadow: var(--mt-plat-letter);
+  color: color-mix(in srgb, var(--mt-plat-text) 86%, var(--f3)); text-shadow: var(--mt-plat-letter);
 }
-html.theme-metal .lib-page[data-node='folders'] .row.item .r-chev { color: color-mix(in srgb, var(--mt-plat-text) 80%, var(--f3)); filter: drop-shadow(0 1px 0 color-mix(in srgb, var(--mt-white) 55%, transparent)); }
+html.theme-metal .lib-page[data-node='folders'] .row.item .r-chev { color: color-mix(in srgb, var(--mt-plat-text) 86%, var(--f3)); filter: var(--mt-plat-glyph); }
 /* the cover, as it is, in a well sunk into the card: a dark cut round it, lit along its top, a lip below */
 html.theme-metal .lib-page[data-node='folders'] .row.item .it-art {
   border-radius: 7px; background-color: var(--f5);

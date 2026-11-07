@@ -25,9 +25,10 @@ A hi-fi faceplate, after the user's mockup of the library as plates of brushed m
   - **Thumbs:** the slider thumbs, the equalizer's band thumbs, the seekbar's knob and the toggles' balls are graphite too.
   - **Small icon buttons** (a row's menu, a folder's remove) stay a bare glyph until hovered, then show a graphite key.
 - **Engraving:** the text on every button and tile is cut into the metal.
-  - **How it's drawn:** the label's fill is a layer of the button's own background, clipped to the letters (`background-clip: text`), and the text itself is transparent. The fill runs from `--mt-cut-a`, the cut's upper wall in shade at the top of the letters, to `--mt-cut-b`, its floor of lighter frosted metal. Under each letter, the cut's lower lip catches the light (`--mt-cut-lip`, the text's shadow). Tiles shade each line of a name separately (`1lh`).
-  - **Glyphs:** icons on keys and knobs are cut the same way, with a dark edge along the top and a lit lip below (`--mt-btn-glyph`).
-  - **The tabs:** the labels of the closed tabs are cut into the dark slot, dimmer, so the open tab's label stands out.
+  - **How it's drawn:** each letter is a groove, darker than the metal. The label's fill is a layer of the button's own background, clipped to the letters (`background-clip: text`), in the colour of the groove's upper wall in deep shade (`--mt-cut-wall`). The text itself is transparent. Its shadow is drawn over that fill 1px lower: it is the groove's floor (`--mt-cut-floor`) and covers each letter except a dark rim along its top. A second shadow just under it is the groove's lower lip catching the light (`--mt-cut-lit`). The two shadows are put together on each label (`--mt-letter-cut`, with the fill in `--mt-letter-fill`), so a key can change the groove's colours: copper when it is on, and the card's own metal on a tile.
+  - **Why dark:** the first engraving drew light, frosted letters, and the user said it still looked like written text. A dark groove with a lit lower lip reads as cut.
+  - **Glyphs:** icons on keys and knobs are cut the same way: groove-dark, with the lit lip below (`--mt-btn-glyph`). Hovering a key brightens the key and leaves the icon cut in.
+  - **The tabs:** the open tab's label is cut into its key. The closed tabs' labels are cut into the dark slot, where the groove's floor is a dim, lighter metal so they still read.
   - **Counts:** the tile counts are cut a little bolder (weight 600), so the engraving reads in the thin digits.
 - **Copper:** the one accent. It marks anything switched on and fills the played part of the song, the ring round play, and the sliders and toggles.
   - **A key that is on** has its lettering cut through to copper (a copper glyph on a knob) and a copper inlay round it; shuffle and repeat also light a small copper lamp in the knob's face.
@@ -74,7 +75,7 @@ There is no art file. Every surface is a CSS gradient or a small SVG noise tile:
 
 **Light mode:** primary text is 8.0:1 on the darkest part of the plate where text sits (`--mt-alu-4`) and 11.2:1 in the light. Secondary text is 6.0:1 there, and hints and numbers are 4.5:1. On the band, light text is 7.6:1 and dim text is 5.8:1 at the band's middle (4.4:1 at its very top, where only the title bar sits). Dark text on copper is 6.0:1 on the darkest copper key. The tile names are light on their cards, as in the mockup: 4.0 to 5.6:1 on the dark finishes and about 3.4:1 on brass and pewter; on the light ones (silver, platinum, rose gold, champagne) a dark edge under every letter carries them.
 
-**Buttons:** the floor of an engraved label is 4.0:1 on a key and 5.6:1 on a tile; copper lettering (on) is 4.7:1, and a copper inlay round the key marks it too. The top of each letter is shaded on purpose (the cut's upper wall), so it is darker than that.
+**Buttons:** an engraved letter is a dark groove, so its body is only about 2.5:1 against a key and 2.0 to 2.4:1 against a tile. What carries it is the lit lip under every letter, which is 6.8:1 against the groove. Copper lettering (on) is lighter than the key and has a copper inlay round the key as well. For more contrast, raise `--mt-cut-floor` towards `--mt-btn-3`, or brighten `--mt-cut-lit`.
 
 **Dark mode:** primary text is 7.7:1 on the plate's lightest part (`--mt-alu-1`) and 12.1:1 in its shade. Secondary text is 5.8:1 and hints are 4.6:1 on the lightest part. Light text on the band is 13:1.
 

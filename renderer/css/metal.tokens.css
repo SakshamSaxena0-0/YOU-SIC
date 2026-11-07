@@ -247,10 +247,11 @@ html.theme-metal.metal-dark {
 html.theme-metal .tile {
   /* the dark cut round a tile's bay */
   --mt-bay-cut: 0 0 0 1px color-mix(in srgb, var(--f4) 65%, var(--mt-void));
-  /* a name engraved in the card (css/metal.css, .tile-title): the cut's upper wall in shade, its floor
-     a lighter, frosted metal */
-  --mt-cut-a: color-mix(in srgb, var(--f-ink) 35%, var(--f4));
-  --mt-cut-b: color-mix(in srgb, var(--f-ink) 92%, var(--mt-white));
+  /* the names and counts are cut in the card like the labels on the keys (see the engraving below),
+     in the card's own metal */
+  --mt-cut-wall: color-mix(in srgb, var(--mt-void) 88%, var(--f5));
+  --mt-cut-floor: color-mix(in srgb, var(--mt-void) 55%, var(--f4));
+  --mt-cut-lit: color-mix(in srgb, var(--mt-white) 42%, var(--f1));
 }
 
 /* ---- no brushing (the user's choice, 2026-11-06): the metal is smooth satin everywhere: the plate, the
@@ -280,20 +281,21 @@ html.theme-metal {
   /* raised: a thin dark outline, a soft lighter top edge (for keys drawn without a border) */
   --mt-btn-raise: 0 0 0 1px color-mix(in srgb, var(--mt-void) 55%, transparent), inset 0 1px 0 color-mix(in srgb, var(--mt-btn-0) 45%, transparent),
     inset 0 -1px 0 color-mix(in srgb, var(--mt-void) 20%, transparent);
-  /* the glyphs on the keys and knobs */
-  --mt-btn-text: var(--mt-btn-ink);
-  /* engraved lettering. The label's fill is clipped to its letters (css/metal.css, section 5) and
-     shaded from --mt-cut-a, the cut's upper wall in shade, to --mt-cut-b, its floor of lighter frosted
-     metal; under each letter, the cut's lower lip catches the light (--mt-cut-lip). A glyph is cut the
-     same way, with a dark edge along its top and a lit lip below (--mt-btn-glyph). */
-  --mt-cut-top: color-mix(in srgb, var(--mt-btn-ink) 30%, var(--mt-btn-4));
-  --mt-cut-floor: color-mix(in srgb, var(--mt-btn-ink) 92%, var(--mt-white));
-  --mt-cut-lip: 0 1px 0 color-mix(in srgb, var(--mt-white) 26%, transparent);
-  --mt-btn-glyph: drop-shadow(0 -1px 0 color-mix(in srgb, var(--mt-void) 70%, transparent)) drop-shadow(0 1px 0 color-mix(in srgb, var(--mt-white) 16%, transparent));
-  /* what is on: the lettering is cut through to copper (copper glyphs on knobs), with a copper inlay
+  /* engraved lettering: each letter is a groove cut into the metal (css/metal.css, section 5). The
+     label's fill, a layer of the key's background clipped to its letters, is the groove's upper wall in
+     deep shade (--mt-cut-wall). The text is transparent and its shadow is drawn over that fill 1px lower:
+     the groove's floor (--mt-cut-floor), darker than the metal, covers each letter but for a dark rim
+     along its top, and under the letter the groove's lower lip catches the light (--mt-cut-lit). */
+  --mt-cut-wall: color-mix(in srgb, var(--mt-void) 88%, var(--mt-btn-5));
+  --mt-cut-floor: color-mix(in srgb, var(--mt-void) 55%, var(--mt-btn-4));
+  --mt-cut-lit: color-mix(in srgb, var(--mt-white) 42%, var(--mt-btn-1));
+  /* the glyphs on the keys and knobs are cut the same way: groove-dark, with the lit lip below */
+  --mt-btn-text: var(--mt-cut-floor);
+  --mt-btn-glyph: drop-shadow(0 1px 0 var(--mt-cut-lit));
+  /* what is on: the groove is cut through to copper (a copper glyph on a knob), with a copper inlay
      round the key */
-  --mt-cut-top-cu: color-mix(in srgb, var(--mt-cu-1) 35%, var(--mt-btn-4));
-  --mt-cut-floor-cu: var(--mt-cu-0);
-  --mt-btn-on: color-mix(in srgb, var(--mt-cu-0) 85%, var(--mt-cu-1));
+  --mt-cut-wall-cu: color-mix(in srgb, var(--mt-void) 70%, var(--mt-cu-4));
+  --mt-cut-floor-cu: var(--mt-cu-2);
+  --mt-btn-on: var(--mt-cu-2);
   --mt-btn-inlay: inset 0 0 0 1px color-mix(in srgb, var(--mt-cu-2) 80%, transparent);
 }

@@ -341,17 +341,19 @@ html.theme-metal .tile .tile-count {
   top: 14px; right: 16px; font-family: var(--mt-btn-font); letter-spacing: 0.02em; font-size: 13px; font-weight: 600; line-height: 1.25; opacity: 1;
 }
 /* the Folders list: each folder is a card built like the Folders tile (the user asked for the tile's look
-   on the list), in platinum (the user's choice, after magenta): the bay with its cut and rim, the channel,
-   the card with its soft machined bevel and matte face, the long cast shadow, the lift on hover and the
-   press; the names in the tiles' face, bold and in their own case (never forced to capitals: the user's rule), printed dark since platinum is light (light in dark mode, where the see-through card reads mid-grey). The folder's cover is
-   shown as it is, set into a well like the tiles' icons. The metal is a little see-through
+   on the list), in royal blue (the user's choice, after magenta and platinum), very matte (the user's
+   choice): no glint, no sheen, no bright edge, only a soft fall of light from above. The bay with its cut
+   and rim, the channel, the card with its soft bevel and flat face, the long cast shadow, the lift on
+   hover and the press; the names in the tiles' face, bold and in their own case (never forced to
+   capitals: the user's rule), printed light. The folder's cover is shown as it is, set into a well like
+   the tiles' icons. The metal is a little see-through
    (--mt-fold-card-a, 0.6), so the bay is drawn as a ring (the row's ::before) round the card (its ::after)
    rather than under it, and the two never overlap. Rows only use ::before on a playing track, and Metal
    hides their ::after hover glow. */
 html.theme-metal .lib-page[data-node='folders'] .item-list { gap: 10px; padding: 10px 16px 18px; }
 html.theme-metal .lib-page[data-node='folders'] .row.item {
-  --f0: var(--mt-platinum-0); --f1: var(--mt-platinum-1); --f2: var(--mt-platinum-2); --f3: var(--mt-platinum-3);
-  --f4: var(--mt-platinum-4); --f5: var(--mt-platinum-5); --f-ink: var(--mt-platinum-ink);
+  --f0: var(--mt-royal-0); --f1: var(--mt-royal-1); --f2: var(--mt-royal-2); --f3: var(--mt-royal-3);
+  --f4: var(--mt-royal-4); --f5: var(--mt-royal-5); --f-ink: var(--mt-royal-ink);
   position: relative; isolation: isolate; height: calc(68px * var(--zoom, 1)); padding: 0 16px 0 14px; gap: 14px;
   border-radius: var(--mt-r-card); color: var(--f-ink); background: none;
   box-shadow: var(--mt-bay-cut), var(--mt-bay-shadow);
@@ -362,40 +364,37 @@ html.theme-metal .lib-page[data-node='folders'] .row.item:hover {
   box-shadow: var(--mt-bay-cut), var(--mt-bay-shadow-up);
 }
 html.theme-metal .lib-page[data-node='folders'] .row.item:active { translate: 0 1px; filter: brightness(0.96); box-shadow: var(--mt-bay-cut), var(--mt-bay-shadow-down); transition-duration: 60ms; }
-/* the bay: a ring round the card, in shade along the top and lit low and to the right */
+/* the bay: a ring round the card, in shade along the top and lit softly below (matte: no glint) */
 html.theme-metal .lib-page[data-node='folders'] .row.item::before {
   display: block; content: ''; position: absolute; inset: 0; z-index: -1; border-radius: var(--mt-r-card); padding: var(--mt-bay-w);
   pointer-events: none; opacity: var(--mt-fold-card-a);
-  background:
-    linear-gradient(90deg, transparent 60%, color-mix(in srgb, var(--mt-white) 7%, transparent)),
-    linear-gradient(180deg, color-mix(in srgb, var(--f4) 70%, var(--mt-void)), var(--f3) 30%, var(--f2) 70%, var(--f1));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--f4) 80%, var(--f3)), var(--f3) 45%, var(--f2));
   mask: linear-gradient(var(--mt-void) 0 0) content-box, linear-gradient(var(--mt-void) 0 0); mask-composite: exclude;
 }
-/* the card: its soft machined bevel, then the matte face */
+/* the card: a soft bevel with no bright edge, then the flat matte face: one even colour with only a soft
+   fall of light from top to bottom (no brushing, no sheen, no streak of light across it) */
 html.theme-metal .lib-page[data-node='folders'] .row.item::after {
   display: block; content: ''; position: absolute; inset: var(--mt-bay-w); z-index: -1; border-radius: calc(var(--mt-r-card) - var(--mt-bay-w));
   border: 1px solid transparent; pointer-events: none; opacity: var(--mt-fold-card-a); transition: none;
   background:
-    var(--mt-brush-card) padding-box,
-    linear-gradient(180deg, color-mix(in srgb, var(--mt-white) 5%, transparent), transparent 55%, color-mix(in srgb, var(--mt-void) 8%, transparent)) padding-box,
-    linear-gradient(90deg, var(--f3), color-mix(in srgb, var(--f3) 85%, var(--f4)) 35%, var(--f3) 55%, var(--f2) 80%, color-mix(in srgb, var(--f1) 70%, var(--f2)) 96%, var(--f2)) padding-box,
-    linear-gradient(180deg, color-mix(in srgb, var(--f0) 70%, var(--f1)), var(--f1) 30%, var(--f3) 70%, color-mix(in srgb, var(--f1) 70%, var(--f2))) border-box;
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--f4) 55%, var(--mt-void)), inset 0 0 0 1px color-mix(in srgb, var(--mt-void) 18%, transparent);
+    linear-gradient(180deg, color-mix(in srgb, var(--f1) 30%, var(--f2)), var(--f2) 50%, color-mix(in srgb, var(--f2) 80%, var(--f3))) padding-box,
+    linear-gradient(180deg, color-mix(in srgb, var(--f1) 65%, var(--f2)), var(--f2) 45%, var(--f3)) border-box;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--f4) 55%, var(--mt-void)), inset 0 0 0 1px color-mix(in srgb, var(--mt-void) 14%, transparent);
 }
 html.theme-metal .lib-page[data-node='folders'] .row.item .r-title {
   font-family: var(--mt-btn-font); font-weight: 700; font-size: 14px; letter-spacing: 0.02em; text-transform: none; /* as written: the user wants names in their own case */
-  color: var(--mt-plat-text); text-shadow: var(--mt-plat-letter);
+  color: var(--mt-fold-text); text-shadow: var(--mt-fold-letter);
 }
 html.theme-metal .lib-page[data-node='folders'] .row.item .r-sub {
   font-family: var(--mt-btn-font); font-weight: 700; font-size: 12px; letter-spacing: 0.02em; margin-top: 2px;
-  color: color-mix(in srgb, var(--mt-plat-text) 86%, var(--f3)); text-shadow: var(--mt-plat-letter);
+  color: color-mix(in srgb, var(--mt-fold-text) 92%, var(--f1)); text-shadow: var(--mt-fold-letter);
 }
-html.theme-metal .lib-page[data-node='folders'] .row.item .r-chev { color: color-mix(in srgb, var(--mt-plat-text) 86%, var(--f3)); filter: var(--mt-plat-glyph); }
-/* the cover, as it is, in a well sunk into the card: a dark cut round it, lit along its top, a lip below */
+html.theme-metal .lib-page[data-node='folders'] .row.item .r-chev { color: color-mix(in srgb, var(--mt-fold-text) 92%, var(--f1)); filter: var(--mt-fold-glyph); }
+/* the cover, as it is, in a well sunk into the card: a dark cut round it, in shade along its top, a soft lip below */
 html.theme-metal .lib-page[data-node='folders'] .row.item .it-art {
   border-radius: 7px; background-color: var(--f5);
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--f5) 45%, var(--mt-void)), 0 -1px 0 1px color-mix(in srgb, var(--mt-void) 25%, transparent),
-    0 1px 0 1px color-mix(in srgb, var(--f0) 60%, var(--f1));
+    0 1px 0 1px color-mix(in srgb, var(--f1) 70%, var(--f2));
 }
 html.theme-metal .lib-page[data-node='folders'] .row.item .it-art.ph { color: color-mix(in srgb, var(--f-ink) 70%, var(--f3)); }
 /* the finishes, in the order of the tiles (Folders, Folders Hierarchy, All Songs, Albums, Artists, Album

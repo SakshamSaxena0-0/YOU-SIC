@@ -128,18 +128,17 @@ html.theme-metal :is(.eq-toggles .chip.on, .reverb-presets .chip.on)::after { ba
 html.theme-metal .preset-chip i .ico { color: var(--mt-btn-text); }
 .theme-row [data-v='metal'] { font-family: 'JetBrains Mono', monospace; font-weight: 800; font-size: 0.86em; letter-spacing: 0.16em; text-transform: uppercase; }
 
-/* ---------- 6. transport: matte graphite knobs in matte graphite rings, play the biggest ---------- */
-html.theme-metal .controls { gap: clamp(10px, 2.8vw, 22px); }
+/* ---------- 6. transport: matte graphite knobs in matte graphite rings, all the same small size (the user's choice) ---------- */
+html.theme-metal .controls { gap: clamp(8px, 1.6vw, 16px); }
 html.theme-metal :is(.ctl-md, .ctl-sm).lg {
   border-radius: 50%; border: 3px solid transparent; color: var(--mt-btn-text);
   background: var(--mt-btn-knob) padding-box, var(--mt-btn-ring) border-box;
   box-shadow: var(--mt-outline), inset 0 0 0 1px color-mix(in srgb, var(--mt-void) 35%, transparent), inset 0 1px 0 1px color-mix(in srgb, var(--mt-white) 7%, transparent), 0 8px 14px -7px color-mix(in srgb, var(--mt-void) 75%, transparent);
 }
 html.theme-metal :is(.ctl-md, .ctl-sm).lg .ico { filter: var(--mt-btn-glyph); }
-html.theme-metal .ctl-md.lg { width: 54px; height: 54px; }
-html.theme-metal .ctl-md.lg .ico { width: 23px; height: 23px; }
-html.theme-metal .ctl-sm.lg { width: 42px; height: 42px; color: var(--mt-btn-text); }
-html.theme-metal .ctl-sm.lg .ico { width: 18px; height: 18px; }
+html.theme-metal :is(.ctl-md, .ctl-sm).lg { width: 44px; height: 44px; }
+html.theme-metal :is(.ctl-md, .ctl-sm).lg .ico { width: 18px; height: 18px; }
+html.theme-metal .ctl-sm.lg { color: var(--mt-btn-text); }
 html.theme-metal .ctl-sm.on {
   color: var(--mt-btn-on);
   box-shadow: var(--mt-outline), var(--mt-btn-inlay), inset 0 1px 0 1px color-mix(in srgb, var(--mt-white) 7%, transparent), 0 8px 14px -7px color-mix(in srgb, var(--mt-void) 75%, transparent);
@@ -149,25 +148,21 @@ html.theme-metal .ctl-sm.on::after {
   display: block; top: auto; bottom: 4px; left: 50%; right: auto; width: 4px; height: 4px; margin: 0 0 0 -2px; border-radius: 50%;
   background: var(--mt-cu-1); box-shadow: 0 0 0 1px color-mix(in srgb, var(--mt-cu-4) 70%, transparent), 0 0 6px var(--mt-cu-1);
 }
-/* play: the biggest matte graphite knob in its ring, the glyph cut into it; the copper ring round it fills as the song plays */
-html.theme-metal .play-wrap { width: 116px; height: 116px; }
+/* play: a knob the same size as the others; the copper ring close round it fills as the song plays */
+html.theme-metal .play-wrap { width: 56px; height: 56px; }
 html.theme-metal .ctl-play.lg {
-  width: 82px; height: 82px; border-radius: 50%; border: 5px solid transparent; color: var(--mt-btn-text);
+  width: 44px; height: 44px; border-radius: 50%; border: 3px solid transparent; color: var(--mt-btn-text);
   background: var(--mt-btn-knob) padding-box, var(--mt-btn-ring) border-box;
-  box-shadow: var(--mt-outline), inset 0 0 0 1px color-mix(in srgb, var(--mt-void) 45%, transparent), inset 0 1px 0 1px color-mix(in srgb, var(--mt-white) 7%, transparent),
-    0 16px 26px -12px color-mix(in srgb, var(--mt-void) 85%, transparent);
+  box-shadow: var(--mt-outline), inset 0 0 0 1px color-mix(in srgb, var(--mt-void) 35%, transparent), inset 0 1px 0 1px color-mix(in srgb, var(--mt-white) 7%, transparent),
+    0 8px 14px -7px color-mix(in srgb, var(--mt-void) 75%, transparent);
   animation: none; filter: none; transition: filter 200ms, translate 220ms var(--mt-ease);
 }
-html.theme-metal .ctl-play.lg:hover { transform: none; translate: 0 -2px; filter: brightness(1.1); }
+html.theme-metal .ctl-play.lg:hover { transform: none; translate: 0 -1px; filter: brightness(1.12); }
 html.theme-metal .ctl-play.lg:active { transform: none; translate: 0 1px; filter: brightness(0.95); transition-duration: 60ms; }
-html.theme-metal .ctl-play .pp { width: 28px; height: 28px; fill: var(--mt-btn-text); filter: var(--mt-btn-glyph); }
+html.theme-metal .ctl-play .pp { width: 18px; height: 18px; fill: var(--mt-btn-text); filter: var(--mt-btn-glyph); }
 /* the ring round it: a groove cut into the plate that fills with copper as the song plays */
-html.theme-metal .pr-track { stroke: color-mix(in srgb, var(--mt-void) 22%, transparent); stroke-width: 2.4; }
-html.theme-metal .pr-fill { stroke: var(--mt-cu-3); stroke-width: 2.4; filter: none; }
-@media (max-height: 720px) {
-  html.theme-metal .play-wrap { width: 98px; height: 98px; }
-  html.theme-metal .ctl-play.lg { width: 68px; height: 68px; }
-}
+html.theme-metal .pr-track { stroke: color-mix(in srgb, var(--mt-void) 22%, transparent); stroke-width: 3.6; }
+html.theme-metal .pr-fill { stroke: var(--mt-cu-3); stroke-width: 3.6; filter: none; }
 /* the volume bar: a groove with copper in it, a knob for a thumb */
 html.theme-metal .vb-ico { color: var(--mt-ink-2); }
 html.theme-metal .vb-ico:hover { color: var(--mt-ink); }
@@ -199,10 +194,17 @@ html.theme-metal .pl-cat-pos { font-size: 11px; color: var(--mt-text-dim); }
    the plate just as far as the other themes fade it into their scrim (a mask, so the metal shows through
    unchanged). Admire art shows all of it. Narrow: a square cover in a polished bezel. */
 html.theme-metal .app.wide #aaWrap .aa-scrim { background: none; }
+/* --mt-art-open: 0 with the controls showing, 1 in Admire art, where the fade is gone and the whole cover
+   shows. It is a registered number, so it eases between the two (with the controls' own fade) rather
+   than switching; only while it moves is the mask redrawn. */
+@property --mt-art-open { syntax: '<number>'; inherits: false; initial-value: 0; }
 html.theme-metal .app.wide #aaWrap .aa-track {
-  --mv: linear-gradient(180deg, var(--mt-void), var(--mt-void) calc(100% - var(--bb, 0px) - 150px), color-mix(in srgb, var(--mt-void) 55%, transparent) calc(100% - var(--bb, 0px) - 50px),
-    color-mix(in srgb, var(--mt-void) 16%, transparent) calc(100% - var(--bb, 0px) + 30px), color-mix(in srgb, var(--mt-void) 5%, transparent));
+  --mv: linear-gradient(180deg, var(--mt-void), var(--mt-void) calc(100% - var(--bb, 0px) - 150px),
+    color-mix(in srgb, var(--mt-void) calc(55% + 45% * var(--mt-art-open)), transparent) calc(100% - var(--bb, 0px) - 50px),
+    color-mix(in srgb, var(--mt-void) calc(16% + 84% * var(--mt-art-open)), transparent) calc(100% - var(--bb, 0px) + 30px),
+    color-mix(in srgb, var(--mt-void) calc(5% + 95% * var(--mt-art-open)), transparent));
   -webkit-mask-image: var(--mv); mask-image: var(--mv);
+  transition: --mt-art-open 0.45s ease, filter 0.4s ease;
 }
 /* no borders between the columns, as in Liquid Glass's Brutal mood (seamless.css, ambient.js): the cover
    fades out at both sides into its own light, which runs on across the plate under the panels beside it.
@@ -216,8 +218,7 @@ html.theme-metal.seamless .app.wide .amb::after {
   content: ''; position: absolute; inset: 0; pointer-events: none;
   background: linear-gradient(180deg, transparent var(--mt-band-h), color-mix(in srgb, var(--mt-void) 20%, transparent) calc(var(--mt-band-h) + 2px), transparent calc(var(--mt-band-h) + 16px));
 }
-html.theme-metal .app.wide.art-only #aaWrap .aa-track { -webkit-mask-image: none; mask-image: none; }
-html.theme-metal.seamless .app.wide.art-only #aaWrap .aa-track { -webkit-mask-image: var(--m); mask-image: var(--m); }
+html.theme-metal .app.wide.art-only #aaWrap .aa-track { --mt-art-open: 1; }
 html.theme-metal .app.wide #aaWrap .aa-img { background-color: transparent; }
 html.theme-metal .app.wide #aaWrap .aa-img.ph { background: none; }
 html.theme-metal .app.wide #aaWrap .aa-img.ph .ico { fill: color-mix(in srgb, var(--mt-ink) 22%, transparent); filter: drop-shadow(0 1px 0 color-mix(in srgb, var(--mt-white) calc(60% * var(--mt-lit)), transparent)); }
@@ -271,7 +272,7 @@ html.theme-metal .seek-times { font-size: 11px; color: var(--mt-ink-2); margin-t
 html.theme-metal .seek-bubble { background: var(--mt-slab-dark); color: var(--mt-text); border-radius: var(--mt-r-sm); box-shadow: var(--mt-outline), var(--mt-shadow-sm); border: 0; padding: 4px 10px; }
 /* the mini player button: a small graphite key */
 html.theme-metal .mini-btn { color: var(--mt-btn-text); position: relative; background: var(--mt-btn-key); box-shadow: var(--mt-btn-raise), var(--mt-drop); text-shadow: var(--mt-btn-letter); }
-html.theme-metal .app.vol-inline .mini-btn { position: absolute; }
+html.theme-metal .app.vol-inline .mini-btn { position: absolute; top: calc(50% + 12px); } /* just under the slider: the transport is small, so the row is short */
 html.theme-metal .mini-btn:hover { filter: brightness(1.12); box-shadow: var(--mt-btn-raise), var(--mt-shadow-sm); }
 html.theme-metal .mini-btn .pl-cat-label { color: inherit; text-shadow: inherit; font-family: var(--mt-btn-font); font-weight: 600; font-size: 10px; letter-spacing: 0.1em; }
 

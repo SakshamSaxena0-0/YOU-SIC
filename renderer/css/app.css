@@ -517,6 +517,22 @@ html.theme-pixel .mini-btn { border-radius: 4px; box-shadow: inset 0 0 0 2px cur
 .tile-ico .ico { width: 21px; height: 21px; }
 .tile-title { font-weight: 700; font-size: 14px; letter-spacing: -0.1px; }
 .tile-count { position: absolute; top: 15px; right: 15px; font-family: var(--mono); font-size: 11px; color: var(--dimmer); }
+/* grid view (the list menu's View > Grid view): a list's items and songs as tiles like the library's own.
+   The songs' grid is virtual: libraryView.js places each tile in the grid's padding and gap. */
+.item-tiles { padding-top: 8px; }
+.root-grid.vgrid { display: block; position: relative; }
+.tile.track { animation: none; } /* tiles come and go as the grid scrolls: no pop-in */
+:is(.item-tile, .tile.track) .tile-title { text-transform: none; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; position: relative; z-index: 1; }
+.tile-sub { text-transform: none; position: relative; z-index: 1; max-width: 100%; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; color: var(--dimmer); }
+.tile.track :is(.tile-title, .tile-sub) { padding-right: 22px; }
+/* a cover in the tile's icon place, shown as it is */
+.tile-ico.has-art { overflow: hidden; background: none; padding: 0; }
+.tile-ico.has-art.round { border-radius: 50%; }
+.tile-ico.has-art .it-art { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: inherit; box-shadow: none; }
+.tile.track.playing .eqbars { display: flex; }
+.tile.track.playing .tile-title { color: var(--acc-light); }
+.tile.track .r-more { position: absolute; right: 6px; bottom: 8px; z-index: 1; opacity: 0; transition: opacity 0.2s; }
+.tile.track:hover .r-more { opacity: 1; }
 @keyframes popIn { from { opacity: 0; transform: translateY(16px) scale(0.97); filter: blur(3px); } to { opacity: 1; transform: none; filter: none; } }
 
 .folder-strip { display: flex; flex-wrap: wrap; gap: 8px; padding: 16px; }

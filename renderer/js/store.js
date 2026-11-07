@@ -38,6 +38,7 @@ export const DEFAULT_SETTINGS = {
   libZoom: 1,
   sidePanel: true, // wide layout: the right-hand lyrics / visualization panel is open
   sorts: {},
+  views: {}, // library: 'grid' or 'list' per kind of view (the list menu's View); unset = the view's own default
   eq: {
     enabled: true, tone: true, limiter: true, reverb: false,
     bands: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], preamp: 0, bass: 0, treble: 0, balance: 0, tempo: 1,

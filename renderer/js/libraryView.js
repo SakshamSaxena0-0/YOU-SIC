@@ -4,6 +4,7 @@ import { SORTS } from './store.js';
 import { menu, menuAt, prompt, chooser, toast, confirmSheet } from './ui.js';
 
 const ROW_H = 64;
+const TILE_H = 108; // a tile's height in grid view, as the library's own (css/app.css .tile)
 
 // Root categories.
 const ROOT = [
@@ -299,15 +300,24 @@ export class LibraryView {
     const zoom = this.store.settings.libZoom || 1;
     const tracks = (page.tracks = this._sorted(page));
     const items = content.items || [];
-    const grid = content.layout === 'grid';
+    // grid view or list view (the list menu's View): a view built as a grid of covers (albums) keeps that
+    // grid; any other shows its items and songs as tiles like the library's own
+    const view = (page.view = this._view(page));
+    const grid = view === 'grid' && content.layout === 'grid';
+    const tiles = view === 'grid' && !grid;
     el.innerHTML = `<div class="scroller">
       ${content.header ? this._albumHeader(content.header) : ''}
-      ${items.length ? `<div class="${grid ? 'item-grid' : 'item-list'}" style="--zoom:${zoom}">${items.map((it, i) => this._itemHtml(it, i, grid)).join('')}</div>` : ''}
-      ${tracks.length ? `<div class="vlist" style="height:${tracks.length * ROW_H}px"></div>` : ''}
+      ${items.length ? (tiles
+        ? `<div class="root-grid item-tiles">${items.map((it, i) => this._tileHtml(it, i)).join('')}</div>`
+        : `<div class="${grid ? 'item-grid' : 'item-list'}" style="--zoom:${zoom}">${items.map((it, i) => this._itemHtml(it, i, grid)).join('')}</div>`) : ''}
+      ${tracks.length ? (view === 'grid' ? '<div class="root-grid vgrid"></div>' : `<div class="vlist" style="height:${tracks.length * ROW_H}px"></div>`) : ''}
       ${!items.length && !tracks.length ? `<div class="empty">${esc(content.empty || 'Nothing here yet')}</div>` : ''}
     </div>`;
     const scroller = (page.scroller = el.firstElementChild);
-    if (tracks.length) this._virtual(page, scroller.querySelector('.vlist'), tracks);
+    if (tracks.length) {
+      if (view === 'grid') this._virtualGrid(page, scroller.querySelector('.vgrid'), tracks);
+      else this._virtual(page, scroller.querySelector('.vlist'), tracks);
+    }
     el.onclick = (e) => {
       const it = e.target.closest('[data-item]');
       if (it) {
@@ -361,39 +371,33 @@ export class LibraryView {
     return `<button class="row item" data-item="${i}" ${delay}>${art}<div class="r-text"><div class="r-title">${esc(it.title)}</div><div class="r-sub">${esc(it.sub || '')}</div></div><span class="r-chev">${icon('chevron_right')}</span></button>`;
   }
 
-  // Virtualized track list: only rows in view (+overscan) exist in the DOM.
-  _virtual(page, host, tracks) {
-    const scroller = page.scroller;
-    const pool = new Map();
-    const stat = page.content.stat;
-    const render = () => {
-      if (!host.isConnected) return;
-      const top = scroller.scrollTop - host.offsetTop;
-      const vh = scroller.clientHeight;
-      const first = Math.max(0, Math.floor(top / ROW_H) - 6);
-      const last = Math.min(tracks.length - 1, Math.ceil((top + vh) / ROW_H) + 6);
-      for (const [i, el] of pool) if (i < first || i > last) { el.remove(); pool.delete(i); }
-      const cur = this.player.track;
-      for (let i = first; i <= last; i++) {
-        if (pool.has(i)) continue;
-        const t = tracks[i];
-        const el = document.createElement('div');
-        el.className = 'row track' + (i % 2 ? ' alt' : '') + (cur && cur.id === t.id ? ' playing' : ''); // .alt: every other row (DOM order is not list order)
-        el.style.transform = `translateY(${i * ROW_H}px)`;
-        el.dataset.i = i;
-        const right = stat === 'plays' ? `${this.store.stats[t.id]?.plays || 0}×` : stat === 'rating' ? '★'.repeat(this.store.rating(t.id)) : fmtTime(t.duration);
-        const num = page.node.type === 'album' && t.track ? `<span class="t-num">${t.track}</span>` : '';
-        el.innerHTML = `${num}<div class="it-art sm ${t.cover ? '' : 'ph'}" ${t.cover ? `style="background-image:url('${coverUrl(t.cover, true)}')"` : ''}>${t.cover ? '' : icon('music_note')}<div class="eqbars"><i></i><i></i><i></i></div></div>
-          <div class="r-text"><div class="r-title">${esc(t.title)}</div><div class="r-sub">${esc([t.artist, t.album].filter(Boolean).join(' · '))}</div></div>
-          <span class="r-dur">${right}</span><button class="icon-btn small r-more">${icon('more_vert')}</button>`;
-        host.appendChild(el);
-        pool.set(i, el);
-      }
-    };
-    page.renderRows = () => { pool.forEach((el) => el.remove()); pool.clear(); render(); };
-    scroller.addEventListener('scroll', render, { passive: true });
-    new ResizeObserver(render).observe(scroller);
-    requestAnimationFrame(render);
+  // An item as a tile like the library's own (grid view): its cover or icon top left, its track count top
+  // right, its name and the rest of its details at the bottom.
+  _tileHtml(it, i) {
+    const m = /^(\d+) tracks?(?: · )?/.exec(it.sub || '');
+    const count = m ? m[1] : '';
+    const sub = m ? it.sub.slice(m[0].length) : it.sub || '';
+    const art = it.cover
+      ? `<span class="tile-ico has-art${it.round ? ' round' : ''}"><span class="it-art" style="background-image:url('${coverUrl(it.cover, true)}')"></span></span>`
+      : `<span class="tile-ico">${icon(it.icon || 'music_note')}</span>`;
+    return `<button class="tile lg item-tile" data-lg="static" data-item="${i}" style="--d:${Math.min(i, 24) * 18}ms">${art}<span class="tile-title">${esc(it.title)}</span>${sub ? `<span class="tile-sub">${esc(sub)}</span>` : ''}<span class="tile-count">${count}</span></button>`;
+  }
+
+  // grid or list, chosen per kind of view (like the sort); a view built as a grid (albums) starts as one
+  _view(page) {
+    const v = this.store.settings.views?.[page.node.type];
+    return v === 'grid' || v === 'list' ? v : page.content.layout === 'grid' ? 'grid' : 'list';
+  }
+
+  _setView(page, v) {
+    this.store.settings.views = { ...(this.store.settings.views || {}), [page.node.type]: v };
+    this.store.saveSettings();
+    if (page.scroller) page.scroller.scrollTop = 0;
+    this.refresh();
+  }
+
+  // Clicks and right-clicks on a list's songs (rows or tiles).
+  _trackHandlers(page, host) {
     host.addEventListener('click', (e) => {
       const row = e.target.closest('.track');
       if (!row) return;
@@ -414,6 +418,102 @@ export class LibraryView {
       e.preventDefault();
       this._trackMenu(page, +row.dataset.i, e.clientX, e.clientY);
     });
+  }
+
+  _trackRight(page, t) {
+    const stat = page.content.stat;
+    return stat === 'plays' ? `${this.store.stats[t.id]?.plays || 0}×` : stat === 'rating' ? '★'.repeat(this.store.rating(t.id)) : fmtTime(t.duration);
+  }
+
+  // Virtualized grid of song tiles (grid view). Like the list, only the tiles in view (+overscan) exist in
+  // the DOM; they are placed here, in the grid's own padding and gap (the theme's .root-grid), so a tile's
+  // place is known without laying out the rest.
+  _virtualGrid(page, host, tracks) {
+    const scroller = page.scroller;
+    const pool = new Map();
+    const g = (page.grid = { cols: 0, w: 0, h: TILE_H, gap: 12, padT: 0, padL: 0 });
+    const layout = () => {
+      const cs = getComputedStyle(host);
+      const padL = parseFloat(cs.paddingLeft) || 0, padR = parseFloat(cs.paddingRight) || 0;
+      const padT = parseFloat(cs.paddingTop) || 0, padB = parseFloat(cs.paddingBottom) || 0;
+      const gap = parseFloat(cs.columnGap) || 12;
+      const inner = host.clientWidth - padL - padR;
+      const min = document.querySelector('.app.wide') ? 126 : 156; // the library grid's smallest tile (css/app.css)
+      const cols = Math.max(1, Math.floor((inner + gap) / (min + gap)));
+      const w = (inner - (cols - 1) * gap) / cols;
+      const changed = cols !== g.cols || Math.abs(w - g.w) > 0.5 || gap !== g.gap;
+      Object.assign(g, { cols, w, gap, padL, padT });
+      const rows = Math.ceil(tracks.length / cols);
+      const content = rows * (g.h + gap) - gap;
+      host.style.height = `${cs.boxSizing === 'border-box' ? padT + content + padB : content}px`;
+      return changed;
+    };
+    const render = () => {
+      if (!host.isConnected || !host.clientWidth) return;
+      if (layout()) { pool.forEach((el) => el.remove()); pool.clear(); }
+      const rowH = g.h + g.gap;
+      const top = scroller.scrollTop - host.offsetTop - g.padT;
+      const vh = scroller.clientHeight;
+      const first = Math.max(0, Math.floor(top / rowH) - 2) * g.cols;
+      const last = Math.min(tracks.length - 1, (Math.ceil((top + vh) / rowH) + 2) * g.cols + g.cols - 1);
+      for (const [i, el] of pool) if (i < first || i > last) { el.remove(); pool.delete(i); }
+      const cur = this.player.track;
+      for (let i = first; i <= last; i++) {
+        if (pool.has(i)) continue;
+        const t = tracks[i];
+        const el = document.createElement('div');
+        el.className = 'tile lg track' + (cur && cur.id === t.id ? ' playing' : '');
+        el.dataset.lg = 'static';
+        el.dataset.i = i;
+        el.style.cssText = `position:absolute;left:${g.padL + (i % g.cols) * (g.w + g.gap)}px;top:${g.padT + Math.floor(i / g.cols) * rowH}px;width:${g.w}px;height:${g.h}px`;
+        const url = t.cover ? coverUrl(t.cover, true) : '';
+        el.innerHTML = `<span class="tile-ico${url ? ' has-art' : ''}">${url ? `<span class="it-art" style="background-image:url('${url}')"></span>` : icon('music_note')}<span class="eqbars"><i></i><i></i><i></i></span></span>
+          <span class="tile-title">${esc(t.title)}</span><span class="tile-sub">${esc(t.artist || t.album || '')}</span>
+          <span class="tile-count">${this._trackRight(page, t)}</span><button class="icon-btn small r-more">${icon('more_vert')}</button>`;
+        host.appendChild(el);
+        pool.set(i, el);
+      }
+    };
+    page.renderRows = () => { pool.forEach((el) => el.remove()); pool.clear(); render(); };
+    scroller.addEventListener('scroll', render, { passive: true });
+    new ResizeObserver(render).observe(scroller);
+    requestAnimationFrame(render);
+    this._trackHandlers(page, host);
+  }
+
+  // Virtualized track list: only rows in view (+overscan) exist in the DOM.
+  _virtual(page, host, tracks) {
+    const scroller = page.scroller;
+    const pool = new Map();
+    const render = () => {
+      if (!host.isConnected) return;
+      const top = scroller.scrollTop - host.offsetTop;
+      const vh = scroller.clientHeight;
+      const first = Math.max(0, Math.floor(top / ROW_H) - 6);
+      const last = Math.min(tracks.length - 1, Math.ceil((top + vh) / ROW_H) + 6);
+      for (const [i, el] of pool) if (i < first || i > last) { el.remove(); pool.delete(i); }
+      const cur = this.player.track;
+      for (let i = first; i <= last; i++) {
+        if (pool.has(i)) continue;
+        const t = tracks[i];
+        const el = document.createElement('div');
+        el.className = 'row track' + (i % 2 ? ' alt' : '') + (cur && cur.id === t.id ? ' playing' : ''); // .alt: every other row (DOM order is not list order)
+        el.style.transform = `translateY(${i * ROW_H}px)`;
+        el.dataset.i = i;
+        const right = this._trackRight(page, t);
+        const num = page.node.type === 'album' && t.track ? `<span class="t-num">${t.track}</span>` : '';
+        el.innerHTML = `${num}<div class="it-art sm ${t.cover ? '' : 'ph'}" ${t.cover ? `style="background-image:url('${coverUrl(t.cover, true)}')"` : ''}>${t.cover ? '' : icon('music_note')}<div class="eqbars"><i></i><i></i><i></i></div></div>
+          <div class="r-text"><div class="r-title">${esc(t.title)}</div><div class="r-sub">${esc([t.artist, t.album].filter(Boolean).join(' · '))}</div></div>
+          <span class="r-dur">${right}</span><button class="icon-btn small r-more">${icon('more_vert')}</button>`;
+        host.appendChild(el);
+        pool.set(i, el);
+      }
+    };
+    page.renderRows = () => { pool.forEach((el) => el.remove()); pool.clear(); render(); };
+    scroller.addEventListener('scroll', render, { passive: true });
+    new ResizeObserver(render).observe(scroller);
+    requestAnimationFrame(render);
+    this._trackHandlers(page, host);
   }
 
   playFrom(page, i) {
@@ -463,8 +563,13 @@ export class LibraryView {
     if (!cur || !page.tracks || !page.scroller) return;
     const i = page.tracks.findIndex((t) => t.id === cur.id);
     if (i < 0) return;
-    const host = page.el.querySelector('.vlist');
-    const y = host.offsetTop + i * ROW_H - page.scroller.clientHeight / 2 + ROW_H / 2;
+    const host = page.el.querySelector('.vlist, .vgrid');
+    if (!host) return;
+    const g = page.view === 'grid' ? page.grid : null;
+    if (g && !g.cols) return; // the grid isn't laid out yet
+    const y = g
+      ? host.offsetTop + g.padT + Math.floor(i / g.cols) * (g.h + g.gap) - page.scroller.clientHeight / 2 + g.h / 2
+      : host.offsetTop + i * ROW_H - page.scroller.clientHeight / 2 + ROW_H / 2;
     page.scroller.scrollTo({ top: Math.max(0, y), behavior: smooth ? 'smooth' : 'auto' });
   }
 
@@ -581,6 +686,12 @@ export class LibraryView {
   listOptions(btn) {
     const page = this.top;
     const items = [];
+    if (page.content.kind !== 'root' && page.content.kind !== 'search') {
+      const view = this._view(page);
+      items.push({ header: 'View' },
+        { label: 'List view', checked: view === 'list', action: () => this._setView(page, 'list') },
+        { label: 'Grid view', checked: view === 'grid', action: () => this._setView(page, 'grid') }, '-');
+    }
     if (page.content.kind === 'tracks' || page.tracks?.length) {
       const cur = this.store.settings.sorts[page.node.type] || 'default';
       items.push({ header: 'Sort by' });

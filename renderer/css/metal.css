@@ -341,6 +341,31 @@ html.theme-metal .tile .tile-count {
   top: 14px; right: 16px; font-family: var(--mt-btn-font); letter-spacing: 0.02em; font-size: 13px; font-weight: 600; line-height: 1.25; opacity: 1;
   font-variant-numeric: tabular-nums;
 }
+/* grid view (the list menu's View > Grid view): items and songs as tiles built like the library's buttons,
+   in the metal of their list: coffee for the Folders list, burgundy for the songs in a folder, emerald
+   elsewhere. A cover in the icon's place is shown as it is, in a recess drawn round it (never over it). */
+html.theme-metal .lib-page[data-node='folders'] .tile {
+  --f0: var(--mt-coffee-0); --f1: var(--mt-coffee-1); --f2: var(--mt-coffee-2); --f3: var(--mt-coffee-3);
+  --f4: var(--mt-coffee-4); --f5: var(--mt-coffee-5); --f-ink: var(--mt-coffee-ink);
+  --f-satin: var(--mt-coffee-satin); --f-velvet: var(--mt-coffee-velvet); --f-sage: var(--mt-coffee-sage); --f-etch: var(--mt-coffee-etch); --f-hi: var(--mt-coffee-hi);
+}
+html.theme-metal .lib-page[data-node='folder'] .tile.track {
+  --f0: var(--mt-burgundy-0); --f1: var(--mt-burgundy-1); --f2: var(--mt-burgundy-2); --f3: var(--mt-burgundy-3);
+  --f4: var(--mt-burgundy-4); --f5: var(--mt-burgundy-5); --f-ink: var(--mt-burgundy-ink);
+  --f-satin: var(--mt-burgundy-satin); --f-velvet: var(--mt-burgundy-velvet); --f-sage: var(--mt-burgundy-sage); --f-etch: var(--mt-burgundy-etch); --f-hi: var(--mt-burgundy-hi);
+}
+html.theme-metal .tile-ico.has-art {
+  background: var(--f4);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--f-etch) 80%, transparent),
+    -2px -2px 4px 0 color-mix(in srgb, var(--f-etch) 60%, transparent),
+    0 1px 0 1px color-mix(in srgb, var(--f-hi) 28%, transparent);
+}
+html.theme-metal .tile-sub {
+  font-family: var(--mt-btn-font); font-weight: 600; font-size: 11.5px; letter-spacing: 0.02em;
+  color: color-mix(in srgb, var(--mt-em-text) 86%, var(--f2)); text-shadow: var(--mt-em-engrave);
+}
+html.theme-metal .tile.track .r-more { color: var(--mt-em-text); }
+html.theme-metal .tile.track.playing .tile-title { color: var(--mt-cu-1); }
 /* the Folders list: each folder is a milled plate built exactly like the library's buttons (the user
    asked for the same on the list, after magenta, platinum and royal blue), in coffee brown (the user's
    choice; the buttons stay emerald), with the same tokens

@@ -19,7 +19,8 @@
 
 /* the lettering on the buttons and tiles: Barlow Semi Condensed, a DIN-like face (OFL, bundled; the
    licence is renderer/fonts/OFL-BarlowSemiCondensed.txt) */
-@font-face { font-family: 'Barlow Semi Condensed'; src: url('../fonts/barlow-semi-condensed-latin-600-normal.woff2') format('woff2'); font-weight: 600 700; font-display: block; }
+@font-face { font-family: 'Barlow Semi Condensed'; src: url('../fonts/barlow-semi-condensed-latin-600-normal.woff2') format('woff2'); font-weight: 600; font-display: block; }
+@font-face { font-family: 'Barlow Semi Condensed'; src: url('../fonts/barlow-semi-condensed-latin-700-normal.woff2') format('woff2'); font-weight: 700; font-display: block; }
 
 html.theme-metal {
   /* ---- the plate: brushed aluminium, a little warm ---- */
@@ -253,6 +254,9 @@ html.theme-metal.metal-dark {
 html.theme-metal {
   --mt-plat-text: color-mix(in srgb, var(--mt-platinum-5) 85%, var(--mt-void));
   --mt-plat-letter: 0 1px 0 color-mix(in srgb, var(--mt-white) 55%, transparent);
+  /* and their metal is a little see-through (the user's choice), so the plate and the cover's light show
+     faintly through it */
+  --mt-fold-card-a: 0.85;
 }
 html.theme-metal :is(.tile, .lib-page[data-node='folders'] .row.item) {
   /* the dark cut round a tile's bay */

@@ -341,10 +341,11 @@ html.theme-metal .tile .tile-count {
   top: 14px; right: 16px; font-family: var(--mt-btn-font); letter-spacing: 0.02em; font-size: 13px; font-weight: 600; line-height: 1.25; opacity: 1;
 }
 /* the Folders list: each folder is a card built like the Folders tile (the user asked for the tile's look
-   on the list), in royal blue (the user's choice, after magenta and platinum), very matte (the user's
-   choice): no glint, no sheen, no bright edge, only a soft fall of light from above. The bay with its cut
-   and rim, the channel, the card with its soft bevel and flat face, the long cast shadow, the lift on
-   hover and the press; the names in the tiles' face, bold and in their own case (never forced to
+   on the list), in royal blue (the user's choice, after magenta and platinum), as matte anodised metal
+   (the user's choice; flat colour alone "doesn't look like a metal card"): a fine bead-blasted grain
+   (--mt-grain), a broad soft light from above right with no glint or streak, a crisp machined edge along
+   the top and a little shade low inside. The bay with its cut and rim, the channel, the card, the long
+   cast shadow, the lift on hover and the press; the names in the tiles' face, bold and in their own case (never forced to
    capitals: the user's rule), printed light. The folder's cover is shown as it is, set into a well like
    the tiles' icons. The metal is a little see-through
    (--mt-fold-card-a, 0.6), so the bay is drawn as a ring (the row's ::before) round the card (its ::after)
@@ -371,15 +372,18 @@ html.theme-metal .lib-page[data-node='folders'] .row.item::before {
   background: linear-gradient(180deg, color-mix(in srgb, var(--f4) 80%, var(--f3)), var(--f3) 45%, var(--f2));
   mask: linear-gradient(var(--mt-void) 0 0) content-box, linear-gradient(var(--mt-void) 0 0); mask-composite: exclude;
 }
-/* the card: a soft bevel with no bright edge, then the flat matte face: one even colour with only a soft
-   fall of light from top to bottom (no brushing, no sheen, no streak of light across it) */
+/* the card: the grain, the broad soft light from above right, the face (lighter at the top, a little
+   shade low down), and the machined edge: light along the top, dark along the bottom */
 html.theme-metal .lib-page[data-node='folders'] .row.item::after {
   display: block; content: ''; position: absolute; inset: var(--mt-bay-w); z-index: -1; border-radius: calc(var(--mt-r-card) - var(--mt-bay-w));
   border: 1px solid transparent; pointer-events: none; opacity: var(--mt-fold-card-a); transition: none;
   background:
-    linear-gradient(180deg, color-mix(in srgb, var(--f1) 30%, var(--f2)), var(--f2) 50%, color-mix(in srgb, var(--f2) 80%, var(--f3))) padding-box,
-    linear-gradient(180deg, color-mix(in srgb, var(--f1) 65%, var(--f2)), var(--f2) 45%, var(--f3)) border-box;
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--f4) 55%, var(--mt-void)), inset 0 0 0 1px color-mix(in srgb, var(--mt-void) 14%, transparent);
+    var(--mt-grain) padding-box,
+    radial-gradient(140% 220% at 85% -60%, color-mix(in srgb, var(--mt-white) 20%, transparent), transparent 60%) padding-box,
+    linear-gradient(180deg, color-mix(in srgb, var(--f1) 55%, var(--f2)), var(--f2) 50%, color-mix(in srgb, var(--f2) 60%, var(--f3))) padding-box,
+    linear-gradient(180deg, color-mix(in srgb, var(--f0) 60%, var(--mt-white)), var(--f1) 25%, var(--f2) 55%, var(--f4)) border-box;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--f4) 55%, var(--mt-void)), inset 0 1px 0 color-mix(in srgb, var(--mt-white) 16%, transparent),
+    inset 0 -12px 16px -12px color-mix(in srgb, var(--mt-void) 30%, transparent);
 }
 html.theme-metal .lib-page[data-node='folders'] .row.item .r-title {
   font-family: var(--mt-btn-font); font-weight: 700; font-size: 14px; letter-spacing: 0.02em; text-transform: none; /* as written: the user wants names in their own case */

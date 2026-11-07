@@ -261,6 +261,11 @@ html.theme-metal {
   --mt-fold-glyph: var(--mt-btn-glyph);
   /* and their metal is see-through (the user's choice), so the plate and the cover's light show through */
   --mt-fold-card-a: 0.6;
+  /* their matte finish, bead-blasted (the user asked for the feel of real matte metal): a very fine grain
+     of light and dark specks in equal measure, so it adds texture but no tint. A static 160px tile, drawn
+     once and repeated (not the brushing, which stays off). The frequency must not be a whole number: the
+     noise is flat on its lattice and the grain would vanish. */
+  --mt-grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='1.25' numOctaves='2' seed='5' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  4 0 0 0 -2'/></filter><filter id='m' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='1.25' numOctaves='2' seed='5' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -4 0 0 0 2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.2'/><rect width='100%25' height='100%25' filter='url(%23m)' opacity='0.24'/></svg>") 0 0 / 160px 160px;
 }
 html.theme-metal :is(.tile, .lib-page[data-node='folders'] .row.item) {
   /* the dark cut round a tile's bay */

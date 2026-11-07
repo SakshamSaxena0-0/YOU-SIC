@@ -341,46 +341,57 @@ html.theme-metal .tile .tile-count {
   top: 14px; right: 16px; font-family: var(--mt-btn-font); letter-spacing: 0.02em; font-size: 13px; font-weight: 600; line-height: 1.25; opacity: 1;
   font-variant-numeric: tabular-nums;
 }
-/* the Folders list (Library > Folders): each folder is a flat plate of satin-anodised burgundy (smoked
-   oxblood), after the user's spec: a long rectangle with slightly rounded corners, integrated into the
-   list's plane, with no outer ring, frame, chamfer or embossed edge round it. The cover on the left, the
-   name and the track count and path stacked in the middle, the chevron on the right, as before. The
-   face is lit like metal: a muted burgundy-grey sheen top left (held to the corner in pixels, since the
-   plate is wide) falling cleanly to a deeply saturated near-black wine bottom right, under the
-   buttons' fine horizontal brushing (about 2%). The name, details and chevron are etched (--mt-em-*,
-   metal.tokens.css): soft silver-burgundy metal in the cut, a crisp near-black wine shadow along its
-   top. The cover is shown as it is, in a recess: soft shade on its top and left walls, drawn round the
-   cover, never over it; a folder without a cover shows its glyph in a well like the buttons' icons.
-   Names are bold and in their own case (never forced to capitals: the user's rule). Every plate is
-   graded the same; no glow, no glass. Hover lights a plate a touch and a press pushes it in. The plate
-   is the row's ::after (so it can be made see-through: --mt-fold-card-a); rows only use ::before on a
-   playing track, and Metal hides their ::after hover glow. */
+/* the Folders list: each folder is a milled plate built exactly like the library's buttons (the user
+   asked for the same on the list, after magenta, platinum and royal blue), in coffee brown (the user's
+   choice; the buttons stay emerald), with the same tokens
+   (--mt-em-*, metal.tokens.css): the hairline seat; the bezel (a crisp 1px outer frame a little darker
+   than the chassis, the satin-to-velvet chamfer, a razor-thin reflection inside it along the top and
+   left); the face, a satin-silver sheen top left falling to a deep velvet forest green bottom right,
+   under the fine horizontal brushing (about 2%). The sheen is held to the plate's top left corner in
+   pixels, since the plate is wide. The folder's cover is shown as it is, in a well stamped into the
+   plate: the well's walls are drawn round the cover (shade along its top and left, a 1px lip of light
+   below), never over it. A folder without a cover shows its glyph in a well like the buttons' icons.
+   The name and details are etched, bold and in their own case (never forced to capitals: the user's
+   rule). Set into the chassis, a plate doesn't lift: hover lights it a touch and a press pushes it in.
+   The frame is the row's ::before (a ring, so the plate can be made see-through: --mt-fold-card-a) and
+   the plate its ::after; rows only use ::before on a playing track, and Metal hides their ::after hover
+   glow. */
 html.theme-metal .lib-page[data-node='folders'] .item-list { gap: 10px; padding: 10px 16px 18px; }
 html.theme-metal .lib-page[data-node='folders'] .row.item {
-  --f0: var(--mt-burgundy-0); --f1: var(--mt-burgundy-1); --f2: var(--mt-burgundy-2); --f3: var(--mt-burgundy-3);
-  --f4: var(--mt-burgundy-4); --f5: var(--mt-burgundy-5); --f-ink: var(--mt-burgundy-ink);
-  --f-satin: var(--mt-burgundy-satin); --f-velvet: var(--mt-burgundy-velvet); --f-sage: var(--mt-burgundy-sage); --f-etch: var(--mt-burgundy-etch); --f-hi: var(--mt-burgundy-hi);
+  --f0: var(--mt-coffee-0); --f1: var(--mt-coffee-1); --f2: var(--mt-coffee-2); --f3: var(--mt-coffee-3);
+  --f4: var(--mt-coffee-4); --f5: var(--mt-coffee-5); --f-ink: var(--mt-coffee-ink);
+  --f-satin: var(--mt-coffee-satin); --f-velvet: var(--mt-coffee-velvet); --f-sage: var(--mt-coffee-sage); --f-etch: var(--mt-coffee-etch); --f-hi: var(--mt-coffee-hi);
+  --mt-bay-w: 1px;
   position: relative; isolation: isolate; height: calc(68px * var(--zoom, 1)); padding: 0 16px 0 14px; gap: 14px;
-  border-radius: var(--mt-r); color: var(--f-ink); background: none; box-shadow: none;
+  border-radius: var(--mt-r-card); color: var(--f-ink); background: none;
+  box-shadow: var(--mt-em-seat);
   transition: filter var(--mt-t) var(--mt-ease);
 }
-html.theme-metal .lib-page[data-node='folders'] .row.item:hover { scale: 1; translate: none; filter: brightness(1.07); background: none; box-shadow: none; }
-html.theme-metal .lib-page[data-node='folders'] .row.item:active { translate: none; filter: brightness(0.97); box-shadow: none; transition-duration: 60ms; }
-html.theme-metal .lib-page[data-node='folders'] .row.item::before { display: none; }
-/* the plate: the brushing, the sheen and the face, edge to edge */
+html.theme-metal .lib-page[data-node='folders'] .row.item:hover {
+  scale: 1; translate: none; filter: brightness(1.07); background: none; box-shadow: var(--mt-em-seat);
+}
+html.theme-metal .lib-page[data-node='folders'] .row.item:active { translate: none; filter: brightness(0.97); box-shadow: var(--mt-em-seat); transition-duration: 60ms; }
+/* the bezel's outer frame: a crisp 1px ring a little darker than the chassis */
+html.theme-metal .lib-page[data-node='folders'] .row.item::before {
+  display: block; content: ''; position: absolute; inset: 0; z-index: -1; border-radius: var(--mt-r-card); padding: var(--mt-bay-w);
+  pointer-events: none; background: var(--mt-em-frame);
+  mask: linear-gradient(var(--mt-void) 0 0) content-box, linear-gradient(var(--mt-void) 0 0); mask-composite: exclude;
+}
+/* the plate: the brushing, the sheen, the face, and the chamfer (its 1px border) */
 html.theme-metal .lib-page[data-node='folders'] .row.item::after {
-  display: block; content: ''; position: absolute; inset: 0; z-index: -1; border-radius: var(--mt-r);
-  border: 0; pointer-events: none; opacity: var(--mt-fold-card-a);
+  display: block; content: ''; position: absolute; inset: var(--mt-bay-w); z-index: -1; border-radius: calc(var(--mt-r-card) - var(--mt-bay-w));
+  border: 1px solid transparent; pointer-events: none; opacity: var(--mt-fold-card-a);
   background:
-    var(--mt-em-brush),
-    radial-gradient(150px 110px at 0% 0%, color-mix(in srgb, var(--f-satin) 22%, transparent), transparent 70%),
-    linear-gradient(135deg, color-mix(in srgb, var(--f-satin) 42%, var(--f1)), color-mix(in srgb, var(--f-satin) 16%, var(--f1)) 24px,
-      var(--f1) 50px, var(--f2) 150px, color-mix(in srgb, var(--f3) 55%, var(--f-velvet)) 74%, var(--f-velvet));
-  box-shadow: none;
+    var(--mt-em-brush) padding-box,
+    radial-gradient(150px 110px at 0% 0%, color-mix(in srgb, var(--f-satin) 24%, transparent), transparent 70%) padding-box,
+    linear-gradient(135deg, color-mix(in srgb, var(--f-satin) 48%, var(--f1)), color-mix(in srgb, var(--f-satin) 20%, var(--f1)) 24px,
+      var(--f1) 50px, var(--f2) 150px, color-mix(in srgb, var(--f3) 60%, var(--f-velvet)) 76%, var(--f-velvet)) padding-box,
+    var(--mt-em-chamfer) border-box;
+  box-shadow: var(--mt-em-face);
   transition: box-shadow var(--mt-t) var(--mt-ease);
 }
-html.theme-metal .lib-page[data-node='folders'] .row.item:active::after { box-shadow: var(--mt-em-pressed); transition-duration: 60ms; }
-/* the name and details, etched */
+html.theme-metal .lib-page[data-node='folders'] .row.item:active::after { box-shadow: var(--mt-em-face), var(--mt-em-pressed); transition-duration: 60ms; }
+/* the name and details, etched like the buttons' lettering */
 html.theme-metal .lib-page[data-node='folders'] .row.item .r-title {
   font-family: var(--mt-btn-font); font-weight: 700; font-size: 14px; letter-spacing: 0.02em; text-transform: none; /* as written: the user wants names in their own case */
   color: var(--mt-em-text); text-shadow: var(--mt-em-engrave);
@@ -390,13 +401,13 @@ html.theme-metal .lib-page[data-node='folders'] .row.item .r-sub {
   color: color-mix(in srgb, var(--mt-em-text) 90%, var(--f2)); text-shadow: var(--mt-em-engrave);
 }
 html.theme-metal .lib-page[data-node='folders'] .row.item .r-chev { color: var(--mt-em-text); filter: var(--mt-em-glyph); }
-/* the cover, as it is, in a recess: a fine dark edge hugging it, soft shade on the top and left walls and
-   a faint lip of light below, all drawn round the cover, never over it */
+/* the cover, as it is, in a well stamped into the plate: the walls are drawn round it, never over it: a
+   crisp dark edge hugging the cover, the wall in shade along its top and left, a 1px lip of light below */
 html.theme-metal .lib-page[data-node='folders'] .row.item .it-art {
   border-radius: 7px; background-color: var(--f4);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--f-etch) 80%, transparent),
-    -2px -2px 4px 0 color-mix(in srgb, var(--f-etch) 60%, transparent),
-    0 1px 0 1px color-mix(in srgb, var(--f-hi) 28%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--f-etch) 90%, transparent),
+    -1px -1px 0 2px color-mix(in srgb, var(--f-etch) 75%, transparent),
+    0 1px 0 1px color-mix(in srgb, var(--f-hi) 50%, transparent);
 }
 /* a folder without a cover: its glyph in a well like the buttons' icons (nothing to hide, so the walls
    are inside it) */

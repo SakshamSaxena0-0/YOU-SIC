@@ -94,6 +94,11 @@ html.theme-metal {
      itself, falling to a deep, saturated espresso (velvet); a warm satin sheen, a warm light on the bezel,
      warm cream metal inside a cut and a near-black brown shadow in it */
   --mt-coffee-0: #9A8574;   --mt-coffee-1: #6F4E37;   --mt-coffee-2: #573C2A;   --mt-coffee-3: #432D1F;   --mt-coffee-4: #2E1F15;   --mt-coffee-5: #1C130D;   --mt-coffee-ink: #D8CABB;
+  /* burgundy: smoked oxblood, satin-anodised, for the songs in a folder (the user's spec): 1 the burgundy,
+     falling to a deeply saturated near-black wine (velvet); a muted burgundy-grey metallic sheen, a soft
+     light on an edge, soft silver-burgundy metal inside a cut and a near-black wine shadow in it */
+  --mt-burgundy-0: #9A7B80; --mt-burgundy-1: #6B2A36; --mt-burgundy-2: #561F2A; --mt-burgundy-3: #43171F; --mt-burgundy-4: #2F1016; --mt-burgundy-5: #1E0A0E; --mt-burgundy-ink: #E0CFCB;
+  --mt-burgundy-hi: #C99AA2; --mt-burgundy-satin: #9C8A8E; --mt-burgundy-velvet: #1F060C; --mt-burgundy-sage: #7E4250; --mt-burgundy-etch: #120407;
   --mt-coffee-hi: #C9A98A;  --mt-coffee-satin: #ADA196; --mt-coffee-velvet: #2B170B; --mt-coffee-sage: #7A5A44; --mt-coffee-etch: #140B06;
   --mt-royal-0: #6F8CF5;    --mt-royal-1: #2E55EE;    --mt-royal-2: #1A3FE0;    --mt-royal-3: #1534C4;    --mt-royal-4: #0E2590;    --mt-royal-5: #08185A;    --mt-royal-ink: #EEF2FF;
 
@@ -278,8 +283,8 @@ html.theme-metal {
    Folders list's plates are built the same way in coffee brown. So these are worked out on each plate, in
    its own metal: --f0 to --f5 and --f-ink, and its accents --f-satin (the sheen), --f-velvet (the depth),
    --f-sage (the bezel's reflection), --f-etch (the shadow in a cut) and --f-hi (the light on a bezel),
-   set in css/metal.css. */
-html.theme-metal :is(.tile, .lib-page[data-node='folders'] .row.item) {
+   set in css/metal.css. The songs in a folder are burgundy plates lit and engraved with them too. */
+html.theme-metal :is(.tile, .lib-page[data-node='folders'] .row.item, .lib-page[data-node='folder'] .row.track) {
   /* the seat: a hairline where the chassis falls into shade above the button and catches the light below */
   --mt-em-seat: 0 -1px 0 color-mix(in srgb, var(--mt-void) 30%, transparent),
     0 1px 0 color-mix(in srgb, var(--mt-white) calc(10% + 35% * var(--mt-lit)), transparent);

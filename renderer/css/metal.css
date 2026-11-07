@@ -480,6 +480,71 @@ html.theme-metal .row.track.playing .r-sub { color: var(--mt-ink-2); }
 html.theme-metal .row.track.playing::before { left: 0; top: 9px; bottom: 9px; width: 3px; border-radius: 2px; background: var(--mt-flow-v); box-shadow: 0 0 0 1px color-mix(in srgb, var(--mt-cu-4) 50%, transparent); }
 html.theme-metal .eqbars { background: color-mix(in srgb, var(--mt-gun-5) 70%, transparent); backdrop-filter: none; }
 html.theme-metal .eqbars i { background: var(--mt-flow); box-shadow: none; border-radius: 1px; }
+/* the songs in a folder (Library > Folders > a folder): each song is a flat plate of satin-anodised
+   burgundy (smoked oxblood), after the user's spec: a long rectangle with slightly rounded corners,
+   integrated into the list's plane, with no outer ring, frame, chamfer or embossed edge round it. The
+   cover on the left, the title and the artist and album stacked in the middle, the length and the menu
+   on the right, as before. The face is lit like metal: a muted burgundy-grey sheen top left (held to the
+   corner in pixels, since the plate is wide) falling cleanly to a deeply saturated near-black wine
+   bottom right, under the buttons' fine horizontal brushing (about 2%). The lettering is etched
+   (--mt-em-*, metal.tokens.css): soft silver-burgundy metal in the cut, a crisp near-black wine shadow
+   along its top. The cover is shown as it is, in a recess: soft shade on its top and left walls, drawn
+   round the cover, never over it. Every plate is graded the same (no striping); no glow, no glass. The
+   playing song keeps its copper strip, with its title in light copper. Hover lights a plate a touch and
+   a press pushes it in. The plate is the row's ::after (the playing strip is its ::before). The rows
+   keep their place in the list (64px apart, 60px tall), so the plates have a 4px gap between them. */
+html.theme-metal .lib-page[data-node='folder'] .row.track {
+  --f0: var(--mt-burgundy-0); --f1: var(--mt-burgundy-1); --f2: var(--mt-burgundy-2); --f3: var(--mt-burgundy-3);
+  --f4: var(--mt-burgundy-4); --f5: var(--mt-burgundy-5); --f-ink: var(--mt-burgundy-ink);
+  --f-satin: var(--mt-burgundy-satin); --f-velvet: var(--mt-burgundy-velvet); --f-sage: var(--mt-burgundy-sage); --f-etch: var(--mt-burgundy-etch); --f-hi: var(--mt-burgundy-hi);
+  isolation: isolate; border-radius: var(--mt-r); color: var(--f-ink); background: none; box-shadow: none;
+  transition: filter var(--mt-t) var(--mt-ease);
+}
+html.theme-metal .lib-page[data-node='folder'] .row.track:hover { scale: 1; filter: brightness(1.07); background: none; box-shadow: none; }
+html.theme-metal .lib-page[data-node='folder'] .row.track:active { filter: brightness(0.97); transition-duration: 60ms; }
+html.theme-metal .lib-page[data-node='folder'] .row.track.playing { background: none; box-shadow: none; }
+/* the plate: the brushing, the sheen and the face, edge to edge */
+html.theme-metal .lib-page[data-node='folder'] .row.track::after {
+  display: block; content: ''; position: absolute; inset: 0; z-index: -1; border-radius: var(--mt-r);
+  border: 0; pointer-events: none; opacity: 1;
+  background:
+    var(--mt-em-brush),
+    radial-gradient(150px 110px at 0% 0%, color-mix(in srgb, var(--f-satin) 22%, transparent), transparent 70%),
+    linear-gradient(135deg, color-mix(in srgb, var(--f-satin) 42%, var(--f1)), color-mix(in srgb, var(--f-satin) 16%, var(--f1)) 24px,
+      var(--f1) 50px, var(--f2) 150px, color-mix(in srgb, var(--f3) 55%, var(--f-velvet)) 74%, var(--f-velvet));
+  box-shadow: none;
+  transition: box-shadow var(--mt-t) var(--mt-ease);
+}
+html.theme-metal .lib-page[data-node='folder'] .row.track:active::after { box-shadow: var(--mt-em-pressed); transition-duration: 60ms; }
+/* the lettering, etched; the title as written */
+html.theme-metal .lib-page[data-node='folder'] .row.track .r-title, html.theme-metal .lib-page[data-node='folder'] .row.track:hover .r-title {
+  font-family: var(--mt-btn-font); font-weight: 700; font-size: 14px; letter-spacing: 0.02em; text-transform: none;
+  color: var(--mt-em-text); text-shadow: var(--mt-em-engrave);
+}
+html.theme-metal .lib-page[data-node='folder'] .row.track .r-sub {
+  font-family: var(--mt-btn-font); font-weight: 600; font-size: 12px; letter-spacing: 0.02em;
+  color: color-mix(in srgb, var(--mt-em-text) 88%, var(--f2)); text-shadow: var(--mt-em-engrave);
+}
+html.theme-metal .lib-page[data-node='folder'] .row.track :is(.r-dur, .t-num) { color: color-mix(in srgb, var(--mt-em-text) 84%, var(--f2)); text-shadow: var(--mt-em-engrave); }
+html.theme-metal .lib-page[data-node='folder'] .row.track .r-more { color: var(--mt-em-text); }
+/* the playing song: its copper strip (the ::before, as everywhere in Metal) and its title in light copper */
+html.theme-metal .lib-page[data-node='folder'] .row.track.playing :is(.r-title, .t-num), html.theme-metal .lib-page[data-node='folder'] .row.track.playing:hover .r-title { color: var(--mt-cu-1); }
+html.theme-metal .lib-page[data-node='folder'] .row.track.playing .r-sub { color: color-mix(in srgb, var(--mt-em-text) 88%, var(--f2)); }
+/* the cover, as it is, in a recess: a fine dark edge hugging it, soft shade on the top and left walls and
+   a faint lip of light below, all drawn round the cover, never over it */
+html.theme-metal .lib-page[data-node='folder'] .row.track .it-art {
+  border-radius: 7px; background-color: var(--f4);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--f-etch) 80%, transparent),
+    -2px -2px 4px 0 color-mix(in srgb, var(--f-etch) 60%, transparent),
+    0 1px 0 1px color-mix(in srgb, var(--f-hi) 28%, transparent);
+}
+/* a song without a cover: its glyph in a well like the buttons' icons (nothing to hide, so the walls are
+   inside it) */
+html.theme-metal .lib-page[data-node='folder'] .row.track .it-art.ph {
+  color: var(--mt-em-text);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--f-etch) 70%, var(--f4)), var(--f4) 45%, color-mix(in srgb, var(--f3) 80%, var(--f2)));
+  box-shadow: var(--mt-em-well);
+}
 /* album grid: prints mounted in polished aluminium frames */
 html.theme-metal .gcell .it-art {
   border-radius: var(--mt-r);

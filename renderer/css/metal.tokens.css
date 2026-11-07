@@ -261,20 +261,12 @@ html.theme-metal.metal-dark {
 
 /* the tokens that read a tile's own finish (--f0 to --f5, set per tile in css/metal.css), so they are
    worked out on each tile rather than on the page. The folder cards of the Folders list are built like the
-   tiles, so they read the same tokens. They are royal blue (the user's choice, after magenta and
-   platinum), a deep colour, so their lettering is printed light with a soft shadow under it, in both
-   modes (--mt-fold-text, --mt-fold-letter, --mt-fold-glyph). */
+   tiles, so they read the same tokens: milled emerald plates like the library's buttons (the user's
+   choice, after magenta, platinum and royal blue), with the buttons' --mt-em-* tokens below. */
 html.theme-metal {
-  --mt-fold-text: color-mix(in srgb, var(--mt-royal-ink) 96%, var(--mt-royal-1));
-  --mt-fold-letter: var(--mt-btn-letter);
-  --mt-fold-glyph: var(--mt-btn-glyph);
-  /* and their metal is see-through (the user's choice), so the plate and the cover's light show through */
-  --mt-fold-card-a: 0.6;
-  /* their matte finish, bead-blasted (the user asked for the feel of real matte metal): a very fine grain
-     of light and dark specks in equal measure, so it adds texture but no tint. A static 160px tile, drawn
-     once and repeated (not the brushing, which stays off). The frequency must not be a whole number: the
-     noise is flat on its lattice and the grain would vanish. */
-  --mt-grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='1.25' numOctaves='2' seed='5' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  4 0 0 0 -2'/></filter><filter id='m' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='1.25' numOctaves='2' seed='5' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -4 0 0 0 2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.2'/><rect width='100%25' height='100%25' filter='url(%23m)' opacity='0.24'/></svg>") 0 0 / 160px 160px;
+  /* how solid their metal is: solid like the buttons (the user asked for the buttons' look on the list;
+     it was 0.6, see-through, before: set it back to 0.6 for that) */
+  --mt-fold-card-a: 1;
 }
 /* the library's buttons (the category tiles), after the user's two specs: heavy milled plates of emerald
    brushed metal, set into the chassis, with everything on them engraved (concave, never raised). */

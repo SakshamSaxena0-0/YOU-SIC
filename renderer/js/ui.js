@@ -12,7 +12,8 @@ export function toast(msg, ms = 2400) {
 
 // ---------- context menu ----------
 let menuClose = null;
-export function menu(x, y, items) {
+// `above`: the top of the key the menu belongs to, so a menu with no room below it opens above the key
+export function menu(x, y, items, above) {
   closeMenu();
   const el = $('#ctx');
   el.innerHTML = items.map((it, i) => {
@@ -26,7 +27,8 @@ export function menu(x, y, items) {
   el.classList.add('open');
   const r = el.getBoundingClientRect();
   const vw = innerWidth, vh = innerHeight;
-  const left = Math.min(x, vw - r.width - 8), top = Math.min(y, vh - r.height - 8);
+  const left = Math.min(x, vw - r.width - 8);
+  const top = above != null && y + r.height > vh - 8 ? above - 4 - r.height : Math.min(y, vh - r.height - 8);
   el.style.left = `${Math.max(8, left)}px`;
   el.style.top = `${Math.max(8, top)}px`;
   el.style.transformOrigin = `${x - left}px ${y - top}px`;
@@ -52,9 +54,11 @@ export function menu(x, y, items) {
 addEventListener('resize', () => closeMenu());
 export function closeMenu() { if (menuClose) { menuClose(); menuClose = null; } }
 
+// under the key, its right edge in line with the key's, or opening rightwards from a key on the left of its
+// column (the player's bottom-left corner key); above the key when there's no room below
 export function menuAt(btn, items) {
   const r = btn.getBoundingClientRect();
-  menu(r.right - 220, r.bottom + 4, items);
+  menu(btn.closest('.pl-corner-l') ? r.left : r.right - 220, r.bottom + 4, items, r.top);
 }
 
 // ---------- sheets (modal panels) ----------

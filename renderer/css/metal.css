@@ -187,30 +187,27 @@ html.theme-metal .nav-btn.on { color: var(--mt-btn-text); filter: none; }
 html.theme-metal .nav-btn.on .ico { filter: var(--mt-btn-glyph); }
 html.theme-metal .nav-ink { top: 5px; bottom: 5px; border-radius: var(--mt-r); background: var(--mt-btn-key); box-shadow: var(--mt-btn-raise), var(--mt-drop); }
 
-/* ---------- 8. player: header (on the band), the cover, the title block (on the plate) ---------- */
+/* ---------- 8. player: header (on the band; narrow windows only), the cover, the title block (on the plate) ---------- */
 html.theme-metal .pl-cat { border-radius: var(--mt-r); }
 html.theme-metal .pl-cat:hover { background: color-mix(in srgb, var(--mt-white) 7%, transparent); }
 html.theme-metal .pl-cat-label { font-size: 9px; color: var(--mt-text-dim); text-shadow: var(--mt-emboss); }
 html.theme-metal .pl-cat-name { font-size: 17px; font-weight: 800; color: var(--mt-text); text-shadow: var(--mt-emboss); }
 html.theme-metal .pl-cat-pos { font-size: 11px; color: var(--mt-text-dim); }
-/* the cover. Wide: as in every theme, it fills its column edge to edge and is drawn as it is. It
-   starts at the band's machined edge (the band runs whole across the window and casts its shadow on the
-   cover's top) and, behind the title block and the controls, fades into the plate just as far as the
-   other themes fade it into their scrim (a mask, so the brushed metal shows through unchanged). Admire
-   art shows all of it. Narrow: a square cover in a polished bezel. */
-html.theme-metal .app.wide #aaWrap .aa-scrim {
-  background: linear-gradient(180deg, transparent var(--mt-band-h), color-mix(in srgb, var(--mt-void) 60%, transparent) var(--mt-band-h),
-    color-mix(in srgb, var(--mt-void) 22%, transparent) calc(var(--mt-band-h) + 2px), transparent calc(var(--mt-band-h) + 16px));
-}
+/* the cover. Wide: as in every theme, it fills its column edge to edge and is drawn as it is. There is no
+   header over it (the user's choice), so it runs up through the band to the window's top edge; the band
+   stays on the library's and the lyrics' columns. Behind the title block and the controls it fades into
+   the plate just as far as the other themes fade it into their scrim (a mask, so the metal shows through
+   unchanged). Admire art shows all of it. Narrow: a square cover in a polished bezel. */
+html.theme-metal .app.wide #aaWrap .aa-scrim { background: none; }
 html.theme-metal .app.wide #aaWrap .aa-track {
-  --mv: linear-gradient(180deg, transparent calc(var(--mt-band-h) - 1px), var(--mt-void) calc(var(--mt-band-h) + 1px),
-    var(--mt-void) calc(100% - var(--bb, 0px) - 150px), color-mix(in srgb, var(--mt-void) 55%, transparent) calc(100% - var(--bb, 0px) - 50px),
+  --mv: linear-gradient(180deg, var(--mt-void), var(--mt-void) calc(100% - var(--bb, 0px) - 150px), color-mix(in srgb, var(--mt-void) 55%, transparent) calc(100% - var(--bb, 0px) - 50px),
     color-mix(in srgb, var(--mt-void) 16%, transparent) calc(100% - var(--bb, 0px) + 30px), color-mix(in srgb, var(--mt-void) 5%, transparent));
   -webkit-mask-image: var(--mv); mask-image: var(--mv);
 }
 /* no borders between the columns, as in Liquid Glass's Brutal mood (seamless.css, ambient.js): the cover
    fades out at both sides into its own light, which runs on across the plate under the panels beside it.
-   Both stop at the band's edge, and the band casts its shadow on the light as it does on the plate. */
+   The light stops at the band's edge, and the band casts its shadow on it as it does on the plate; up in
+   the band the cover's sides fade into the band. */
 html.theme-metal.seamless .app.wide #aaWrap .aa-track {
   -webkit-mask-image: var(--m), var(--mv); -webkit-mask-composite: source-in; mask-image: var(--m), var(--mv); mask-composite: intersect;
 }

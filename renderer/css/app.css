@@ -183,8 +183,6 @@ input { font: inherit; color: inherit; }
 .app.wide #aaWrap .aa-scrim {
   display: block; position: absolute; pointer-events: none;
   background:
-    linear-gradient(180deg, color-mix(in srgb, var(--art-scrim) 90%, transparent), color-mix(in srgb, var(--art-scrim) 80%, transparent) calc(var(--tb) + 58px),
-      color-mix(in srgb, var(--art-scrim) 36%, transparent) calc(var(--tb) + 120px), transparent calc(var(--tb) + 200px)),
     linear-gradient(0deg, color-mix(in srgb, var(--art-scrim) 94%, transparent), color-mix(in srgb, var(--art-scrim) 82%, transparent) calc(var(--bb, 0px) - 30px),
       color-mix(in srgb, var(--art-scrim) 45%, transparent) calc(var(--bb, 0px) + 50px), transparent calc(var(--bb, 0px) + 150px));
 }
@@ -194,18 +192,39 @@ input { font: inherit; color: inherit; }
 .app.wide #aaWrap .aa-back.aa-info { visibility: visible; opacity: 0; transition: opacity 0.35s ease, width 0.8s var(--spring), height 0.8s var(--spring), margin 0.8s var(--spring); }
 .app.wide #aaWrap.info-on .aa-back.aa-info { opacity: 1; }
 
-/* Admire art (the picture button beside the player's library button, or A): the header, title block,
-   seekbar, controls and dock fade away with the fades over the cover, so nothing covers it. A, Esc and a
-   tap on the cover bring them back. Wide layout only. */
-#plAdmire { display: none; }
-.app.wide #plAdmire { display: grid; }
+/* Wide: no header over the cover (the user's choice: nothing blocks the art at the top). The cover runs
+   up to the window's top edge; the title bar's strip stays the window's drag area, so #aaWrap (taps,
+   swipes) starts below it. The header's keys go to the bottom corners beside the dock: the song's menu
+   on the left, the mini player and Admire art on the right (the mini player's labelled key under the
+   volume bar is for narrow windows). The library key isn't needed here: the library is always beside the
+   player, and the dock has its own key. The corners are anchored to the dock, so they stay in line with it
+   in every theme; when the column is too narrow for them beside the dock (.corners-up, set by
+   PlayerView._bleed()), they are anchored just above the title block instead, over the cover's foot. */
+#player > .pl-corner { display: none; }
+.app.wide #player > .pl-header:not(.pl-corner) { display: none; }
+.app.wide #aaWrap { margin-top: var(--tb); }
+.app.wide #miniBtn { display: none; }
+.app.wide #player > .pl-nav { anchor-name: --pl-dock; }
+.app.wide #player > .pl-info { anchor-name: --pl-title; }
+.app.wide #player > .pl-corner {
+  display: flex; align-items: center; gap: 8px; position: absolute; z-index: 2; margin: 0; padding: 0; height: auto;
+  position-anchor: --pl-dock; top: anchor(top); bottom: anchor(bottom);
+}
+.app.wide #player > .pl-corner-l { left: 16px; }
+.app.wide #player > .pl-corner-r { right: calc(var(--rw) + 16px); }
+.app.wide #player.corners-up > .pl-corner { position-anchor: --pl-title; top: auto; bottom: calc(anchor(top) + 8px); }
+.app.wide #player:not(.corners-up) > .pl-nav { margin-left: max(18px, 112px - var(--cpad)); margin-right: max(18px, 112px - var(--cpad)); }
+
+/* Admire art (the fullscreen key in the bottom-right corner, or A): the title block, seekbar, controls,
+   dock and corner keys fade away with the fades over the cover, so nothing covers it. A, Esc and a tap on
+   the cover bring them back. Wide layout only. */
 .app.wide #player > :is(.pl-header, .pl-info, .seek, .controls, .pl-nav) { transition: opacity 0.35s ease, translate 0.45s var(--ease), visibility 0s linear 0s; }
 .app.wide.art-only #player > :is(.pl-header, .pl-info, .seek, .controls, .pl-nav) {
   opacity: 0; visibility: hidden; pointer-events: none;
   transition: opacity 0.3s ease, translate 0.4s var(--ease), visibility 0s linear 0.3s;
 }
 .app.wide.art-only #player > .pl-header { translate: 0 -12px; }
-.app.wide.art-only #player > :is(.pl-info, .seek, .controls, .pl-nav) { translate: 0 14px; }
+.app.wide.art-only #player > :is(.pl-info, .seek, .controls, .pl-nav, .pl-corner) { translate: 0 14px; }
 .app.wide #aaWrap .aa-scrim { transition: opacity 0.45s ease; }
 .app.wide.art-only #aaWrap .aa-scrim { opacity: 0; }
 

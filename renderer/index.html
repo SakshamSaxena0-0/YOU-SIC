@@ -73,8 +73,6 @@
 
         <div class="pl-header">
           <button class="icon-btn lg" data-act="library" title="Library (Ctrl+L)" data-icon="queue_music"></button>
-          <!-- wide layout: hide the player's header and controls so the album art shows on its own -->
-          <button class="icon-btn lg" id="plAdmire" data-icon="image" title="Admire art (A)" aria-pressed="false"></button>
           <div class="pl-cat" id="plCat" title="Track source">
             <div class="pl-cat-label">Playing from</div>
             <div class="pl-cat-name" id="plCatName">Library</div>
@@ -164,6 +162,17 @@
           <button class="nav-btn" data-act="sleep" data-icon="timer" data-label="TIMER" title="Sleep timer"></button>
           <button class="nav-btn" data-act="settings" data-icon="settings" data-label="SET" title="Settings"></button>
         </nav>
+
+        <!-- wide layout: no header over the cover (css: .app.wide); its keys sit in the bottom corners beside
+             the dock. They carry the header's class, so each theme draws them as it draws the header's keys -->
+        <div class="pl-header pl-corner pl-corner-l">
+          <button class="icon-btn lg" data-act="playerMenu" title="Menu" data-icon="more_vert"></button>
+        </div>
+        <div class="pl-header pl-corner pl-corner-r">
+          <button class="icon-btn lg" id="plMini" data-icon="mini_player" title="Mini player"></button>
+          <!-- Admire art: hide the title block, the controls and the dock so the album art shows on its own -->
+          <button class="icon-btn lg" id="plAdmire" data-icon="fullscreen" title="Fullscreen (Admire Art)" aria-pressed="false"></button>
+        </div>
       </section>
 
       <!-- ============ LIBRARY SCREEN ============ -->

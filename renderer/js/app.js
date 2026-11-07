@@ -144,9 +144,8 @@ class App {
     this._syncSide();
   }
 
-  // Admire art (wide layout): show only the album art, with nothing over it (css: .art-only). The Admire art
-  // button beside the player's library button turns it on; A, Esc and a tap on the cover bring the header and
-  // the controls back.
+  // Admire art (wide layout): show only the album art, with nothing over it (css: .art-only). The fullscreen
+  // key in the player's bottom-right corner turns it on; A, Esc and a tap on the cover bring the controls back.
   toggleArt(force) {
     const on = !this.narrow && (force ?? !this.root.classList.contains('art-only'));
     if (on && this.playerView.flipped) this.playerView.flipArt(false);
@@ -415,8 +414,8 @@ class App {
     vr.onchange = () => vr.blur(); // so Space, the arrows and the other shortcuts reach the player again
     $('#vbIco').onclick = () => this.toggleMute();
     $('#volBar').addEventListener('wheel', wheel, { passive: false });
-    $('#miniBtn').onclick = () => this.mini.open();
-    if (!this.mini.supported) $('#miniBtn').style.display = 'none';
+    $('#miniBtn').onclick = $('#plMini').onclick = () => this.mini.open();
+    if (!this.mini.supported) $('#miniBtn').style.display = $('#plMini').style.display = 'none';
     new ResizeObserver(() => this._fitVolBar()).observe($('.controls'));
     this._syncVol();
   }

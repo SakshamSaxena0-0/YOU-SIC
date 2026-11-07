@@ -4,7 +4,7 @@ A hi-fi faceplate, after the user's mockup of the library as plates of brushed m
 
 ## The look
 
-- **Ground:** the window is one plate of brushed aluminium under a band of dark brushed gunmetal. The band covers the title bar and the three column headers and ends in a machined edge that casts a soft shadow.
+- **Ground:** the window is one plate of brushed aluminium under a band of dark brushed gunmetal. The band covers the title bar and the library's and lyrics' headers and ends in a machined edge that casts a soft shadow. In the wide layout the player has no header (the user asked for nothing over the cover), so in the middle column the cover runs up through the band to the window's top edge.
 - **Tiles:** the library's tiles are thick cards of graphite, all in the Folders tile's finish: the user asked for every tile and every button in that colour.
   - The other finishes are still defined in `metal.tokens.css`. Deleting the last rule of the finishes in section 9 of `metal.css` gives each tile its own metal again. In tile order: graphite, silver, rose gold, brass, pewter, platinum, cherry, champagne, titanium, silver, smoke, copper, bronze, oxblood and jade.
 - **How a card is built** (after the user's close-up of the Folders tile), from the outside in:
@@ -34,7 +34,7 @@ A hi-fi faceplate, after the user's mockup of the library as plates of brushed m
   - **The primary text button's** label is copper.
 - **Text:** on the plate it is printed dark into the metal; on the band it is light.
 - **The cover:** shown as it is, as in every theme. The theme doesn't change it: the user's rule is that a theme never alters the album art.
-  - **Wide layout:** it fills the middle column, as in the other themes. It starts at the band's machined edge, so the band stays whole across the window and casts its shadow on the cover's top. Behind the title block and the controls it fades into the plate exactly as far as the other themes fade it into their scrim, and **Admire art** shows all of it.
+  - **Wide layout:** it fills the middle column, as in the other themes. It runs up to the window's top edge: there is no header over it, and its sides fade into the band up there. The song's menu, the mini player and Admire art (a fullscreen key, "Fullscreen (Admire Art)") sit in the bottom corners beside the dock, drawn like the header keys. Behind the title block and the controls it fades into the plate exactly as far as the other themes fade it into their scrim, and **Admire art** shows all of it.
   - **No borders between the columns,** as in Liquid Glass's Brutal mood (the user asked for the same): the cover fades out at both sides into its own light, which runs on across the plate under the library and the lyrics, so the columns meet without a seam. The light is the colour along each edge of the cover, drawn once per song (`ambient.js`). It stops at the band's edge and follows the cover's fade down the window. The masks are in `seamless.css`; Metal adds its own vertical profile.
   - **Narrow layout:** a square cover in a polished bezel.
   - An etched (line-art) cover was tried and removed: the user's rule is that the theme leaves album art alone.

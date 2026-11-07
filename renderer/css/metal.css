@@ -341,14 +341,15 @@ html.theme-metal .tile .tile-count {
   top: 14px; right: 16px; font-family: var(--mt-btn-font); letter-spacing: 0.02em; font-size: 13px; font-weight: 600; line-height: 1.25; opacity: 1;
 }
 /* the Folders list: each folder is a card built like the Folders tile (the user asked for the tile's look
-   on the list), in magenta metal (the user's choice): the bay with its cut and rim, the channel, the card
-   with its soft machined bevel and matte face, the long cast shadow, the lift on hover and the press;
-   the names printed in the tiles' lettering. The folder's cover is shown as it is, set into a well like
-   the tiles' icons. The card is the row's ::before (rows only use it on a playing track). */
+   on the list), in platinum (the user's choice, after magenta): the bay with its cut and rim, the channel,
+   the card with its soft machined bevel and matte face, the long cast shadow, the lift on hover and the
+   press; the names in the tiles' lettering, printed dark since platinum is light. The folder's cover is
+   shown as it is, set into a well like the tiles' icons. The card is the row's ::before (rows only use it
+   on a playing track). */
 html.theme-metal .lib-page[data-node='folders'] .item-list { gap: 10px; padding: 10px 16px 18px; }
 html.theme-metal .lib-page[data-node='folders'] .row.item {
-  --f0: var(--mt-magenta-0); --f1: var(--mt-magenta-1); --f2: var(--mt-magenta-2); --f3: var(--mt-magenta-3);
-  --f4: var(--mt-magenta-4); --f5: var(--mt-magenta-5); --f-ink: var(--mt-magenta-ink);
+  --f0: var(--mt-platinum-0); --f1: var(--mt-platinum-1); --f2: var(--mt-platinum-2); --f3: var(--mt-platinum-3);
+  --f4: var(--mt-platinum-4); --f5: var(--mt-platinum-5); --f-ink: var(--mt-platinum-ink);
   position: relative; isolation: isolate; height: calc(68px * var(--zoom, 1)); padding: 0 16px 0 14px; gap: 14px;
   border-radius: var(--mt-r-card); color: var(--f-ink);
   background:
@@ -377,20 +378,20 @@ html.theme-metal .lib-page[data-node='folders'] .row.item::before {
 }
 html.theme-metal .lib-page[data-node='folders'] .row.item .r-title {
   font-family: var(--mt-btn-font); font-weight: 600; font-size: 13px; letter-spacing: 0.05em; text-transform: uppercase;
-  color: var(--mt-card-text); text-shadow: var(--mt-btn-letter);
+  color: var(--mt-plat-text); text-shadow: var(--mt-plat-letter);
 }
 html.theme-metal .lib-page[data-node='folders'] .row.item .r-sub {
   font-family: var(--mt-btn-font); font-weight: 600; font-size: 12px; letter-spacing: 0.02em; margin-top: 2px;
-  color: color-mix(in srgb, var(--mt-card-text) 74%, var(--f2)); text-shadow: var(--mt-btn-letter);
+  color: color-mix(in srgb, var(--mt-plat-text) 78%, var(--f3)); text-shadow: var(--mt-plat-letter);
 }
-html.theme-metal .lib-page[data-node='folders'] .row.item .r-chev { color: color-mix(in srgb, var(--mt-card-text) 80%, var(--f2)); filter: var(--mt-btn-glyph); }
+html.theme-metal .lib-page[data-node='folders'] .row.item .r-chev { color: color-mix(in srgb, var(--mt-plat-text) 80%, var(--f3)); filter: drop-shadow(0 1px 0 color-mix(in srgb, var(--mt-white) 55%, transparent)); }
 /* the cover, as it is, in a well sunk into the card: a dark cut round it, lit along its top, a lip below */
 html.theme-metal .lib-page[data-node='folders'] .row.item .it-art {
   border-radius: 7px; background-color: var(--f5);
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--f5) 45%, var(--mt-void)), 0 -1px 0 1px color-mix(in srgb, var(--mt-void) 25%, transparent),
     0 1px 0 1px color-mix(in srgb, var(--f0) 60%, var(--f1));
 }
-html.theme-metal .lib-page[data-node='folders'] .row.item .it-art.ph { color: color-mix(in srgb, var(--f-ink) 48%, var(--f3)); }
+html.theme-metal .lib-page[data-node='folders'] .row.item .it-art.ph { color: color-mix(in srgb, var(--f-ink) 70%, var(--f3)); }
 /* the finishes, in the order of the tiles (Folders, Folders Hierarchy, All Songs, Albums, Artists, Album
    Artists, Genres, Years, Composers, Playlists, Queue, Recently Added, Recently Played, Most Played,
    Top Rated). */

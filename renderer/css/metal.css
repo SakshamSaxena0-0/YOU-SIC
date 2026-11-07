@@ -287,21 +287,22 @@ html.theme-metal .search-bar:focus-within { box-shadow: var(--mt-cut), 0 0 0 1.5
 html.theme-metal .search-bar input { color: var(--mt-ink); font-family: var(--mt-ui); font-weight: 600; }
 html.theme-metal .search-bar input::placeholder { color: var(--mt-ink-3); }
 html.theme-metal .search-ico { color: var(--mt-ink-2); }
-/* category tiles (the library's buttons): deep emerald brushed metal set into the chassis, after the
-   user's spec (premium audio hardware). From the outside in: a hairline where the chassis falls into shade
-   above and catches the light below; a fine dark recess round the button (the tile itself, 2px), in shade
-   along its top; then the button (the tile's ::before): a fine bevel, lighter top left, and a slightly
-   pillowed face (a soft catch of light along its top, its edges rolling softly into shade) of British
-   racing green: a muted green-grey reflection top left falling to a rich, velvety forest green bottom
-   right, under an ultra-fine horizontal brushing (--mt-em-brush, about 3%). No glow and no gloss. The
-   icon's box, the icon, the name and the count are engraved (--mt-em-*, metal.tokens.css). Set into the
-   chassis, the button doesn't lift: hover lights it a touch and a press pushes it in. Names are shown as
-   written (never forced to capitals: the user's rule). */
+/* category tiles (the library's buttons): heavy milled plates of deep emerald brushed metal set into the
+   chassis, after the user's two specs (premium audio hardware). From the outside in: a hairline where the
+   chassis falls into shade above and catches the light below; the bezel: a crisp 1px outer frame a little
+   darker than the chassis (the tile itself), the chamfer (the plate's 1px border, bright satin top left,
+   velvet bottom right) and a razor-thin reflection just inside it along the top and left; then the face,
+   lit like metal: a satin-silver sheen top left falling to a deep velvet forest green bottom right, under
+   a fine horizontal brushing (about 2%). No glow and no gloss. The icon sits in a well stamped into the
+   plate (concave: shade on its top and left inner walls, a lip of light on its bottom inner edge); the
+   icon, the name and the count are etched (--mt-em-*, metal.tokens.css). Set into the chassis, the
+   button doesn't lift: hover lights it a touch and a press pushes it in. Names are shown as written
+   (never forced to capitals: the user's rule). */
 html.theme-metal .root-grid { gap: 14px; padding: 12px 16px 20px; }
 html.theme-metal .tile {
-  --mt-bay-w: 2px;
+  --mt-bay-w: 1px;
   height: 108px; border: 0; border-radius: var(--mt-r-card); color: var(--f-ink); filter: none; padding: 15px 16px; outline: 0;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--f5) 70%, var(--mt-void)), var(--f5) 45%, color-mix(in srgb, var(--f5) 75%, var(--f4)));
+  background: var(--mt-em-frame);
   box-shadow: var(--mt-em-seat);
   transition: filter var(--mt-t) var(--mt-ease);
 }
@@ -313,9 +314,10 @@ html.theme-metal .tile.lg::before {
   padding: 0; -webkit-mask: none; mask: none; border: 1px solid transparent; pointer-events: none;
   background:
     var(--mt-em-brush) padding-box,
-    radial-gradient(110% 130% at 0% 0%, color-mix(in srgb, var(--f0) 30%, transparent), transparent 60%) padding-box,
-    linear-gradient(135deg, color-mix(in srgb, var(--f0) 35%, var(--f1)), var(--f1) 18%, var(--f2) 48%, var(--f3) 76%, var(--f4)) padding-box,
-    linear-gradient(135deg, color-mix(in srgb, var(--f0) 65%, var(--f1)), var(--f2) 40%, var(--f4) 85%) border-box;
+    var(--mt-em-sheen) padding-box,
+    linear-gradient(135deg, color-mix(in srgb, var(--mt-emerald-satin) 48%, var(--f1)), color-mix(in srgb, var(--mt-emerald-satin) 20%, var(--f1)) 16%,
+      var(--f1) 30%, var(--f2) 52%, color-mix(in srgb, var(--f3) 60%, var(--mt-emerald-velvet)) 76%, var(--mt-emerald-velvet)) padding-box,
+    var(--mt-em-chamfer) border-box;
   box-shadow: var(--mt-em-face);
   transition: box-shadow var(--mt-t) var(--mt-ease);
 }
@@ -324,14 +326,15 @@ html.theme-metal .tile-title {
   position: relative; z-index: 1; font-family: var(--mt-btn-font); font-weight: 600; font-size: 13px; letter-spacing: 0.03em; line-height: 1.15;
   text-transform: none; /* as written: the user's rule */
 }
-/* the names and counts, engraved: raw silver-green metal in the cut, shade along its top, a bright bezel below */
+/* the names and counts, etched: raw silver-green metal in the cut, a crisp near-black shadow along its top */
 html.theme-metal :is(.tile-title, .tile-count) { color: var(--mt-em-text); text-shadow: var(--mt-em-engrave); }
-/* the icon's box, cut into the button: its floor in shade along the top */
+/* the icon's well, stamped into the plate: its floor in shade under the top left wall, catching a little
+   light towards the bottom right */
 html.theme-metal .tile-ico {
   width: 37px; height: 37px; top: 15px; left: 15px; border-radius: 7px; border: 0;
   color: var(--mt-em-text);
-  background: linear-gradient(180deg, color-mix(in srgb, var(--f4) 70%, var(--mt-void)), var(--f3) 55%, color-mix(in srgb, var(--f3) 70%, var(--f2)));
-  box-shadow: var(--mt-em-cut);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--mt-emerald-etch) 70%, var(--f4)), var(--f4) 45%, color-mix(in srgb, var(--f3) 80%, var(--f2)));
+  box-shadow: var(--mt-em-well);
 }
 html.theme-metal .tile-ico .ico { width: 17px; height: 17px; filter: var(--mt-em-glyph); }
 html.theme-metal .tile .tile-count {

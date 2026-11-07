@@ -18,20 +18,20 @@ A hi-fi faceplate, after the user's mockup of the library as plates of brushed m
   The cards and every button are **matte**. The user tried them glossy (a clear coat with a sharp horizon, and a sheen that slid on hover) and chose matte instead. There is no clear coat, no glint and no sheen: only soft light from above and a soft edge.
 
   The bay casts a long shadow on the plate. On hover it lifts and the shadow grows; on a click it presses in. The bay is the tile itself and the card is its `::before`.
-- **Tile contents:** each icon sits in a well sunk into the card: lit along its top, dark in the middle, its floor catching a little light, with a bright lip below it. The glyph is tinted with the card's metal. Names and counts are mono capitals **engraved** in the card, like the lettering on a metal card (see Engraving below).
+- **Tile contents:** each icon sits in a well sunk into the card: lit along its top, dark in the middle, its floor catching a little light, with a bright lip below it. The glyph is tinted with the card's metal. Names and counts are light mono capitals with a dark edge under them (see Lettering below).
 - **Buttons:** every button in the theme is graphite, like the Folders tile, in both modes. The tokens are `--mt-btn-*` at the end of `metal.tokens.css`.
-  - **Flat keys** (text buttons, chips, the theme and mode pickers, the dock's open tab, the lyrics/visualizer and equalizer tabs, the mini player button, the keys on the cover's back) are matte graphite with a soft machined edge and engraved labels.
-  - **Round buttons:** the header buttons on the band are matte graphite keys. The transport knobs, play, the window studs and the equalizer's knobs are matte graphite faces in matte graphite rings, with their glyphs engraved.
+  - **Flat keys** (text buttons, chips, the theme and mode pickers, the dock's open tab, the lyrics/visualizer and equalizer tabs, the mini player button, the keys on the cover's back) are matte graphite with a soft machined edge.
+  - **Round buttons:** the header buttons on the band are matte graphite keys. The transport knobs, play, the window studs and the equalizer's knobs are matte graphite faces in matte graphite rings.
   - **Thumbs:** the slider thumbs, the equalizer's band thumbs, the seekbar's knob and the toggles' balls are graphite too.
   - **Small icon buttons** (a row's menu, a folder's remove) stay a bare glyph until hovered, then show a graphite key.
-- **Engraving:** the text on every button and tile is cut into the metal.
-  - **How it's drawn:** each letter is a groove, darker than the metal. The label's fill is a layer of the button's own background, clipped to the letters (`background-clip: text`), in the colour of the groove's upper wall in deep shade (`--mt-cut-wall`). The text itself is transparent. Its shadow is drawn over that fill 1px lower: it is the groove's floor (`--mt-cut-floor`) and covers each letter except a dark rim along its top. A second shadow just under it is the groove's lower lip catching the light (`--mt-cut-lit`). The two shadows are put together on each label (`--mt-letter-cut`, with the fill in `--mt-letter-fill`), so a key can change the groove's colours: copper when it is on, and the card's own metal on a tile.
-  - **Why dark:** the first engraving drew light, frosted letters, and the user said it still looked like written text. A dark groove with a lit lower lip reads as cut.
-  - **Glyphs:** icons on keys and knobs are cut the same way: groove-dark, with the lit lip below (`--mt-btn-glyph`). Hovering a key brightens the key and leaves the icon cut in.
-  - **The tabs:** the open tab's label is cut into its key. The closed tabs' labels are cut into the dark slot, where the groove's floor is a dim, lighter metal so they still read.
-  - **Counts:** the tile counts are cut a little bolder (weight 600), so the engraving reads in the thin digits.
+- **Lettering:** the text on every button and tile is light, with a dark edge under each letter.
+  - **How it's drawn:** the label's fill is a layer of the button's own background, clipped to the letters (`background-clip: text`), and shows only as a lighter line along the top of each letter (`--mt-cut-hi`). The text itself is transparent. Its shadow, drawn over that fill half a pixel lower, is the letter (`--mt-cut-face`). A second shadow under it is the dark edge (`--mt-cut-shade`). The two are put together on each label (`--mt-letter-cut`, with the fill in `--mt-letter-fill`), so a key can change the colours: copper when it is on, and the card's own metal on a tile.
+  - **History:** the user first had light, frosted lettering and said it looked written, not engraved. Dark grooves with a light edge under them came next, and they called that awful and asked for the colours the other way round: light on top, dark at the bottom. That is what it is now.
+  - **Glyphs:** icons on keys and knobs are drawn the same way: light, with the dark edge under them (`--mt-btn-glyph`). Hovering a key brightens the key and leaves the icon as it is.
+  - **The tabs:** the open tab's label is on its key. The closed tabs' labels sit dimmer on the dark slot.
+  - **Counts:** the tile counts are a little bolder (weight 600), so they read in the thin digits.
 - **Copper:** the one accent. It marks anything switched on and fills the played part of the song, the ring round play, and the sliders and toggles.
-  - **A key that is on** has its lettering cut through to copper (a copper glyph on a knob) and a copper inlay round it; shuffle and repeat also light a small copper lamp in the knob's face.
+  - **A key that is on** has copper lettering (a copper glyph on a knob) and a copper inlay round it; shuffle and repeat also light a small copper lamp in the knob's face.
   - **The primary text button's** label is copper.
 - **Text:** on the plate it is printed dark into the metal; on the band it is light.
 - **The cover:** shown as it is, as in every theme. The theme doesn't change it: the user's rule is that a theme never alters the album art.
@@ -75,7 +75,7 @@ There is no art file. Every surface is a CSS gradient or a small SVG noise tile:
 
 **Light mode:** primary text is 8.0:1 on the darkest part of the plate where text sits (`--mt-alu-4`) and 11.2:1 in the light. Secondary text is 6.0:1 there, and hints and numbers are 4.5:1. On the band, light text is 7.6:1 and dim text is 5.8:1 at the band's middle (4.4:1 at its very top, where only the title bar sits). Dark text on copper is 6.0:1 on the darkest copper key. The tile names are light on their cards, as in the mockup: 4.0 to 5.6:1 on the dark finishes and about 3.4:1 on brass and pewter; on the light ones (silver, platinum, rose gold, champagne) a dark edge under every letter carries them.
 
-**Buttons:** an engraved letter is a dark groove, so its body is only about 2.5:1 against a key and 2.0 to 2.4:1 against a tile. What carries it is the lit lip under every letter, which is 6.8:1 against the groove. Copper lettering (on) is lighter than the key and has a copper inlay round the key as well. For more contrast, raise `--mt-cut-floor` towards `--mt-btn-3`, or brighten `--mt-cut-lit`.
+**Buttons:** the lettering is 4.0 to 4.5:1 against a key and a little more on a tile, and the dark edge under each letter makes it stand out more. Copper lettering (on) also has a copper inlay round the key.
 
 **Dark mode:** primary text is 7.7:1 on the plate's lightest part (`--mt-alu-1`) and 12.1:1 in its shade. Secondary text is 5.8:1 and hints are 4.6:1 on the lightest part. Light text on the band is 13:1.
 

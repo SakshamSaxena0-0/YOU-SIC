@@ -80,10 +80,9 @@ html.theme-metal .tb-close:hover { color: var(--mt-white); background: linear-gr
 /* ---------- 5. buttons ----------
    Every button is graphite, the finish of the Folders tile (the user's choice), on the band and on the
    plate, in both modes, and matte: soft light from above, a soft machined edge, no gloss. Labels are
-   engraved in the metal like the lettering on a metal card: each letter is a groove cut in, darker
-   than the metal, its upper wall in deep shade and its lower lip catching the light; glyphs are cut the
-   same way. Hover lifts a key a touch, press sinks it. On: the groove is cut through to copper and a
-   copper inlay runs round the key; the primary button's label is copper. */
+   light letters with a dark edge under them (the user's choice); glyphs are drawn the same way. Hover
+   lifts a key a touch, press sinks it. On: the lettering is copper and a copper inlay runs round the
+   key; the primary button's label is copper. */
 html.theme-metal :is(.pl-header, .lib-header, .eq-header, .side-header) .icon-btn.lg {
   width: 40px; height: 40px; border-radius: 50%; border: 1px solid transparent; color: var(--mt-btn-text); filter: none;
   background: var(--mt-btn-key) padding-box, var(--mt-btn-edge) border-box;
@@ -108,14 +107,14 @@ html.theme-metal :is(.ctl.lg, .btn, .chip, .ab-btn, .fchip.add):hover { transfor
 html.theme-metal :is(.ctl.lg, .btn, .chip, .ab-btn, .fchip.add):active { transform: none; filter: brightness(0.95); translate: 0 1px; box-shadow: var(--mt-pressed); transition-duration: 60ms; }
 html.theme-metal .icon-btn:not(.lg) { color: var(--mt-ink-2); }
 html.theme-metal .icon-btn:not(.lg):hover { background: var(--mt-btn-key); color: var(--mt-btn-text); box-shadow: var(--mt-btn-raise); }
-/* engraved labels (metal.tokens.css, --mt-cut-*): the label's fill is a layer of the key's own
-   background clipped to its letters, in the colour of the groove's upper wall; the text itself is
-   transparent, and its shadow, drawn over the fill 1px lower, is the groove's floor, leaving a dark rim
-   along the top of each letter, then the lit lower lip just under it. Worked out on each label, so a
-   key can change the groove's colours (copper when on, the card's metal on a tile). */
+/* the labels (metal.tokens.css, --mt-cut-*): the label's fill is a layer of the key's own background
+   clipped to its letters, which shows only as a lighter line along the top of each letter; the text
+   itself is transparent, and its shadow, drawn over the fill half a pixel lower, is the letter, with a
+   second, dark shadow under it. Worked out on each label, so a key can change the colours (copper when
+   on, the card's metal on a tile). */
 html.theme-metal :is(.btn, .chip, .ab-btn, .fchip.add, .mini-btn, .tile-title, .tile-count, .eq-tab, .choice.sel, .shortcuts span) {
-  --mt-letter-fill: linear-gradient(var(--mt-cut-wall), var(--mt-cut-wall));
-  --mt-letter-cut: 0 1px 0 var(--mt-cut-floor), 0 1.75px 0 var(--mt-cut-lit);
+  --mt-letter-fill: linear-gradient(var(--mt-cut-hi), var(--mt-cut-hi));
+  --mt-letter-cut: 0 0.5px 0 var(--mt-cut-face), 0 1.5px 0 var(--mt-cut-shade);
 }
 html.theme-metal :is(.btn, .chip, .ab-btn, .fchip.add) {
   color: transparent;
@@ -125,7 +124,7 @@ html.theme-metal :is(.btn, .chip, .ab-btn, .fchip.add) {
 html.theme-metal :is(.btn, .chip, .ab-btn, .fchip.add, .mini-btn, .choice.sel) .ico { color: var(--mt-btn-text); filter: var(--mt-btn-glyph); }
 /* text buttons; the primary one's label is cut through to copper, and a key that is on has a copper inlay too */
 html.theme-metal .btn { height: 40px; padding: 0 22px; border-radius: var(--mt-r); font-family: var(--mt-ui); font-weight: 700; font-size: 13.5px; letter-spacing: 0.03em; text-shadow: var(--mt-letter-cut); }
-html.theme-metal :is(.btn:not(.ghost), .chip.on) { --mt-cut-wall: var(--mt-cut-wall-cu); --mt-cut-floor: var(--mt-cut-floor-cu); }
+html.theme-metal :is(.btn:not(.ghost), .chip.on) { --mt-cut-hi: var(--mt-cut-hi-cu); --mt-cut-face: var(--mt-cut-face-cu); }
 html.theme-metal :is(.btn:not(.ghost), .chip.on) .ico { color: var(--mt-btn-on); }
 html.theme-metal .chip.on { box-shadow: var(--mt-outline), var(--mt-btn-inlay), var(--mt-shadow-sm); }
 html.theme-metal .btn .ico { width: 17px; height: 17px; }
@@ -343,8 +342,8 @@ html.theme-metal .tile-title {
   position: relative; z-index: 1; font-family: var(--mt-label); font-weight: 700; font-size: 12.5px; letter-spacing: 0.035em; line-height: 1.25;
   text-transform: uppercase;
 }
-/* the names and counts are engraved in the card like the labels on the keys, in the card's own metal
-   (the .tile block in metal.tokens.css) */
+/* the names and counts are drawn like the labels on the keys, in the card's own metal (the .tile block
+   in metal.tokens.css) */
 html.theme-metal :is(.tile-title, .tile-count) {
   color: transparent; text-shadow: var(--mt-letter-cut); background: var(--mt-letter-fill);
   -webkit-background-clip: text; background-clip: text;
@@ -460,18 +459,17 @@ html.theme-metal .scan-fill { background: var(--mt-flow); }
 /* ---------- 10. equalizer ---------- */
 /* the tabs (on the band, and the lyrics / visualizer switch): a slot cut into the gunmetal with a graphite key in it */
 html.theme-metal .eq-tabs { background: color-mix(in srgb, var(--mt-gun-6) 85%, transparent); border: 0; border-radius: var(--mt-r); box-shadow: var(--mt-cut-dark); }
-/* the tabs' labels are engraved too: cut into the key on the open tab, and into the dark slot on the
-   others, where the groove's floor is a dim, lighter metal so the label still reads */
+/* the tabs' labels are drawn the same way: on the open tab's key, and dimmer on the dark slot */
 html.theme-metal .eq-tab {
   color: transparent; font-family: var(--mt-label); font-weight: 700; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; border-radius: var(--mt-r-sm);
   text-shadow: var(--mt-letter-cut); background: var(--mt-letter-fill);
   -webkit-background-clip: text; background-clip: text;
 }
 html.theme-metal .eq-tab:not(.active) {
-  --mt-cut-wall: var(--mt-void); --mt-cut-floor: color-mix(in srgb, var(--mt-text-dim) 50%, var(--mt-gun-6));
-  --mt-cut-lit: color-mix(in srgb, var(--mt-white) 9%, transparent);
+  --mt-cut-hi: color-mix(in srgb, var(--mt-text-dim) 70%, var(--mt-gun-6)); --mt-cut-face: color-mix(in srgb, var(--mt-text-dim) 60%, var(--mt-gun-6));
+  --mt-cut-shade: var(--mt-void);
 }
-html.theme-metal .eq-tab:not(.active):hover { --mt-cut-floor: color-mix(in srgb, var(--mt-text-dim) 75%, var(--mt-gun-6)); }
+html.theme-metal .eq-tab:not(.active):hover { --mt-cut-face: color-mix(in srgb, var(--mt-text-dim) 85%, var(--mt-gun-6)); }
 html.theme-metal .eq-tab-ink { background: var(--mt-btn-key); border-radius: var(--mt-r-sm); box-shadow: var(--mt-btn-raise), var(--mt-drop); }
 /* the graph: a dark display window set into the plate, in a polished frame */
 html.theme-metal .eq-graph {
@@ -534,7 +532,7 @@ html.theme-metal .choice.sel {
 }
 html.theme-metal .choice.sel .choice-ico { color: var(--mt-btn-text); }
 html.theme-metal .choice.sel .choice-check { color: var(--mt-btn-on); filter: var(--mt-btn-glyph); }
-html.theme-metal .choice.sel .choice-hint { color: color-mix(in srgb, var(--mt-btn-text) 75%, var(--mt-btn-3)); text-shadow: 0 1px 0 var(--mt-cut-lit); }
+html.theme-metal .choice.sel .choice-hint { color: color-mix(in srgb, var(--mt-btn-text) 80%, var(--mt-btn-2)); text-shadow: 0 1px 0 var(--mt-cut-shade); }
 html.theme-metal .choice-ico { color: var(--mt-ink-2); }
 html.theme-metal #volIco { color: var(--mt-text-dim); }
 html.theme-metal #volVal { color: var(--mt-text); }

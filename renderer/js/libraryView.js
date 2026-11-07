@@ -218,6 +218,7 @@ export class LibraryView {
     const content = this.resolve(node);
     const el = document.createElement('div');
     el.className = 'lib-page';
+    el.dataset.node = node.type; // which view this is, for the themes (Metal draws the Folders list as cards)
     const page = { node, content, el };
     if (content.kind === 'root') this._buildRoot(page);
     else if (content.kind === 'search') this._buildSearch(page);

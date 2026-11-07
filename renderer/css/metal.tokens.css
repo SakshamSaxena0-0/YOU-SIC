@@ -65,6 +65,8 @@ html.theme-metal {
   /* ---- the tile finishes: 0 the polished highlight, 1-3 the brushed face from light to shade, 4 the
      dark of the frame, 5 the icon's well, ink the name ---- */
   --mt-graphite-0: #8C8A85; --mt-graphite-1: #6A6964; --mt-graphite-2: #5C5B56; --mt-graphite-3: #4D4C48; --mt-graphite-4: #373634; --mt-graphite-5: #2A2927; --mt-graphite-ink: #DDD2C1;
+  /* magenta: anodised metal, for the cards of the Folders list (the user's choice) */
+  --mt-magenta-0: #E27DC2; --mt-magenta-1: #C04C9D; --mt-magenta-2: #A43483; --mt-magenta-3: #88276C; --mt-magenta-4: #5E1B4C; --mt-magenta-5: #421337; --mt-magenta-ink: #FBE3F2;
   --mt-silver-0: #F3F1EC;   --mt-silver-1: #D4D1CB;   --mt-silver-2: #C3C0B9;   --mt-silver-3: #ACA9A2;   --mt-silver-4: #84827D;   --mt-silver-5: #3A3936;   --mt-silver-ink: #F9F7F2;
   --mt-rosegold-0: #F8DED4; --mt-rosegold-1: #E0B6A8; --mt-rosegold-2: #CCA092; --mt-rosegold-3: #B3867A; --mt-rosegold-4: #86655B; --mt-rosegold-5: #4A3631; --mt-rosegold-ink: #FFF2EB;
   --mt-brass-0: #CFBA96;    --mt-brass-1: #A48F71;    --mt-brass-2: #8F7C61;    --mt-brass-3: #786750;    --mt-brass-4: #5A4D3C;    --mt-brass-5: #3A3126;    --mt-brass-ink: #F2D19B;
@@ -247,8 +249,9 @@ html.theme-metal.metal-dark {
 }
 
 /* the tokens that read a tile's own finish (--f0 to --f5, set per tile in css/metal.css), so they are
-   worked out on each tile rather than on the page */
-html.theme-metal .tile {
+   worked out on each tile rather than on the page. The folder cards of the Folders list are built like the
+   tiles, so they read the same tokens. */
+html.theme-metal :is(.tile, .lib-page[data-node='folders'] .row.item) {
   /* the dark cut round a tile's bay */
   --mt-bay-cut: 0 0 0 1px color-mix(in srgb, var(--f4) 65%, var(--mt-void));
   /* the names and counts are printed like the labels on the keys (see the lettering below), in the

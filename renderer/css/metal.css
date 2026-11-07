@@ -111,14 +111,14 @@ html.theme-metal .icon-btn:not(.lg):hover { background: var(--mt-btn-key); color
 html.theme-metal :is(.btn, .chip, .ab-btn, .fchip.add) { font-weight: 600; text-shadow: var(--mt-btn-letter); }
 html.theme-metal :is(.btn, .chip, .ab-btn, .fchip.add, .mini-btn, .choice.sel) .ico { color: var(--mt-btn-text); filter: var(--mt-btn-glyph); }
 /* text buttons; the primary one's label is copper, and a key that is on has a copper inlay too */
-html.theme-metal .btn { height: 40px; padding: 0 22px; border-radius: var(--mt-r); font-family: var(--mt-btn-font); font-size: 15px; letter-spacing: 0.03em; }
+html.theme-metal .btn { height: 40px; padding: 0 22px; border-radius: var(--mt-r); font-family: var(--mt-btn-font); font-size: 13.5px; letter-spacing: 0.03em; }
 html.theme-metal :is(.btn:not(.ghost), .chip.on) { color: var(--mt-btn-on); }
 html.theme-metal :is(.btn:not(.ghost), .chip.on) .ico { color: var(--mt-btn-on); }
 html.theme-metal .chip.on { box-shadow: var(--mt-outline), var(--mt-btn-inlay), var(--mt-shadow-sm); }
 html.theme-metal .btn .ico { width: 17px; height: 17px; }
-html.theme-metal .fchip.add { border-radius: var(--mt-r); font-family: var(--mt-btn-font); font-size: 13.5px; letter-spacing: 0.02em; }
+html.theme-metal .fchip.add { border-radius: var(--mt-r); font-family: var(--mt-btn-font); font-size: 12.5px; letter-spacing: 0.02em; }
 /* chips: small keys */
-html.theme-metal .chip { border-radius: var(--mt-r-sm); font-family: var(--mt-btn-font); font-size: 13.5px; }
+html.theme-metal .chip { border-radius: var(--mt-r-sm); font-family: var(--mt-btn-font); font-size: 12.5px; }
 /* their indicator: a small lamp set into the key that lights copper */
 html.theme-metal :is(.eq-toggles .chip:not(.preset-chip), .reverb-presets .chip)::after {
   background: var(--mt-btn-5); border-radius: 50%;
@@ -254,7 +254,7 @@ html.theme-metal .ab-fmt span, html.theme-metal .ab-fmt span:nth-child(n) {
   border-radius: var(--mt-r-sm); padding: 2px 8px; background: var(--mt-gun-6); color: var(--mt-text); box-shadow: var(--mt-cut-dark); border: 0; font-size: 10.5px;
 }
 html.theme-metal :is(.ab-foot, .ab-file) { color: var(--mt-text-dim); }
-html.theme-metal .ab-btn, html.theme-metal .ab-btn:nth-child(n) { height: 30px; border-radius: var(--mt-r-sm); font-family: var(--mt-btn-font); font-size: 13px; letter-spacing: 0.02em; text-shadow: var(--mt-btn-letter); }
+html.theme-metal .ab-btn, html.theme-metal .ab-btn:nth-child(n) { height: 30px; border-radius: var(--mt-r-sm); font-family: var(--mt-btn-font); font-size: 12px; letter-spacing: 0.02em; text-shadow: var(--mt-btn-letter); }
 /* the title block, printed into the plate */
 html.theme-metal #plTitle { font-size: 34px; line-height: 1.1; }
 html.theme-metal .pl-artist { color: var(--mt-ink-2); font-weight: 700; font-size: 15px; letter-spacing: 0.01em; text-shadow: var(--mt-engrave); }
@@ -276,7 +276,7 @@ html.theme-metal .seek-bubble { background: var(--mt-slab-dark); color: var(--mt
 html.theme-metal .mini-btn { color: var(--mt-btn-text); position: relative; background: var(--mt-btn-key); box-shadow: var(--mt-btn-raise), var(--mt-drop); text-shadow: var(--mt-btn-letter); }
 html.theme-metal .app.vol-inline .mini-btn { position: absolute; }
 html.theme-metal .mini-btn:hover { filter: brightness(1.12); box-shadow: var(--mt-btn-raise), var(--mt-shadow-sm); }
-html.theme-metal .mini-btn .pl-cat-label { color: inherit; text-shadow: inherit; font-family: var(--mt-btn-font); font-weight: 600; font-size: 11px; letter-spacing: 0.1em; }
+html.theme-metal .mini-btn .pl-cat-label { color: inherit; text-shadow: inherit; font-family: var(--mt-btn-font); font-weight: 600; font-size: 10px; letter-spacing: 0.1em; }
 
 /* ---------- 9. library ---------- */
 html.theme-metal .lib-title { font-size: 30px; color: var(--mt-text); text-shadow: var(--mt-emboss); }
@@ -323,7 +323,7 @@ html.theme-metal .tile.lg::before {
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--f4) 55%, var(--mt-void)), inset 0 0 0 1px color-mix(in srgb, var(--mt-void) 18%, transparent);
 }
 html.theme-metal .tile-title {
-  position: relative; z-index: 1; font-family: var(--mt-btn-font); font-weight: 600; font-size: 14.5px; letter-spacing: 0.05em; line-height: 1.15;
+  position: relative; z-index: 1; font-family: var(--mt-btn-font); font-weight: 600; font-size: 13px; letter-spacing: 0.05em; line-height: 1.15;
   text-transform: uppercase;
 }
 /* the names and counts are printed like the labels on the keys, in the ink of the card's own metal
@@ -340,7 +340,7 @@ html.theme-metal .tile-ico {
 }
 html.theme-metal .tile-ico .ico { width: 17px; height: 17px; filter: drop-shadow(0 1px 0 color-mix(in srgb, var(--mt-void) 45%, transparent)); }
 html.theme-metal .tile .tile-count {
-  top: 14px; right: 16px; font-family: var(--mt-btn-font); letter-spacing: 0.02em; font-size: 14.5px; font-weight: 600; line-height: 1.25; opacity: 1;
+  top: 14px; right: 16px; font-family: var(--mt-btn-font); letter-spacing: 0.02em; font-size: 13px; font-weight: 600; line-height: 1.25; opacity: 1;
 }
 /* the finishes, in the order of the tiles (Folders, Folders Hierarchy, All Songs, Albums, Artists, Album
    Artists, Genres, Years, Composers, Playlists, Queue, Recently Added, Recently Played, Most Played,
@@ -442,7 +442,7 @@ html.theme-metal .scan-fill { background: var(--mt-flow); }
 html.theme-metal .eq-tabs { background: color-mix(in srgb, var(--mt-gun-6) 85%, transparent); border: 0; border-radius: var(--mt-r); box-shadow: var(--mt-cut-dark); }
 /* the tabs' labels are printed like the keys': on the open tab's key, and dimmer on the dark slot */
 html.theme-metal .eq-tab {
-  color: color-mix(in srgb, var(--mt-text-dim) 60%, var(--mt-gun-6)); font-family: var(--mt-btn-font); font-weight: 600; font-size: 12.5px; letter-spacing: 0.1em;
+  color: color-mix(in srgb, var(--mt-text-dim) 60%, var(--mt-gun-6)); font-family: var(--mt-btn-font); font-weight: 600; font-size: 11.5px; letter-spacing: 0.1em;
   text-transform: uppercase; border-radius: var(--mt-r-sm); text-shadow: var(--mt-btn-letter);
 }
 html.theme-metal .eq-tab:hover { color: color-mix(in srgb, var(--mt-text-dim) 85%, var(--mt-gun-6)); }

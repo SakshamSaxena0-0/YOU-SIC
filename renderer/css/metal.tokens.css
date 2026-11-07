@@ -90,6 +90,11 @@ html.theme-metal {
      saturated velvet forest green bottom right, the satin-sage of the bezel's razor-thin reflection
      (#2A5A44, the user's), and the near-black green inside a cut */
   --mt-emerald-satin: #93A39A; --mt-emerald-velvet: #052A17; --mt-emerald-sage: #2A5A44; --mt-emerald-etch: #03120A;
+  /* coffee brown: the same milled plate in coffee, for the Folders list (the user's choice): 1 the coffee
+     itself, falling to a deep, saturated espresso (velvet); a warm satin sheen, a warm light on the bezel,
+     warm cream metal inside a cut and a near-black brown shadow in it */
+  --mt-coffee-0: #9A8574;   --mt-coffee-1: #6F4E37;   --mt-coffee-2: #573C2A;   --mt-coffee-3: #432D1F;   --mt-coffee-4: #2E1F15;   --mt-coffee-5: #1C130D;   --mt-coffee-ink: #D8CABB;
+  --mt-coffee-hi: #C9A98A;  --mt-coffee-satin: #ADA196; --mt-coffee-velvet: #2B170B; --mt-coffee-sage: #7A5A44; --mt-coffee-etch: #140B06;
   --mt-royal-0: #6F8CF5;    --mt-royal-1: #2E55EE;    --mt-royal-2: #1A3FE0;    --mt-royal-3: #1534C4;    --mt-royal-4: #0E2590;    --mt-royal-5: #08185A;    --mt-royal-ink: #EEF2FF;
 
   /* ---- light ---- */
@@ -269,40 +274,44 @@ html.theme-metal {
   --mt-fold-card-a: 1;
 }
 /* the library's buttons (the category tiles), after the user's two specs: heavy milled plates of emerald
-   brushed metal, set into the chassis, with everything on them engraved (concave, never raised). */
-html.theme-metal {
+   brushed metal, set into the chassis, with everything on them engraved (concave, never raised). The
+   Folders list's plates are built the same way in coffee brown. So these are worked out on each plate, in
+   its own metal: --f0 to --f5 and --f-ink, and its accents --f-satin (the sheen), --f-velvet (the depth),
+   --f-sage (the bezel's reflection), --f-etch (the shadow in a cut) and --f-hi (the light on a bezel),
+   set in css/metal.css. */
+html.theme-metal :is(.tile, .lib-page[data-node='folders'] .row.item) {
   /* the seat: a hairline where the chassis falls into shade above the button and catches the light below */
   --mt-em-seat: 0 -1px 0 color-mix(in srgb, var(--mt-void) 30%, transparent),
     0 1px 0 color-mix(in srgb, var(--mt-white) calc(10% + 35% * var(--mt-lit)), transparent);
   /* the bezel, layer 1: a crisp 1px outer frame a little darker than the chassis round it */
   --mt-em-frame: color-mix(in srgb, var(--mt-alu-4) 72%, var(--mt-void));
   /* layer 2, the chamfer (the plate's 1px border): bright satin top left, falling to velvet bottom right */
-  --mt-em-chamfer: linear-gradient(135deg, color-mix(in srgb, var(--mt-emerald-satin) 70%, var(--mt-emerald-sage)), var(--mt-emerald-sage) 30%,
-    color-mix(in srgb, var(--mt-emerald-sage) 40%, var(--mt-emerald-velvet)) 62%, color-mix(in srgb, var(--mt-emerald-velvet) 70%, var(--mt-void)));
+  --mt-em-chamfer: linear-gradient(135deg, color-mix(in srgb, var(--f-satin) 70%, var(--f-sage)), var(--f-sage) 30%,
+    color-mix(in srgb, var(--f-sage) 40%, var(--f-velvet)) 62%, color-mix(in srgb, var(--f-velvet) 70%, var(--mt-void)));
   /* layer 3, just inside the chamfer: a razor-thin reflection along the top and left, the user's satin-sage
      lifted with the satin silver so it stays lighter than the face even where the sheen is brightest; the
      face's lower edge in shade, and its edges rolling softly away (a slight pillow) */
-  --mt-em-face: inset 1px 1px 0 color-mix(in srgb, color-mix(in srgb, var(--mt-emerald-sage) 45%, var(--mt-emerald-satin)) 55%, transparent),
-    inset 0 -1px 0 color-mix(in srgb, var(--mt-emerald-etch) 45%, transparent),
+  --mt-em-face: inset 1px 1px 0 color-mix(in srgb, color-mix(in srgb, var(--f-sage) 45%, var(--f-satin)) 55%, transparent),
+    inset 0 -1px 0 color-mix(in srgb, var(--f-etch) 45%, transparent),
     inset 0 0 8px color-mix(in srgb, var(--mt-void) 18%, transparent);
   --mt-em-pressed: inset 0 2px 6px color-mix(in srgb, var(--mt-void) 45%, transparent);
   /* the face: metallic light from the top left, a satin-silver sheen falling to velvet forest green */
-  --mt-em-sheen: radial-gradient(90% 120% at 0% 0%, color-mix(in srgb, var(--mt-emerald-satin) 24%, transparent), transparent 60%);
+  --mt-em-sheen: radial-gradient(90% 120% at 0% 0%, color-mix(in srgb, var(--f-satin) 24%, transparent), transparent 60%);
   /* the fine horizontal brushing, about 2%, blended into the gradient (a static tile, drawn once; the rest
      of the theme stays unbrushed) */
   --mt-em-brush: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='120'><filter id='n' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='0.004 1.3' numOctaves='2' seed='13' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  2.4 0 0 0 -1.2'/></filter><filter id='m' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='0.004 1.3' numOctaves='2' seed='13' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -2.4 0 0 0 1.2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/><rect width='100%25' height='100%25' filter='url(%23m)' opacity='0.045'/></svg>") 0 0 / 400px 120px;
   /* the lettering, etched: raw silver-green metal in the cut, a crisp 1px near-black green shadow along the
      top of each cut, and a faint lip of light along its bottom */
-  --mt-em-text: color-mix(in srgb, var(--mt-emerald-ink) 88%, var(--mt-emerald-1));
-  --mt-em-engrave: 0 -1px 0 color-mix(in srgb, var(--mt-emerald-etch) 88%, transparent),
-    0 1px 0 color-mix(in srgb, var(--mt-emerald-hi) 26%, transparent);
-  --mt-em-glyph: drop-shadow(0 -1px 0 color-mix(in srgb, var(--mt-emerald-etch) 85%, transparent))
-    drop-shadow(0 1px 0 color-mix(in srgb, var(--mt-emerald-hi) 24%, transparent));
+  --mt-em-text: color-mix(in srgb, var(--f-ink) 88%, var(--f1));
+  --mt-em-engrave: 0 -1px 0 color-mix(in srgb, var(--f-etch) 88%, transparent),
+    0 1px 0 color-mix(in srgb, var(--f-hi) 26%, transparent);
+  --mt-em-glyph: drop-shadow(0 -1px 0 color-mix(in srgb, var(--f-etch) 85%, transparent))
+    drop-shadow(0 1px 0 color-mix(in srgb, var(--f-hi) 24%, transparent));
   /* the icon's well, stamped into the plate (concave): a crisp dark edge and a soft depth shadow along its
      top and left inner walls, and a 1px line of light on its bottom inner edge, the chiselled lip */
-  --mt-em-well: inset 1px 1px 0 color-mix(in srgb, var(--mt-emerald-etch) 90%, transparent),
-    inset 3px 3px 4px -2px color-mix(in srgb, var(--mt-emerald-etch) 75%, transparent),
-    inset 0 -1px 0 color-mix(in srgb, var(--mt-emerald-hi) 50%, transparent);
+  --mt-em-well: inset 1px 1px 0 color-mix(in srgb, var(--f-etch) 90%, transparent),
+    inset 3px 3px 4px -2px color-mix(in srgb, var(--f-etch) 75%, transparent),
+    inset 0 -1px 0 color-mix(in srgb, var(--f-hi) 50%, transparent);
 }
 html.theme-metal :is(.tile, .lib-page[data-node='folders'] .row.item) {
   /* the dark cut round a tile's bay */

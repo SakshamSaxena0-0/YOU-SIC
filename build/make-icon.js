@@ -104,9 +104,45 @@ for (let y = 0; y < S; y++) for (let x = 0; x < S; x++) {
 const crcT = new Int32Array(256).map((_, n) => { let c = n; for (let j = 0; j < 8; j++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; return c; });
 const crc = (buf) => { let c = -1; for (const v of buf) c = crcT[(c ^ v) & 255] ^ (c >>> 8); return (c ^ -1) >>> 0; };
 const chunk = (t, d) => { const l = Buffer.alloc(4); l.writeUInt32BE(d.length); const td = Buffer.concat([Buffer.from(t), d]); const c = Buffer.alloc(4); c.writeUInt32BE(crc(td)); return Buffer.concat([l, td, c]); };
-const raw = Buffer.alloc(S * (S * 4 + 1));
-for (let y = 0; y < S; y++) { raw[y * (S * 4 + 1)] = 0; px.copy(raw, y * (S * 4 + 1) + 1, y * S * 4, (y + 1) * S * 4); }
-const ihdr = Buffer.alloc(13); ihdr.writeUInt32BE(S, 0); ihdr.writeUInt32BE(S, 4); ihdr[8] = 8; ihdr[9] = 6;
+const png = (buf, n) => {
+  const raw = Buffer.alloc(n * (n * 4 + 1));
+  for (let y = 0; y < n; y++) { raw[y * (n * 4 + 1)] = 0; buf.copy(raw, y * (n * 4 + 1) + 1, y * n * 4, (y + 1) * n * 4); }
+  const ihdr = Buffer.alloc(13); ihdr.writeUInt32BE(n, 0); ihdr.writeUInt32BE(n, 4); ihdr[8] = 8; ihdr[9] = 6;
+  return Buffer.concat([Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]), chunk('IHDR', ihdr), chunk('IDAT', zlib.deflateSync(raw, { level: 9 })), chunk('IEND', Buffer.alloc(0))]);
+};
+// a smaller copy, each pixel the exact (alpha-weighted) average of the area it covers
+const shrink = (n) => {
+  const k = S / n, pre = new Float64Array(S * S * 4);
+  for (let i = 0; i < S * S; i++) { const a = px[i * 4 + 3] / 255; pre[i * 4] = px[i * 4] * a; pre[i * 4 + 1] = px[i * 4 + 1] * a; pre[i * 4 + 2] = px[i * 4 + 2] * a; pre[i * 4 + 3] = a; }
+  const weights = (o) => { const w = []; const a = o * k, b = a + k; for (let s = Math.floor(a); s < Math.ceil(b); s++) w.push([s, Math.min(b, s + 1) - Math.max(a, s)]); return w; };
+  const out = Buffer.alloc(n * n * 4);
+  for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) {
+    const acc = [0, 0, 0, 0];
+    for (const [sy, wy] of weights(y)) for (const [sx, wx] of weights(x)) { const j = (sy * S + sx) * 4, w = wx * wy; for (let c = 0; c < 4; c++) acc[c] += pre[j + c] * w; }
+    const a = acc[3] / (k * k), o = (y * n + x) * 4;
+    out[o + 3] = Math.round(a * 255);
+    for (let c = 0; c < 3; c++) out[o + c] = a ? Math.round(clamp(acc[c] / acc[3] / 255) * 255) : 0;
+  }
+  return out;
+};
+
 const out = process.argv[2] || path.join(__dirname, 'icon.png');
-fs.writeFileSync(out, Buffer.concat([Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]), chunk('IHDR', ihdr), chunk('IDAT', zlib.deflateSync(raw, { level: 9 })), chunk('IEND', Buffer.alloc(0))]));
+fs.writeFileSync(out, png(px, S));
 console.log('written', out);
+// the Windows icon (the exe, the shortcut, the taskbar): every size Windows asks for, each a PNG, so the
+// build uses it as it is
+if (!process.argv[2]) {
+  const sizes = [256, 128, 64, 48, 40, 32, 24, 20, 16];
+  const imgs = sizes.map((n) => png(shrink(n), n));
+  const head = Buffer.alloc(6); head.writeUInt16LE(0, 0); head.writeUInt16LE(1, 2); head.writeUInt16LE(sizes.length, 4);
+  let off = 6 + 16 * sizes.length;
+  const dir = sizes.map((n, i) => {
+    const e = Buffer.alloc(16);
+    e[0] = n >= 256 ? 0 : n; e[1] = n >= 256 ? 0 : n; e.writeUInt16LE(1, 4); e.writeUInt16LE(32, 6);
+    e.writeUInt32LE(imgs[i].length, 8); e.writeUInt32LE(off, 12); off += imgs[i].length;
+    return e;
+  });
+  const ico = path.join(__dirname, 'icon.ico');
+  fs.writeFileSync(ico, Buffer.concat([head, ...dir, ...imgs]));
+  console.log('written', ico);
+}

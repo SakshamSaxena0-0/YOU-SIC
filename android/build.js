@@ -81,8 +81,8 @@ fs.copyFileSync(path.join(ROOT, 'build', 'icon.png'), path.join(www, 'build', 'i
 // the Android copy of index.html: a phone viewport, then window.pa (pa-android.js) and android.css before anything else
 const indexFile = path.join(www, 'renderer', 'index.html');
 let html = fs.readFileSync(indexFile, 'utf8');
-const boot = '<script src="js/boot.js"></script>';
-if (!html.includes(boot)) throw new Error('index.html: boot.js tag not found');
+const boot = '<link rel="stylesheet" href="css/app.css">';
+if (!html.includes(boot)) throw new Error('index.html: app.css link not found');
 html = html.replace('<meta charset="utf-8">', '<meta charset="utf-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">')
   .replace(boot, '<script src="../android/pa-android.js"></script>\n  <link rel="stylesheet" href="../android/android.css">\n  ' + boot);
 fs.writeFileSync(indexFile, html);

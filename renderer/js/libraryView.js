@@ -42,8 +42,6 @@ export class LibraryView {
     $('#libShuffle').onclick = () => this.shuffleCurrent();
     $('#libPlay').onclick = () => this.playCurrent();
     $('#libMenu').onclick = (e) => this.listOptions(e.currentTarget);
-    // the root page's "Recently played" shelf follows playback (the previous track is counted on change)
-    this.player.addEventListener('track', () => setTimeout(() => this._refreshShelf(), 300));
 
     this.player.addEventListener('track', () => this._markPlaying());
     this.player.addEventListener('queue', () => { if (this.top?.node.type === 'queue') this.refresh(); });
@@ -173,13 +171,6 @@ export class LibraryView {
     const reduce = this.store.settings.reduceMotion || !animate;
     if (reduce) { from.style.display = 'none'; done && done(); return; }
     const ease = 'cubic-bezier(.22,.9,.25,1)';
-    // Y2K theme: a short 24px slide, the new page blurring in
-    if (document.documentElement.classList.contains('theme-subway')) {
-      from.animate([{ transform: 'none', opacity: 1 }, { transform: `translateX(${-dir * 24}px)`, opacity: 0 }], { duration: 220, easing: 'ease-out' })
-        .finished.then(() => { if (dir > 0) from.style.display = 'none'; done && done(); });
-      to.animate([{ transform: `translateX(${dir * 24}px)`, opacity: 0, filter: 'blur(6px)' }, { transform: 'none', opacity: 1, filter: 'blur(0)' }], { duration: 220, easing: 'ease-out' });
-      return;
-    }
     from.animate([{ transform: 'translateX(0)', opacity: 1 }, { transform: `translateX(${-dir * 28}%)`, opacity: 0 }], { duration: 340, easing: ease })
       .finished.then(() => { if (dir > 0) from.style.display = 'none'; done && done(); });
     to.animate([{ transform: `translateX(${dir * 40}%)`, opacity: 0 }, { transform: 'translateX(0)', opacity: 1 }], { duration: 380, easing: ease });
@@ -237,7 +228,6 @@ export class LibraryView {
         <span class="tile-title">${esc(it.title)}</span>
         <span class="tile-count">${it.count ?? ''}</span>
       </button>`).join('')}</div>
-      ${empty ? '' : this._statsHtml()}
       ${empty ? `<div class="empty-lib">${icon('library')}<h3>Your library is empty</h3><p>Add a folder with music to get started.</p><button class="btn lg" data-lg="static" id="emptyAdd">Add Music Folder</button></div>` : ''}
       <div class="folder-strip">${this.store.folders.map((f) => `<span class="fchip" title="${esc(f)}">${icon('folder')}${esc(f)}</span>`).join('')}
         <button class="fchip add lg" data-lg="static" id="rootAdd">${icon('add')}Add folder</button><button class="fchip add lg" data-lg="static" id="rootRescan">${icon('refresh')}Rescan</button></div>
@@ -246,44 +236,9 @@ export class LibraryView {
     el.onclick = (e) => {
       const b = e.target.closest('.tile');
       if (b) this.push(content.items[+b.dataset.i].node);
-      const sh = e.target.closest('.shelf-item');
-      if (sh) {
-        const recent = this.store.recentlyPlayed();
-        this.player.playList(recent, +sh.dataset.i, { title: 'Recently Played', node: { type: 'recentlyPlayed', title: 'Recently Played' } });
-      }
       if (e.target.closest('#emptyAdd, #rootAdd')) this.app.addFolder();
       if (e.target.closest('#rootRescan')) this.app.rescan(true);
     };
-  }
-
-  // Library stats (computed from the real library) and a shelf of the six most recently played covers.
-  // Shown by the Y2K theme (css/subway.css §11); hidden in the others.
-  _statsHtml() {
-    const ts = this.store.tracks;
-    const secs = ts.reduce((a, t) => a + (t.duration || 0), 0);
-    const bytes = ts.reduce((a, t) => a + (t.size || 0), 0);
-    const h = Math.floor(secs / 3600), m = Math.floor((secs % 3600) / 60);
-    const time = h ? `${h}h ${m}m` : `${m}m`;
-    const size = bytes >= 1e9 ? `${(bytes / 1e9).toFixed(1)} GB` : `${Math.max(1, Math.round(bytes / 1e6))} MB`;
-    return `<div class="lib-stats">
-        <span class="stat"><b>TRACKS</b>${ts.length}</span><span class="stat"><b>TIME</b>${time}</span><span class="stat"><b>SIZE</b>${size}</span>
-      </div>
-      <div class="shelf"><div class="sec-title">Recently played</div><div class="shelf-row">${this._shelfItems()}</div></div>`;
-  }
-
-  _shelfItems() {
-    const recent = this.store.recentlyPlayed().slice(0, 6);
-    if (!recent.length) return '<div class="shelf-empty">Songs you play show up here</div>';
-    return recent.map((t, i) => {
-      const url = coverUrl(t.cover, true);
-      return `<button class="shelf-item" data-i="${i}" title="${esc(t.title)}${t.artist ? ' · ' + esc(t.artist) : ''}">
-        <span class="it-art${url ? '' : ' ph'}" ${url ? `style="background-image:url('${url}')"` : ''}>${url ? '' : icon('music_note')}</span></button>`;
-    }).join('');
-  }
-
-  _refreshShelf() {
-    const row = this.stack[0]?.el.querySelector('.shelf-row');
-    if (row) { row.innerHTML = this._shelfItems(); hydrateIcons(row); }
   }
 
   _tracksOf(page) { return page.content.tracks || []; }

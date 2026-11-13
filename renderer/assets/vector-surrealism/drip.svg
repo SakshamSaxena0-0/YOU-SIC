@@ -1,5 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 24" preserveAspectRatio="none">
-  <!-- Vector Surrealism: a melting bottom edge (original artwork). Used as a CSS mask: the strip
-       hangs under a card in the card's own colour, so the card looks like it is dripping. -->
-  <path fill="#000" d="M0 0H240V6C232 6 230 10 226 10C222 10 222 6 214 6C200 6 198 20 190 20C182 20 182 6 168 6C156 6 154 12 148 12C142 12 142 6 128 6C116 6 114 24 104 24C94 24 94 6 82 6C70 6 70 13 64 13C58 13 58 6 46 6C34 6 34 17 26 17C18 17 18 6 8 6H0Z"/>
-</svg>

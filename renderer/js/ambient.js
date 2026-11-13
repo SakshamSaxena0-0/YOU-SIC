@@ -103,7 +103,7 @@ export class Ambient {
     const g = {
       w: t ? t.offsetWidth : 0, h: t ? t.offsetHeight : 0, f: edge ? edge.box.offsetWidth : 0,
       tb: css(document.documentElement, '--tb'), bb: this.wrap ? css(this.wrap, '--bb') : 0,
-      band: document.documentElement.classList.contains('theme-metal') ? css(document.documentElement, '--mt-band-h') : 0,
+      band: 0, // a band over the plate (no theme has one now)
     };
     g.key = [g.w, g.h, g.f, g.tb, g.bb, g.band].map(Math.round).join();
     return g;

@@ -359,16 +359,14 @@ export class EqView {
     const padT = 26, padB = 26;
     const ih = h - padT - padB;
     const y = (db) => padT + ih / 2 - (db / (RANGE + 3)) * ih / 2;
-    // grid: cyan HUD lines (cyberpunk), faint teal lines (subway)
-    const cl = document.documentElement.classList;
-    const cy = cl.contains('theme-cyber'), sw = cl.contains('theme-subway');
-    g.strokeStyle = cy ? 'rgba(0,240,255,0.14)' : sw ? 'rgba(150,225,210,0.1)' : 'rgba(255,255,255,0.06)';
+    // grid: faint lines
+    g.strokeStyle = 'rgba(255,255,255,0.06)';
     g.lineWidth = 1;
     for (const db of [-12, -6, 0, 6, 12]) {
       g.beginPath(); g.moveTo(0, y(db)); g.lineTo(w, y(db)); g.stroke();
     }
-    g.fillStyle = cy ? 'rgba(0,240,255,0.55)' : sw ? 'rgba(170,230,218,0.5)' : 'rgba(255,255,255,0.25)';
-    g.font = cy ? '10px "JetBrains Mono", monospace' : sw ? 'bold 10px Arial, sans-serif' : '10px "Segoe UI", sans-serif';
+    g.fillStyle = 'rgba(255,255,255,0.25)';
+    g.font = '10px "Segoe UI", sans-serif';
     for (const db of [-12, 0, 12]) g.fillText((db > 0 ? '+' : '') + db, 4, y(db) - 3);
     // response
     const total = new Float32Array(this.freqs.length);

@@ -10,7 +10,6 @@ import { VisView } from './visView.js';
 import { LyricsView } from './lyricsView.js';
 import { toast, menuAt, openSheet, closeSheet, chooser, closeMenu } from './ui.js';
 import { liquidAll, watchLiquid, refreshLiquid } from './liquidGlass.js';
-import { initVsWorld } from './vsWorld.js';
 import { MiniLink } from './miniLink.js';
 
 class App {
@@ -38,7 +37,6 @@ class App {
     installRipples();
     this._bindWindow();
     this._bindTooltips();
-    initVsWorld();
     matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', () => this._applyLook());
     await this.store.init();
     const s = this.store.settings;
@@ -92,7 +90,7 @@ class App {
     if (!this.player.track) this.playerView.refreshColors();
     // refresh the library in the background (incremental: only changed files are re-read)
     if (this.store.folders.length) this.rescan(false, !this.store.tracks.length);
-    requestAnimationFrame(() => { this.root.classList.add('ready'); document.documentElement.classList.remove('boot-y2k'); });
+    requestAnimationFrame(() => this.root.classList.add('ready'));
     // background window: pause looping decorations (see .idle in app.css)
     const idle = () => document.documentElement.classList.toggle('idle', !document.hasFocus());
     addEventListener('blur', idle);
@@ -476,16 +474,14 @@ class App {
   }
 
   // ---------- look ----------
-  // glass is the default look; every other theme (cyber, subway, pixel, vector-surrealism, liminal, midnight, metal) is solid: no wallpaper, glass or refraction
+  // Liquid Glass is the only theme (store.js THEMES); solidTheme stays for a theme without glass
   get theme() { return THEMES.includes(this.store.settings.theme) ? this.store.settings.theme : 'glass'; }
   get solidTheme() { return this.theme !== 'glass'; }
   // Liquid Glass's Brutal mood: the same glass in black and white (brutal.css, html.glass-brutal)
   get brutal() { return this.theme === 'glass' && this.store.settings.glassMood !== 'clear'; }
   // no borders between the columns: the cover dissolves into its own light (css/seamless.css, ambient.js).
-  // Liquid Glass's Brutal mood and Metal
-  get seamless() { return this.brutal || this.theme === 'metal'; }
-  // Metal's dark mode (Settings > Mode): the same faceplate in dark brushed steel (html.metal-dark)
-  get metalDark() { return this.theme === 'metal' && this.store.settings.metalMode === 'dark'; }
+  // Liquid Glass's Brutal mood
+  get seamless() { return this.brutal; }
 
   // Reduce effects is on when the user turned it on, or (until they choose) when Windows asks for less motion.
   get reduceEffects() {
@@ -497,12 +493,10 @@ class App {
     const s = this.store.settings;
     const theme = this.theme, solid = this.solidTheme;
     const html0 = document.documentElement;
-    try { localStorage.setItem('pr-theme', theme); } catch {} // read by boot.js for the splash
     if (!html0.classList.contains('theme-' + theme)) {
       THEMES.forEach((t) => html0.classList.toggle('theme-' + t, t === theme));
       html0.classList.toggle('theme-solid', solid);
       this.playerView.wave.setTheme(theme);
-      this.playerView.refreshFx();
       this.playerView.ambient.refit(); // each theme shapes the cover's light its own way (ambient.js light)
       refreshLiquid();
       requestAnimationFrame(() => this._fitVolBar()); // each theme sizes and spaces the controls its own way
@@ -531,10 +525,6 @@ class App {
     if (html.classList.contains('seamless') !== this.seamless) {
       html.classList.toggle('seamless', this.seamless);
       this.playerView.refreshColors();
-    }
-    if (html.classList.contains('metal-dark') !== this.metalDark) {
-      html.classList.toggle('metal-dark', this.metalDark);
-      this.playerView.wave.setTheme(theme); // the seekbar is drawn in the plate's colours
     }
     if (!s.dynamicAccent && !solid && !brutal) {
       const rgb = hexToRgb(s.accent);
@@ -679,10 +669,6 @@ class App {
         <div class="range-wrap"><input type="range" min="0" max="12" step="1" value="${s.crossfade}" data-r="crossfade" style="--p:${(s.crossfade / 12) * 100}%"><span class="rv">${s.crossfade}s</span></div></div>
       ${tog('resume', 'Resume playback on start', 'Restore the last track, list and position')}
       <div class="set-sec">Look and Feel</div>
-      ${pick('theme', 'Theme', 'Liquid Glass: clear glass over your wallpaper. Cyberpunk: neon HUD. Y2K Subway: dim teal, chrome and glass. Pixel: a retro 90s desktop in pixel art. Vector Surrealism: dark fantasy as a surreal vector poster. Liminal: a vintage dream, sunset over the clouds on old film. Midnight: a city at 3 a.m., dark polished gunmetal and cold cyan light. Metal: a hi-fi faceplate of satin aluminium, graphite tiles and keys, copper accents', [['glass', 'Liquid Glass'], ['cyber', 'Cyberpunk'], ['subway', 'Y2K Subway'], ['pixel', 'Pixel'], ['vector-surrealism', 'Vector Surrealism'], ['liminal', 'Liminal'], ['midnight', 'Midnight'], ['metal', 'Metal']])}
-      <div class="metal-only">
-      ${pick('metalMode', 'Mode', 'Light: satin aluminium under a gunmetal band. Dark: the same faceplate in dark satin steel', [['light', 'Light'], ['dark', 'Dark']])}
-      </div>
       <div class="glass-only">
       ${pick('glassMood', 'Mood', 'Brutal: black and white, deep darkness, hard white light and heavy type. Clear: clear glass tinted by the album art', [['brutal', 'Brutal'], ['clear', 'Clear']])}
       <div class="clear-only">

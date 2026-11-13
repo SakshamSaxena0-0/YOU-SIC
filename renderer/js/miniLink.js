@@ -37,7 +37,7 @@ export class MiniLink {
   _look() {
     const h = document.documentElement, vars = {};
     for (const n of h.style) if (n.startsWith('--')) vars[n] = h.style.getPropertyValue(n);
-    const cls = [...h.classList].filter((c) => !['idle', 'app-wide', 'app-side-on', 'glass-window', 'boot-y2k'].includes(c)).join(' ');
+    const cls = [...h.classList].filter((c) => !['idle', 'app-wide', 'app-side-on', 'glass-window'].includes(c)).join(' ');
     return { cls, vars };
   }
 

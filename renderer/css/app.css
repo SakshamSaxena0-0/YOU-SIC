@@ -97,6 +97,8 @@ input { font: inherit; color: inherit; }
   box-shadow: 0 0 12px var(--acc-mid), inset 0 1px 1px rgba(255, 255, 255, 0.6);
 }
 .tb-title { font-size: 11px; font-weight: 700; color: var(--dimmer); letter-spacing: 2.2px; text-transform: uppercase; }
+/* the app's name (YouSic) as it is written, never forced to capitals (the user's rule), whatever the theme */
+.titlebar .tb-drag .tb-title { text-transform: none; }
 .tb-buttons { display: flex; -webkit-app-region: no-drag; }
 .tb-btn { width: 46px; height: var(--tb); display: grid; place-items: center; color: var(--dim); transition: background 0.15s, color 0.15s; }
 .tb-btn svg { width: 10px; height: 10px; stroke: currentColor; stroke-width: 1.1; fill: none; }

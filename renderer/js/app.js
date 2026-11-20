@@ -12,6 +12,11 @@ import { toast, menuAt, openSheet, closeSheet, chooser, closeMenu } from './ui.j
 import { liquidAll, watchLiquid, refreshLiquid } from './liquidGlass.js';
 import { MiniLink } from './miniLink.js';
 
+// A soft spring (damping 0.92, 0.7 s): it sets off quickly and settles without a bounce. Used for the moves of
+// the view transitions (App._vtMoves).
+const SPRING = 'linear(0, 0.0194, 0.0683, 0.1355, 0.2127, 0.2938, 0.3747, 0.4524, 0.5252, 0.5919, 0.6522, 0.7058, 0.7529, 0.794, 0.8294, 0.8596, 0.8853, 0.907, 0.925, 0.9401, 0.9525, 0.9626, 0.9709, 0.9776, 0.9829, 0.9872, 0.9905, 0.9932, 0.9952, 0.9968, 0.9979, 0.9988, 0.9994, 0.9999, 1.0002, 1.0004, 1.0005, 1.0006, 1.0006, 1.0006, 1)';
+const SPRING_MS = 700;
+
 class App {
   constructor() {
     this.store = new Store();
@@ -197,6 +202,8 @@ class App {
       stop();
       if (this._fullWant !== on || on === (this._fullTo ?? this.full)) return;
       this._fullTo = on;
+      // which way it goes (css: html.vt-out, the light beside the cover fades out on the way out)
+      document.documentElement.classList.toggle('vt-out', !on);
       this._viewMorph('vt-full', () => { this._fullTo = undefined; this._setFull(on); });
     };
     const screenSized = () => innerWidth >= screen.width - 2 && innerHeight >= screen.height - 2;
@@ -206,7 +213,7 @@ class App {
     this._fullT = setTimeout(go, 450);
   }
 
-  // A change shown as a view transition (css: html.vt-full, html.vt-fit): the cover moves and resizes from
+  // A change shown as a view transition (css: html.vt-full): the cover moves and resizes from
   // where it was to where it goes while the rest cross-fades, and the panels stay above the cover the whole
   // way. The browser does the moving (no script per frame). Reduce animations, or no support, just switches.
   _viewMorph(cls, change) {
@@ -217,11 +224,40 @@ class App {
     const vt = document.startViewTransition(change);
     this._vt = vt;
     this._vtCls = cls;
+    vt.ready.then(() => this._vtMoves()).catch(() => {});
     vt.finished.finally(() => {
       if (this._vt !== vt) return;
       html.classList.remove(cls);
       this._vt = null;
     });
+  }
+
+  // The browser moves a box whose size changes by animating its width and height, which the page has to
+  // work out again on every frame, so anything else the page does meanwhile shows as a stutter. Each such
+  // move is played instead as a move and scale only, from where and how big the box was to where it is now,
+  // which the graphics card plays by itself, at the screen's full rate, on a soft spring. (The pictures
+  // inside stretch to the box, so the scale gives back each one's own shape at its own end.)
+  _vtMoves() {
+    const html = document.documentElement, moves = [];
+    for (const a of document.getAnimations()) {
+      const pe = a.effect?.pseudoElement || '';
+      if (!pe.startsWith('::view-transition-group(') || pe === '::view-transition-group(root)') continue;
+      const from = a.effect.getKeyframes?.()[0];
+      if (!from?.width || !from?.height) continue;
+      a.cancel();
+      moves.push([pe, from]);
+    }
+    for (const [pe, from] of moves) {
+      const cs = getComputedStyle(html, pe);
+      const w = parseFloat(cs.width), h = parseFloat(cs.height);
+      if (!w || !h) continue;
+      const m0 = new DOMMatrixReadOnly(from.transform && from.transform !== 'none' ? from.transform : undefined);
+      const m1 = new DOMMatrixReadOnly(cs.transform && cs.transform !== 'none' ? cs.transform : undefined);
+      html.animate([
+        { transform: `translate(${m0.e}px, ${m0.f}px) scale(${parseFloat(from.width) / w}, ${parseFloat(from.height) / h})` },
+        { transform: `translate(${m1.e}px, ${m1.f}px)` },
+      ], { pseudoElement: pe, duration: SPRING_MS, easing: SPRING, fill: 'both' });
+    }
   }
 
   // the page's side of it
@@ -243,12 +279,18 @@ class App {
       this.showSide(null);
       this._fsText();
       this._fsShow();
+      this.playerView._bleed();
+      this.playerView.fsLight.draw();
     } else {
       clearTimeout(this._fsTimer);
       this.root.classList.remove('full', 'fs-ui');
       $('#plNav').before($('.seek'), $('.controls'));
+      // the title comes back as it is (the move fades it in); its own entrance would only play under it
+      $('.pl-info').classList.remove('enter', 'enter-r', 'enter-l');
+      $('#plMeta')?.classList.remove('flash');
       this._layout();
       if (!this.narrow) this.showSide(this._fsSide);
+      this.playerView._bleed();
     }
   }
 
@@ -262,8 +304,24 @@ class App {
     this.store.saveSettings();
     const fit = this.store.settings.fullFit === 'fit';
     $$('#fsPanel [data-fit]').forEach((b) => b.classList.toggle('on', (b.dataset.fit === 'fit') === fit));
-    if (this.full && fit !== this.root.classList.contains('fs-fit')) this._viewMorph('vt-fit', () => this._fsFitUi());
+    if (this.full && fit !== this.root.classList.contains('fs-fit') && !this.store.settings.reduceMotion) this._fitMorph();
     else this._fsFitUi();
+  }
+
+  // The cover's box changes at once (the picture is stretched to its box in both ways), and is then moved and
+  // scaled from where it was to where it is: the graphics card plays that by itself, at the screen's full
+  // rate. A second switch on the way picks up from wherever the cover is.
+  _fitMorph() {
+    const img = $('#aaTrack .aa-card[data-slot="cur"] .aa-img');
+    const r0 = img.getBoundingClientRect();
+    this._fitAnim?.cancel();
+    this._fsFitUi();
+    const r1 = img.getBoundingClientRect();
+    if (!r0.width || !r0.height || !r1.width || !r1.height) return;
+    this._fitAnim = img.animate([
+      { transformOrigin: '0 0', transform: `translate(${r0.left - r1.left}px, ${r0.top - r1.top}px) scale(${r0.width / r1.width}, ${r0.height / r1.height})` },
+      { transformOrigin: '0 0', transform: 'none' },
+    ], { duration: SPRING_MS, easing: SPRING });
   }
 
   _fsFitUi() {

@@ -127,6 +127,8 @@ export class Ambient {
     clearTimeout(this._refit);
     this._refit = setTimeout(() => {
       if (!this.img) return;
+      // not during a view transition: it would have to be captured again on every frame of it
+      if (document.documentElement.classList.contains('vt-full')) return this.refit();
       const g = this._geom();
       if (g.key === this.key || !g.w) return;
       this._show(this.seq, this.img);

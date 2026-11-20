@@ -57,7 +57,7 @@ input { font: inherit; color: inherit; }
 .app { position: fixed; inset: 0; opacity: 0; transition: opacity 0.6s ease; }
 .app.ready { opacity: 1; }
 .reduce-motion *, .reduce-motion *::before, .reduce-motion *::after { transition-duration: 0s !important; animation-duration: 0s !important; }
-.no-anim .screen { transition: none !important; }
+.no-anim .screen, .app.no-anim .side { transition: none !important; }
 
 /* film grain over everything — the detail that stops flat dark UIs looking "default" */
 .grain {
@@ -191,8 +191,8 @@ input { font: inherit; color: inherit; }
 /* tap the cover: it dims and the song's details fade in over it */
 .app.wide #aaWrap.info-on .aa-card[data-slot='cur'] { visibility: visible; }
 .app.wide #aaWrap.info-on .aa-track { filter: brightness(0.42) saturate(0.9); }
-.app.wide #aaWrap .aa-back.aa-info { visibility: visible; opacity: 0; transition: opacity 0.35s ease, width 0.8s var(--spring), height 0.8s var(--spring), margin 0.8s var(--spring); }
-.app.wide #aaWrap.info-on .aa-back.aa-info { opacity: 1; }
+.app.wide #aaWrap .aa-back.aa-info { visibility: visible; opacity: 0; transition: opacity 0.35s ease; }
+.app.wide #aaWrap.info-on .aa-back.aa-info { opacity: 1; transition: opacity 0.35s ease, width 0.8s var(--spring), height 0.8s var(--spring), margin 0.8s var(--spring); }
 
 /* Wide: no header over the cover (the user's choice: nothing blocks the art at the top). The cover runs
    up to the window's top edge; the title bar's strip stays the window's drag area, so #aaWrap (taps,
@@ -1414,10 +1414,11 @@ html.glass-window, html.glass-window body { background: transparent; }
   margin-left: calc(var(--aa) * var(--s) / -2); margin-top: calc(var(--aa) * var(--s) / -2);
   transform: none; scale: none; backface-visibility: visible; -webkit-backface-visibility: visible;
   visibility: hidden; pointer-events: none; z-index: 2;
-  transition: width 0.8s var(--spring), height 0.8s var(--spring), margin 0.8s var(--spring);
 }
 .playing .aa-back.aa-info { --s: 1; }
-.aa-wrap.info-on .aa-info { visibility: visible; pointer-events: auto; }
+/* it follows the cover's size (and shrinks a little while paused) only while it is shown: hidden, it would
+   be laid out again on every frame of every layout change for nothing */
+.aa-wrap.info-on .aa-info { visibility: visible; pointer-events: auto; transition: width 0.8s var(--spring), height 0.8s var(--spring), margin 0.8s var(--spring); }
 .aa-wrap.info-on .aa-card[data-slot='cur'] { visibility: hidden; }
 .lyrics-open .aa-info, .vis-on .aa-info { opacity: 0; pointer-events: none !important; }
 /* the back follows the front's size (covers shrink a little while paused) */
@@ -1465,7 +1466,7 @@ html.fx-lite .grain { display: none !important; }
 .app.wide.full :is(#library, #eq) { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.3s ease, visibility 0s linear 0.3s; }
 .app.wide.full #player { left: 0; }
 .app.wide.full #player > :is(.pl-info, .pl-nav, .pl-corner, .pl-header) { display: none; }
-.app.wide.full #aaWrap .aa-scrim { opacity: 0; }
+.app.wide.full #aaWrap .aa-scrim { display: none; }
 /* the cover is never cut off. By default it is stretched over the whole screen (or the half beside the
    lyrics), so the screen is all cover; Whole cover (.fs-fit, App.setFullFit) shows it at its own shape
    instead: its box is the largest of that shape that fits (--fs-ar, fullLight.js), centred, and the room
@@ -1527,39 +1528,42 @@ html.fx-lite .grain { display: none !important; }
 .fs-panel .ctl-sm.lg { width: 40px; height: 40px; }
 .fs-panel .ctl-sm .ico { width: 20px; height: 20px; }
 
-/* Going in and out of full screen (html.vt-full) and between Fill screen and Whole cover (html.vt-fit) are
-   view transitions (App._viewMorph). The cover (fs-art; fs-img for the switch) moves and resizes from where
-   it was to where it goes, its shade (fs-scrim) with it; the library, the side panel, the title, the dock, the corner keys and the title
+/* Going in and out of full screen (html.vt-full) is a view transition (App._viewMorph; Fill screen and Whole
+   cover is App._fitMorph). The cover (fs-art) moves and resizes from where
+   it was to where it goes, its shade (fs-scrim) with it, its light (fs-glow, Whole cover, on the way out) fading under it; the library, the side panel, the title, the dock, the corner keys and the title
    bar fade where they stand, above it; the seekbar and the transport glide between the player and the
    control panel, above that; the rest of the page cross-fades below. The names are set only while one runs. */
 html.vt-full #aaTrack { view-transition-name: fs-art; }
 html.vt-full #aaWrap > .aa-scrim { view-transition-name: fs-scrim; }
-html.vt-fit #aaTrack .aa-card[data-slot='cur'] .aa-img { view-transition-name: fs-img; }
-html.vt-full #library { view-transition-name: fs-lib; }
-html.vt-full #eq { view-transition-name: fs-eq; }
-html:is(.vt-full, .vt-fit) #side { view-transition-name: fs-side; }
+/* on the way in the light starts out hidden under the library and the cover anyway, so it needs no layer of its own */
+html.vt-full.vt-out .app.full.fs-fit #aaWrap > .fs-light { view-transition-name: fs-glow; }
+html.vt-full .app.wide:not(.full):not([data-screen='eq']) #library { view-transition-name: fs-lib; }
+html.vt-full .app.wide:not(.full)[data-screen='eq'] #eq { view-transition-name: fs-eq; }
+html.vt-full .app.wide.side-on #side { view-transition-name: fs-side; }
 html.vt-full .titlebar { view-transition-name: fs-bar; }
 html.vt-full #player > .pl-info { view-transition-name: fs-title; }
 html.vt-full #player > .pl-corner-l { view-transition-name: fs-cl; }
 html.vt-full #player > .pl-corner-r { view-transition-name: fs-cr; }
 html.vt-full #plNav { view-transition-name: fs-dock; }
-html:is(.vt-full, .vt-fit) #fsPanel { view-transition-name: fs-panel; }
+html.vt-full #fsPanel { view-transition-name: fs-panel; }
 html.vt-full :is(#player, #fsPanel) > .seek { view-transition-name: fs-seek; }
 html.vt-full :is(#player, #fsPanel) > .controls { view-transition-name: fs-ctl; }
-html:is(.vt-full, .vt-fit)::view-transition-group(*) { z-index: 3; animation-duration: 0.62s; animation-timing-function: var(--ease); }
-html:is(.vt-full, .vt-fit)::view-transition-group(root) { z-index: 0; }
-html:is(.vt-full, .vt-fit)::view-transition-group(fs-art), html.vt-fit::view-transition-group(fs-img) { z-index: 1; }
-html.vt-full::view-transition-group(fs-scrim) { z-index: 2; }
-html.vt-full::view-transition-group(fs-seek), html.vt-full::view-transition-group(fs-ctl) { z-index: 4; }
-html:is(.vt-full, .vt-fit)::view-transition-old(*), html:is(.vt-full, .vt-fit)::view-transition-new(*) { animation-duration: 0.36s; }
-html:is(.vt-full, .vt-fit)::view-transition-old(root), html:is(.vt-full, .vt-fit)::view-transition-new(root) { animation-duration: 0.45s; }
-/* the cover: each picture covers the moving box (no stretching on the way); the switch's two pictures are
-   the same cover stretched to the box, so only the box is seen to move */
-html.vt-full::view-transition-old(fs-art), html.vt-full::view-transition-new(fs-art) { width: 100%; height: 100%; object-fit: cover; animation-duration: 0.45s; }
-/* its shade is a gradient: it simply stretches with the cover */
-html.vt-full::view-transition-old(fs-scrim), html.vt-full::view-transition-new(fs-scrim) { width: 100%; height: 100%; object-fit: fill; }
-/* the side panel is half the screen wide in full screen: it slides and fades at its own size, never scaled */
-html:is(.vt-full, .vt-fit)::view-transition-old(fs-side), html:is(.vt-full, .vt-fit)::view-transition-new(fs-side) {
-  width: 100%; height: 100%; object-fit: none; object-position: left top;
-}
-html.vt-fit::view-transition-old(fs-img), html.vt-fit::view-transition-new(fs-img) { width: 100%; height: 100%; object-fit: fill; }
+html.vt-full::view-transition-group(*) { z-index: 4; transform-origin: 0 0; animation-duration: 0.62s; animation-timing-function: var(--ease); }
+html.vt-full::view-transition-group(root) { z-index: 0; }
+html.vt-full::view-transition-group(fs-glow) { z-index: 1; }
+html.vt-full::view-transition-group(fs-art) { z-index: 2; }
+html.vt-full::view-transition-group(fs-scrim) { z-index: 3; }
+html.vt-full::view-transition-group(fs-seek), html.vt-full::view-transition-group(fs-ctl) { z-index: 5; }
+html.vt-full::view-transition-old(*), html.vt-full::view-transition-new(*) { animation-duration: 0.36s; }
+html.vt-full::view-transition-old(root), html.vt-full::view-transition-new(root) { animation-duration: 0.45s; }
+/* every picture fills its box: a moving box is scaled from the old size (App._vtMoves), which gives the old
+   picture back its own shape at the start and the new one at the end, in between they cross-fade */
+html.vt-full::view-transition-old(*), html.vt-full::view-transition-new(*) { width: 100%; height: 100%; object-fit: fill; }
+/* nothing inside a captured piece changes on the way (it would have to be captured again on every frame):
+   the control panel, the light beside the cover and the shade appear as they end, and the move fades them */
+html.vt-full :is(.fs-panel, .fs-light, .fs-light canvas, .aa-scrim) { transition: none !important; }
+html.vt-full::view-transition-old(fs-art), html.vt-full::view-transition-new(fs-art) { animation-duration: 0.45s; }
+/* the page behind the moving pieces changes at once, underneath them: a full-screen cross-fade there would
+   cost the graphics card two more full-screen layers on every frame for almost nothing to see */
+html.vt-full::view-transition-old(root) { display: none; }
+html.vt-full::view-transition-new(root) { animation: none; }

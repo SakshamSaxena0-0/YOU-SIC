@@ -95,9 +95,10 @@ html .app.wide:not(.full) .side .ly-line.active { color: #fff; font-weight: 600;
 /* the whole cover, blurred (ambient.js bleed), over the mood's dark ground */
 html.seamless .app.wide .amb-full { z-index: 0; background: var(--br-coal); }
 html.seamless.glass-window .app.wide .amb-full { background: var(--br-panel); }
-.amb-full canvas.show { opacity: 0.45; }
-/* the panes' own edge light (seamless.css) would wash over their cards: the whole-window colours replace it */
-html.seamless .app.wide:not(.full) :is(.amb-l, .amb-r) { display: none; }
+.amb-full canvas.show { opacity: 0.62; }
+/* and the cover's edge light flows on over the panes' cards, from the cover's side across to the far one
+   (ambient.js paint: toned so it colours the cards without fogging their text) */
+html.seamless .app.wide:not(.full) :is(.amb-l, .amb-r) canvas.show { opacity: 0.6; }
 html.seamless .app.wide.full .amb-full { display: none; }
 html.glass-brutal .app.wide:not(.full) :is(#player > .bg, #library, #eq) { background: none; }
 html.glass-brutal .app.wide:not(.full) :is(.lib-header, .side-header) { background: none; box-shadow: none; }

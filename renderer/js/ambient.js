@@ -9,6 +9,9 @@
 // again when the layout changes size; the old light cross-fades to the new one (brutal.css .amb).
 const W = 32, H = 48;
 const FLOOR = 0.22; // the light left where the scrim is darkest, behind the controls
+// the light on the panes (and the wash under the window) is kept deep, so their text keeps its contrast
+// over any cover: saturation up, luminance (0-255) capped
+const PANE_SAT = 1.4, PANE_MAXY = 96, WASH_MAXY = 84;
 
 // the scrim's two gradients (app.css .app.wide #aaWrap .aa-scrim): [distance from that end, darkness]
 const lerp = (stops, d) => {
@@ -52,26 +55,43 @@ function column(img, side, g) {
   return col;
 }
 
-// paint one piece: the column stretched across it, fading away from the cover (panels only), and
-// following the scrim down the window
+// Light that falls on a pane has to stay colour, never a pale wash over its text: every pixel keeps its
+// hue, gains saturation (sat), and is brought down to a luminance of at most maxY (0-255). A pale or white
+// cover then tints the panes instead of fogging them.
+function tone(x, w, h, sat, maxY) {
+  let d;
+  try { d = x.getImageData(0, 0, w, h); } catch { return; }
+  const p = d.data;
+  for (let i = 0; i < p.length; i += 4) {
+    const y = 0.2126 * p[i] + 0.7152 * p[i + 1] + 0.0722 * p[i + 2];
+    const k = y > maxY ? maxY / y : 1;
+    for (let j = 0; j < 3; j++) p[i + j] = Math.max(0, Math.min(255, (y + (p[i + j] - y) * sat) * k));
+  }
+  x.putImageData(d, 0, 0);
+}
+
+// paint one piece: the column stretched across it, flowing away from the cover across the pane (panels
+// only), and following the scrim down the window
 function paint(c, col, side, kind, g) {
   const w = kind === 'panel' ? W : 2;
   c.width = w; c.height = H;
   const x = c.getContext('2d');
   x.drawImage(col, 0, 0, 1, H, 0, 0, w, H);
+  if (kind === 'panel') tone(x, w, H, PANE_SAT, PANE_MAXY);
   x.globalCompositeOperation = 'destination-in';
   if (kind === 'panel') {
-    // full strength where the panel meets the cover, gone by its far side
+    // full strength where the pane meets the cover, still there at its far side
     const fromCover = side === 'l' ? [w, 0] : [0, w];
     const fade = x.createLinearGradient(fromCover[0], 0, fromCover[1], 0);
-    for (const [p, a] of [[0, 1], [0.12, 0.72], [0.3, 0.45], [0.6, 0.16], [1, 0]]) fade.addColorStop(p, `rgba(0,0,0,${a})`);
+    for (const [p, a] of [[0, 1], [0.18, 0.84], [0.42, 0.62], [0.72, 0.42], [1, 0.28]]) fade.addColorStop(p, `rgba(0,0,0,${a})`);
     x.fillStyle = fade;
     x.fillRect(0, 0, w, H);
   }
+  // down the window: the panes take the cover's darkening only half way, so the light runs their whole height
   const down = x.createLinearGradient(0, 0, 0, H);
   for (let i = 0; i <= 24; i++) {
-    const t = i / 24;
-    down.addColorStop(t, `rgba(0,0,0,${light(t * g.h, g).toFixed(3)})`);
+    const t = i / 24, v = light(t * g.h, g);
+    down.addColorStop(t, `rgba(0,0,0,${(kind === 'panel' ? 0.45 + 0.55 * v : v).toFixed(3)})`);
   }
   x.fillStyle = down;
   x.fillRect(0, 0, w, H);
@@ -89,10 +109,12 @@ function bleed(c, img) {
   big.width = w + 2 * pad; big.height = h + 2 * pad;
   const b = big.getContext('2d');
   const s = Math.max(big.width / iw, big.height / ih);
-  b.filter = 'blur(4px) saturate(1.25) brightness(0.8)';
+  b.filter = 'blur(4px)';
   b.drawImage(img, (big.width - iw * s) / 2, (big.height - ih * s) * 0.38, iw * s, ih * s);
   c.width = w; c.height = h;
-  c.getContext('2d').drawImage(big, pad, pad, w, h, 0, 0, w, h);
+  const x = c.getContext('2d');
+  x.drawImage(big, pad, pad, w, h, 0, 0, w, h);
+  tone(x, w, h, PANE_SAT, WASH_MAXY);
   return true;
 }
 

@@ -79,6 +79,8 @@ class App {
     $('#plAdmire').onclick = () => this.toggleArt();
     $('#plFull').onclick = $('#fullBtn').onclick = () => this.toggleFull(true);
     $('#fsExit').onclick = () => this.toggleFull(false);
+    $('#fsFit').onclick = () => this.setFullFit(this.store.settings.fullFit === 'fit' ? 'fill' : 'fit');
+    this._fsFitUi();
     // full screen needs the window's help (preload.js); the Android build has none
     if (!pa.setFullScreen) $('#plFull').style.display = $('#fullBtn').style.display = 'none';
     pa.onFullScreen?.((on) => this._setFull(on));
@@ -194,6 +196,24 @@ class App {
       this._layout();
       if (!this.narrow) this.showSide(this._fsSide);
     }
+  }
+
+  // how the cover shows in full screen (the panel's key, remembered): stretched over the whole screen, so the
+  // screen is all cover and none of it is cut off (the default), or whole at its own shape (.fs-fit), the room
+  // beside it lit by its own edges (fullLight.js)
+  setFullFit(mode) {
+    this.store.settings.fullFit = mode === 'fit' ? 'fit' : 'fill';
+    this.store.saveSettings();
+    this._fsFitUi();
+    this.playerView.fsLight.draw();
+  }
+
+  _fsFitUi() {
+    const fit = this.store.settings.fullFit === 'fit';
+    this.root.classList.toggle('fs-fit', fit);
+    const b = $('#fsFit');
+    setIcon(b, fit ? 'aspect_fill' : 'aspect_fit');
+    b.title = fit ? 'Stretch the cover over the whole screen' : 'Show the whole cover at its own shape';
   }
 
   _fsText() {

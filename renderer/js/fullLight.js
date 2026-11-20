@@ -1,4 +1,4 @@
-// Full screen (app.css .app.full): the cover fits the screen whole, and the room it leaves (beside it, or
+// Full screen, the whole-cover way (app.css .app.full.fs-fit): the cover fits the screen whole, and the room it leaves (beside it, or
 // above and below it) is lit by the cover's own edges, stretched out towards the screen's edges and fading
 // into the ground there, so the cover sits in its own light rather than between black bars. The light is a
 // tiny canvas the browser stretches over the screen: soft, with no blur filter. It is drawn once per song

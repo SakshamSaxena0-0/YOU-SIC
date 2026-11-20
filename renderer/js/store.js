@@ -19,6 +19,7 @@ export const DEFAULT_SETTINGS = {
   theme: 'glass', // Liquid Glass, the only theme
   glassMood: 'brutal', // Liquid Glass only: brutal (black and white, hard light, heavy type) | clear (clear glass tinted by the album)
   refraction: true,
+  fullFit: 'fill', // full screen: fill (the cover stretched over the whole screen) | fit (the whole cover at its own shape, lit by its edges)
   windowBg: 'wallpaper', // wallpaper | acrylic | solid
   buttonStyle: 'ios', // ios (clear glass) | bubble | aqua (liquid-filled)
   liquid: 'aqua', // aqua | lime | accent

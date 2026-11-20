@@ -1454,7 +1454,7 @@ html.fx-lite .grain { display: none !important; }
 
 /* ==========================================================================
    Full screen (the key beside the mini player, F11 or F; App.toggleFull)
-   The window takes the whole screen and the album art fills it, shown as it is: no title bar, no library,
+   The window takes the whole screen and the album art fills it, with nothing over it: no title bar, no library,
    no title block, dock or corner keys, no shade over the art. Moving the pointer brings up a control panel
    at the bottom centre (.fs-ui); the seekbar and the transport move into it. Lyrics take the right half of
    the screen beside the art: the right-hand panel at half the width. Always the wide layout (App._layout).
@@ -1466,12 +1466,15 @@ html.fx-lite .grain { display: none !important; }
 .app.wide.full #player { left: 0; }
 .app.wide.full #player > :is(.pl-info, .pl-nav, .pl-corner, .pl-header) { display: none; }
 .app.wide.full #aaWrap .aa-scrim { opacity: 0; }
-/* the cover fits the screen whole (never cropped), centred; the room it leaves is lit by its own edges
-   (.fs-light, fullLight.js) instead of the column-edge light (ambient.js), which isn't needed here */
-.app.wide.full #aaWrap .aa-img { background-size: contain; background-position: center; background-repeat: no-repeat; background-color: transparent; }
+/* the cover is never cut off. By default it is stretched over the whole screen (or the half beside the
+   lyrics), so the screen is all cover; the panel's key (.fs-fit, App.setFullFit) shows it whole at its own
+   shape instead, centred, the room it leaves lit by its own edges (.fs-light, fullLight.js). The
+   column-edge light (ambient.js) isn't needed in either */
+.app.wide.full #aaWrap .aa-img { background-size: 100% 100%; background-position: center; background-repeat: no-repeat; }
+.app.wide.full.fs-fit #aaWrap .aa-img { background-size: contain; background-color: transparent; }
 .app.wide.full #aaWrap > .amb-edge { display: none; }
 .fs-light { display: none; }
-.app.wide.full #aaWrap > .fs-light {
+.app.wide.full.fs-fit #aaWrap > .fs-light {
   display: block; position: absolute; overflow: hidden; pointer-events: none; transition: opacity 0.4s ease;
   inset: calc(-1 * var(--bt, 0px)) calc(-1 * var(--br, 0px)) calc(-1 * var(--bb, 0px)) calc(-1 * var(--bl, 0px));
 }

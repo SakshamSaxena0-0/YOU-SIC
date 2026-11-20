@@ -139,7 +139,10 @@
         <div class="fs-panel lg" id="fsPanel" data-lg-blur="10" role="group" aria-label="Player controls">
           <div class="fs-head">
             <div class="fs-text"><div class="fs-title" id="fsTitle"></div><div class="fs-artist" id="fsArtist"></div></div>
-            <button class="icon-btn lg" id="fsFit" data-icon="aspect_fit" title="Show the whole cover"></button>
+            <div class="fs-fit-pick" role="group" aria-label="Album art in full screen">
+              <button class="chip lg" data-fit="fill" title="Stretch the album art over the whole screen: no empty space">Fill screen</button>
+              <button class="chip lg" data-fit="fit" title="The whole album art at its own shape, its colours glowing beside it">Whole cover</button>
+            </div>
             <button class="icon-btn lg" id="fsLyrics" data-act="lyrics" data-icon="lyrics" title="Lyrics (Y)"></button>
             <button class="icon-btn lg" id="fsExit" data-icon="fullscreen_exit" title="Exit full screen (Esc)"></button>
           </div>

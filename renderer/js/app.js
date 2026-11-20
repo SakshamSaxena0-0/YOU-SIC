@@ -79,7 +79,7 @@ class App {
     $('#plAdmire').onclick = () => this.toggleArt();
     $('#plFull').onclick = $('#fullBtn').onclick = () => this.toggleFull(true);
     $('#fsExit').onclick = () => this.toggleFull(false);
-    $('#fsFit').onclick = () => this.setFullFit(this.store.settings.fullFit === 'fit' ? 'fill' : 'fit');
+    $$('#fsPanel [data-fit]').forEach((b) => (b.onclick = () => this.setFullFit(b.dataset.fit)));
     this._fsFitUi();
     // full screen needs the window's help (preload.js); the Android build has none
     if (!pa.setFullScreen) $('#plFull').style.display = $('#fullBtn').style.display = 'none';
@@ -198,9 +198,9 @@ class App {
     }
   }
 
-  // how the cover shows in full screen (the panel's key, remembered): stretched over the whole screen, so the
-  // screen is all cover and none of it is cut off (the default), or whole at its own shape (.fs-fit), the room
-  // beside it lit by its own edges (fullLight.js)
+  // how the cover shows in full screen (the panel's Fill screen / Whole cover choice, or Settings; remembered):
+  // stretched over the whole screen, so the screen is all cover and none of it is cut off (the default), or
+  // whole at its own shape (.fs-fit), the room beside it lit by its own edges (fullLight.js)
   setFullFit(mode) {
     this.store.settings.fullFit = mode === 'fit' ? 'fit' : 'fill';
     this.store.saveSettings();
@@ -211,9 +211,7 @@ class App {
   _fsFitUi() {
     const fit = this.store.settings.fullFit === 'fit';
     this.root.classList.toggle('fs-fit', fit);
-    const b = $('#fsFit');
-    setIcon(b, fit ? 'aspect_fill' : 'aspect_fit');
-    b.title = fit ? 'Stretch the cover over the whole screen' : 'Show the whole cover at its own shape';
+    $$('#fsPanel [data-fit]').forEach((b) => b.classList.toggle('on', (b.dataset.fit === 'fit') === fit));
   }
 
   _fsText() {
@@ -779,6 +777,7 @@ class App {
       ${tog('refraction', 'Liquid glass refraction', 'Buttons bend the background at their edges like thick glass (GPU)')}
       ${tog('blurBg', 'Blurred album art background')}
       </div>
+      ${pa.setFullScreen ? pick('fullFit', 'Full screen album art', 'Fill screen: stretched over the whole screen, no empty space. Whole cover: the album art at its own shape, its colours glowing beside it', [['fill', 'Fill screen'], ['fit', 'Whole cover']]) : ''}
       ${tog('waveform', 'Waveform seekbar', 'Decode tracks to draw a real waveform')}
       ${tog('rating', 'Show rating stars')}
       ${tog('reduceMotion', 'Reduce animations')}
@@ -822,6 +821,7 @@ class App {
         const key = pk.dataset.pick;
         s[key] = pk.dataset.v;
         this.store.saveSettings();
+        if (key === 'fullFit') this.setFullFit(s[key]);
         this._applyLook();
         if (key === 'windowBg' || key === 'theme') this._applyGlassWindow();
         if (key === 'theme') {

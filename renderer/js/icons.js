@@ -60,9 +60,6 @@ export const ICONS = {
   fullscreen_exit: 'M8 5h2v5H5V8h3V5zm6 0h2v3h3v2h-5V5zM5 14h5v5H8v-3H5v-2zm9 0h5v2h-3v3h-2v-5z',
   // a screen with a small window in its corner (original)
   mini_player: 'M3 4h18c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zm0 2v12h18V6H3zm9 5h7v5h-7z',
-  // full screen's two ways of showing the cover (original): stretched across the screen / whole, at its own shape
-  aspect_fill: 'M3 5h18v14H3V5zm2 2v10h14V7H5zm1 5l3-3v2h6V9l3 3-3 3v-2H9v2l-3-3z',
-  aspect_fit: 'M3 5h18v14H3V5zm2 2v10h14V7H5zm4 2h6v6H9V9z',
   image: 'M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z',
 };
 

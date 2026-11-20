@@ -1505,7 +1505,10 @@ html.fx-lite .grain { display: none !important; }
 .fs-text { flex: 1; min-width: 0; }
 .fs-title { font-size: 15px; font-weight: 800; letter-spacing: -0.2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .fs-artist { font-size: 12.5px; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
-.fs-head .icon-btn.on, .btn-ios .fs-head .icon-btn.on {
+/* Fill screen / Whole cover (App.setFullFit) */
+.fs-fit-pick { display: flex; gap: 5px; flex: none; margin-right: 6px; }
+.fs-fit-pick .chip { height: 32px; padding: 0 13px; white-space: nowrap; }
+.fs-head :is(.icon-btn, .chip).on, .btn-ios .fs-head :is(.icon-btn, .chip).on {
   --lg-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.15)); color: #fff;
 }
 /* the seekbar and the transport, a size down */

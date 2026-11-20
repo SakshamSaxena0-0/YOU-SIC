@@ -101,8 +101,11 @@
             <button class="vb-ico" id="vbIco" title="Mute (M)" data-icon="volume_up"></button>
             <input type="range" id="vbRange" min="0" max="100" value="80" aria-label="Volume">
             <span class="seek-times vb-val" id="vbVal">80</span>
-            <!-- the mini player: a small window that stays on top (renderer/mini.html) -->
-            <button class="mini-btn" id="miniBtn" title="Mini player"><span data-icon="mini_player"></span><span class="pl-cat-label">Mini player</span></button>
+            <!-- the mini player: a small window that stays on top (renderer/mini.html); full screen beside it -->
+            <span class="mini-pair">
+              <button class="mini-btn" id="miniBtn" title="Mini player"><span data-icon="mini_player"></span><span class="pl-cat-label">Mini player</span></button>
+              <button class="mini-btn mini-full" id="fullBtn" title="Full screen (F11)"><span data-icon="fullscreen"></span></button>
+            </span>
           </div>
         </div>
 
@@ -123,8 +126,20 @@
         </div>
         <div class="pl-header pl-corner pl-corner-r">
           <button class="icon-btn lg" id="plMini" data-icon="mini_player" title="Mini player"></button>
+          <!-- Full screen: the window takes the whole screen and the album art fills it (App.toggleFull) -->
+          <button class="icon-btn lg" id="plFull" data-icon="fullscreen" title="Full screen (F11)"></button>
           <!-- Admire art: hide the title block, the controls and the dock so the album art shows on its own -->
-          <button class="icon-btn lg" id="plAdmire" data-icon="fullscreen" title="Fullscreen (Admire Art)" aria-pressed="false"></button>
+          <button class="icon-btn lg" id="plAdmire" data-icon="image" title="Admire art (A)" aria-pressed="false"></button>
+        </div>
+
+        <!-- full screen: the controls, at the bottom centre while the pointer moves. The seekbar and the
+             transport move in here while full screen is on, and back out after (App._setFull) -->
+        <div class="fs-panel lg" id="fsPanel" data-lg-blur="10" role="group" aria-label="Player controls">
+          <div class="fs-head">
+            <div class="fs-text"><div class="fs-title" id="fsTitle"></div><div class="fs-artist" id="fsArtist"></div></div>
+            <button class="icon-btn lg" id="fsLyrics" data-act="lyrics" data-icon="lyrics" title="Lyrics (Y)"></button>
+            <button class="icon-btn lg" id="fsExit" data-icon="fullscreen_exit" title="Exit full screen (Esc)"></button>
+          </div>
         </div>
       </section>
 

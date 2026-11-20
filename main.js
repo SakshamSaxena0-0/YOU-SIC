@@ -445,6 +445,15 @@ async function createWindow() {
   const sendState = () => win.webContents.send('win:state', { maximized: win.isMaximized() });
   win.on('maximize', sendState);
   win.on('unmaximize', sendState);
+  // full screen: the page follows the window (App._setFull), whichever way it came in or out; F11 toggles it
+  win.on('enter-full-screen', () => win.webContents.send('win:full', true));
+  win.on('leave-full-screen', () => win.webContents.send('win:full', false));
+  win.webContents.on('before-input-event', (e, input) => {
+    if (input.type === 'keyDown' && input.key === 'F11' && !input.control && !input.alt && !input.meta) {
+      e.preventDefault();
+      win.setFullScreen(!win.isFullScreen());
+    }
+  });
   for (const ev of ['move', 'resize', 'maximize', 'unmaximize', 'restore']) win.on(ev, () => wall.on && sendGeom());
   for (const ev of ['focus', 'restore', 'show']) win.on(ev, () => wall.on && refreshWallpaper());
   screen.on('display-metrics-changed', () => { if (wall.on) { wall.v = 0; refreshWallpaper(); } });
@@ -573,6 +582,7 @@ function setupIpc() {
     }
   });
   ipcMain.on('win:max', () => (win.isMaximized() ? win.unmaximize() : win.maximize()));
+  ipcMain.on('win:full', (_e, on) => { if (win && !win.isDestroyed() && win.isFullScreen() !== !!on) win.setFullScreen(!!on); });
   ipcMain.handle('win:glass', (_e, on) => {
     on = !!on && GLASS_SUPPORTED;
     try {

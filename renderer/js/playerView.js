@@ -157,9 +157,9 @@ export class PlayerView {
     const set = (k, v) => wrap.style.setProperty(k, `${Math.max(0, Math.round(v))}px`);
     set('--bt', w.top - p.top); set('--bb', p.bottom - w.bottom);
     set('--bl', w.left - p.left); set('--br', right - w.right);
-    // the corner keys (css: .pl-corner) sit beside the dock; a column too narrow to give them 112px a side
+    // the corner keys (css: .pl-corner) sit beside the dock; a column too narrow to give them 160px a side
     // beside a 340px dock lifts them over the cover, just above the title block
-    $('#player').classList.toggle('corners-up', right - p.left < 2 * 112 + 340);
+    $('#player').classList.toggle('corners-up', right - p.left < 2 * 160 + 340);
     this.ambient.refit();
   }
 

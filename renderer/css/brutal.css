@@ -157,3 +157,8 @@ html.glass-brutal.btn-ios .app.wide :is(#library, #eq, .side) :is(button, a, [ro
 
 /* Settings: the album colour options do nothing in this mood */
 html.glass-brutal .clear-only { display: none; }
+
+/* full screen's control panel (app.css .fs-panel): a slab like the dock; its lyrics key solid white when on */
+html.glass-brutal .fs-panel { border-radius: calc(var(--br-r) + 4px); }
+html.glass-brutal.btn-ios .fs-head .icon-btn.on { --lg-bg: var(--br-solid); color: var(--br-ink); }
+html.glass-brutal.btn-ios .fs-head .icon-btn.on .ico { filter: none; }

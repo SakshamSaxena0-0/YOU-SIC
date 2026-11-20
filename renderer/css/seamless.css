@@ -21,3 +21,11 @@ html.seamless .app.wide #aaWrap :is(.aa-track, .aa-scrim) {
 }
 /* tap the cover and it dims for the song's details: its light dims with it */
 html.seamless .app.wide:has(#aaWrap.info-on) .amb canvas.show { opacity: 0.25; }
+/* full screen (app.css .app.full): the cover meets the screen's edges, so it doesn't fade there; with lyrics
+   open it fades only at its right edge, into the light that runs on under the lyrics */
+html.seamless .app.wide.full #aaWrap :is(.aa-track, .aa-scrim) { -webkit-mask-image: none; mask-image: none; }
+html.seamless .app.wide.full.side-on #aaWrap :is(.aa-track, .aa-scrim) {
+  --m: linear-gradient(90deg, #000 calc(100% - var(--amb-f)), rgba(0, 0, 0, 0.9) calc(100% - var(--amb-f) * 0.8),
+    rgba(0, 0, 0, 0.5) calc(100% - var(--amb-f) * 0.5), rgba(0, 0, 0, 0.1) calc(100% - var(--amb-f) * 0.2), transparent);
+  -webkit-mask-image: var(--m); mask-image: var(--m);
+}

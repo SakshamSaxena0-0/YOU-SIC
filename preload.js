@@ -13,6 +13,8 @@ contextBridge.exposeInMainWorld('pa', {
   minimize: () => ipcRenderer.send('win:min'),
   maximize: () => ipcRenderer.send('win:max'),
   close: () => ipcRenderer.send('win:close'),
+  setFullScreen: (on) => ipcRenderer.send('win:full', !!on),
+  onFullScreen: (cb) => ipcRenderer.on('win:full', (_e, on) => cb(on)),
   setGlass: (on) => ipcRenderer.invoke('win:glass', on),
   glassSupported: () => ipcRenderer.invoke('win:glassSupported'),
   setTitle: (t) => ipcRenderer.send('win:title', t),

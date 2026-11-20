@@ -77,6 +77,13 @@ class App {
     $$('#side .eq-tab').forEach((t) => (t.onclick = () => this.showSide(t.dataset.side)));
     $('#sideClose').onclick = () => this.showSide(null);
     $('#plAdmire').onclick = () => this.toggleArt();
+    $('#plFull').onclick = $('#fullBtn').onclick = () => this.toggleFull(true);
+    $('#fsExit').onclick = () => this.toggleFull(false);
+    // full screen needs the window's help (preload.js); the Android build has none
+    if (!pa.setFullScreen) $('#plFull').style.display = $('#fullBtn').style.display = 'none';
+    pa.onFullScreen?.((on) => this._setFull(on));
+    this.player.addEventListener('track', () => this._fsText());
+    this._bindFull();
     this._layout();
     new ResizeObserver(() => { this._layout(); this._navInk(); if (!this.narrow) this._sideInk(); }).observe(document.body);
     document.fonts.ready.then(() => { if (!this.narrow) this._sideInk(); });
@@ -110,7 +117,8 @@ class App {
   // Wide windows get three columns: the library (or the equalizer) on the left, the player in the middle
   // and lyrics or the visualization on the right (#side). Narrow windows keep one screen at a time.
   _layout() {
-    const wide = innerWidth >= 980;
+    // full screen always uses the wide layout: it is what lets the cover fill the window and lyrics take a half
+    const wide = innerWidth >= 980 || this.root.classList.contains('full');
     if (wide !== this.root.classList.contains('wide')) {
       this.root.classList.toggle('wide', wide);
       if (wide && this.screen === 'player') this.screen = 'library';
@@ -137,7 +145,7 @@ class App {
       $('#sideBody').append(ly, vis);
       if (this.visOpen) this.paneHost().classList.add('vis-on');
       else if (this.lyrics.open) this.paneHost().classList.add('lyrics-open');
-      else if (this.store.settings.sidePanel !== false) this.lyrics.toggle(true);
+      else if (this.store.settings.sidePanel !== false && !this.root.classList.contains('full')) this.lyrics.toggle(true);
     }
     this._syncSide();
   }
@@ -151,6 +159,71 @@ class App {
     $('#plAdmire').setAttribute('aria-pressed', String(on));
   }
 
+  // Full screen (the key beside the mini player, F11 or F): the window takes the whole screen and the album
+  // art fills it, with nothing over it (css: .app.full). Moving the pointer brings up a control panel at the
+  // bottom centre (#fsPanel, which the seekbar and the transport move into); it goes again once the pointer
+  // rests. Lyrics (Y, or the panel's key) take the right half of the screen, beside the art. Esc leaves.
+  get full() { return this.root.classList.contains('full'); }
+
+  toggleFull(force) {
+    const on = force ?? !this.full;
+    this._setFull(on);
+    pa.setFullScreen?.(on);
+  }
+
+  // the page's side of it; also called when the window goes in or out of full screen by itself (F11)
+  _setFull(on) {
+    if (on === this.full) return;
+    closeMenu();
+    $('#volPop').classList.remove('open');
+    if (on) {
+      this.toggleArt(false);
+      if (this.playerView.flipped) this.playerView.flipArt(false, false);
+      // the art starts on its own; whatever the right-hand panel showed comes back on the way out
+      this._fsSide = this.visOpen ? 'vis' : this.lyrics.open ? 'lyrics' : null;
+      $('#fsPanel').append($('.seek'), $('.controls'));
+      this.root.classList.add('full');
+      this._layout();
+      this.showSide(null);
+      this._fsText();
+      this._fsShow();
+    } else {
+      clearTimeout(this._fsTimer);
+      this.root.classList.remove('full', 'fs-ui');
+      $('#plNav').before($('.seek'), $('.controls'));
+      this._layout();
+      if (!this.narrow) this.showSide(this._fsSide);
+    }
+  }
+
+  _fsText() {
+    if (!this.full) return;
+    $('#fsTitle').textContent = $('#plTitle').textContent;
+    $('#fsArtist').textContent = $('#plArtist').textContent;
+  }
+
+  // the panel comes up while the pointer moves (or on a tap) and goes 2.6 s after it stops, but not while
+  // the pointer is on the panel or a menu is open
+  _bindFull() {
+    const wake = () => { if (this.full) this._fsShow(); };
+    addEventListener('pointermove', wake, { passive: true });
+    addEventListener('pointerdown', wake, { passive: true });
+  }
+
+  _fsShow() {
+    if (!this.root.classList.contains('fs-ui')) this.root.classList.add('fs-ui');
+    clearTimeout(this._fsTimer);
+    this._fsTimer = setTimeout(() => this._fsHide(), 2600);
+  }
+
+  _fsHide() {
+    if ($('#fsPanel').matches(':hover') || $('#ctx').classList.contains('open') || $('#volPop').classList.contains('open')) {
+      this._fsTimer = setTimeout(() => this._fsHide(), 1000);
+      return;
+    }
+    this.root.classList.remove('fs-ui');
+  }
+
   // the panel's tabs: 'lyrics', 'vis', or null to hide the panel
   showSide(which) {
     if (which === 'vis') { if (!this.visOpen) this.toggleVis(true); return; }
@@ -162,6 +235,7 @@ class App {
     if (this.narrow) { this.root.classList.remove('side-on'); return; }
     const on = this.visOpen || this.lyrics.open;
     this.root.classList.toggle('side-on', on);
+    $('#fsLyrics').classList.toggle('on', this.lyrics.open);
     if (this.store.settings.sidePanel !== on) { this.store.settings.sidePanel = on; this.store.saveSettings(); }
     this._sideInk();
   }
@@ -183,6 +257,8 @@ class App {
 
   show(screen) {
     closeMenu();
+    // the library and the equalizer are out of sight in full screen: going to them leaves it
+    if (screen !== 'player' && this.full) this.toggleFull(false);
     if (this.root.classList.contains('wide') && screen === 'player') screen = 'library';
     this.screen = screen;
     this._applyScreen(true);
@@ -289,11 +365,12 @@ class App {
       else if (k === 'ArrowDown') { e.preventDefault(); this.setVolume(this.store.settings.volume - 0.05); }
       else if (k === 'f' && e.ctrlKey) { e.preventDefault(); this.show('library'); this.library.toggleSearch(true); }
       else if (k === 'l' && e.ctrlKey) { e.preventDefault(); this.openLibrary(); }
-      else if (k === 'Backspace' || (k === 'ArrowLeft' && e.altKey) || k === 'BrowserBack') { if (this.screen === 'library') this.library.back(); else this.showPlayer(); }
-      else if (k === 'Escape') { if (this.vis.host.classList.contains('full')) this.vis.toggleFull(); else if (this.root.classList.contains('art-only')) this.toggleArt(false); else if (this.visOpen) this.toggleVis(false); else if (this.screen !== 'player') this.showPlayer(); }
+      else if (k === 'Backspace' || (k === 'ArrowLeft' && e.altKey) || k === 'BrowserBack') { if (this.full) return; if (this.screen === 'library') this.library.back(); else this.showPlayer(); }
+      else if (k === 'Escape') { if (this.vis.host.classList.contains('full')) this.vis.toggleFull(); else if (this.full) this.toggleFull(false); else if (this.root.classList.contains('art-only')) this.toggleArt(false); else if (this.visOpen) this.toggleVis(false); else if (this.screen !== 'player') this.showPlayer(); }
       else if (k === 'e' || k === 'E') this.openEq();
       else if (k === 'v' || k === 'V') this.toggleVis();
       else if ((k === 'f' || k === 'F') && this.visOpen) this.vis.toggleFull();
+      else if ((k === 'f' || k === 'F') && !e.ctrlKey && !e.altKey && pa.setFullScreen) this.toggleFull();
       else if (k === 'y' || k === 'Y') this.toggleLyrics();
       else if (k === 'i' || k === 'I') this.playerView.flipArt();
       else if (k === 'a' || k === 'A') this.toggleArt();
@@ -303,7 +380,7 @@ class App {
       else if (/^[0-5]$/.test(k) && e.altKey && p.track) this.store.setRating(p.track.id, +k);
     });
     // mouse back button
-    addEventListener('mouseup', (e) => { if (e.button === 3) { if (this.screen === 'library') this.library.back(); else this.showPlayer(); } });
+    addEventListener('mouseup', (e) => { if (e.button === 3 && !this.full) { if (this.screen === 'library') this.library.back(); else this.showPlayer(); } });
   }
 
   // ---------- premium touches ----------
@@ -435,6 +512,7 @@ class App {
   // the bar shows the volume itself while it is on screen
   _volBarShown() {
     const r = this.root.classList;
+    if (r.contains('full')) return r.contains('fs-ui');
     return !r.contains('art-only') && (!this.narrow || this.screen === 'player');
   }
 

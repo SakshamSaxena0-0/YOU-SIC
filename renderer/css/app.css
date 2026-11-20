@@ -205,7 +205,7 @@ input { font: inherit; color: inherit; }
 #player > .pl-corner { display: none; }
 .app.wide #player > .pl-header:not(.pl-corner) { display: none; }
 .app.wide #aaWrap { margin-top: var(--tb); }
-.app.wide #miniBtn { display: none; }
+.app.wide .mini-pair { display: none; }
 .app.wide #player > .pl-nav { anchor-name: --pl-dock; }
 .app.wide #player > .pl-info { anchor-name: --pl-title; }
 .app.wide #player > .pl-corner {
@@ -215,7 +215,8 @@ input { font: inherit; color: inherit; }
 .app.wide #player > .pl-corner-l { left: 16px; }
 .app.wide #player > .pl-corner-r { right: calc(var(--rw) + 16px); }
 .app.wide #player.corners-up > .pl-corner { position-anchor: --pl-title; top: auto; bottom: calc(anchor(top) + 8px); }
-.app.wide #player:not(.corners-up) > .pl-nav { margin-left: max(18px, 112px - var(--cpad)); margin-right: max(18px, 112px - var(--cpad)); }
+/* room for the corner keys: three on the right (mini player, full screen, admire art) */
+.app.wide #player:not(.corners-up) > .pl-nav { margin-left: max(18px, 160px - var(--cpad)); margin-right: max(18px, 160px - var(--cpad)); }
 
 /* Admire art (the fullscreen key in the bottom-right corner, or A): the title block, seekbar, controls,
    dock and corner keys fade away with the fades over the cover, so nothing covers it. A, Esc and a tap on
@@ -450,16 +451,19 @@ input { font: inherit; color: inherit; }
 .vol-bar .seek-times.vb-val { display: block; flex: none; min-width: 3ch; margin: 0; padding: 0; text-align: right; font-variant-numeric: tabular-nums; }
 .vol-bar.no-val .vb-val { display: none; }
 /* the mini player button: under the volume bar (in its row when the bar has a row of its own) */
+.mini-pair { display: inline-flex; align-items: center; gap: 6px; flex: none; }
 .mini-btn {
-  display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 10px 0 8px; flex: none; border-radius: 12px; color: var(--dim);
+  position: relative; display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 10px 0 8px; flex: none; border-radius: 12px; color: var(--dim);
   box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 32%, transparent); transition: color 0.2s, background-color 0.2s, box-shadow 0.2s;
 }
 .mini-btn:hover { color: var(--text); background-color: color-mix(in srgb, var(--text) 8%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 60%, transparent); }
 .mini-btn [data-icon] { display: grid; }
 .mini-btn .ico { width: 15px; height: 15px; }
 .mini-btn .pl-cat-label { color: inherit; font-size: 9.5px; letter-spacing: 1.6px; white-space: nowrap; margin: 0; }
-.app.vol-inline .mini-btn { position: absolute; top: calc(50% + 22px); left: 50%; translate: -50% 0; }
-.app.vol-row .mini-btn { margin-left: 8px; }
+.app.vol-inline .mini-pair { position: absolute; top: calc(50% + 22px); left: 50%; translate: -50% 0; }
+/* full screen, beside it: the icon alone */
+.mini-btn.mini-full { padding: 0 8px; }
+.app.vol-row .mini-pair { margin-left: 8px; }
 
 /* floating dock */
 .pl-nav {
@@ -1447,3 +1451,55 @@ html.glass-window, html.glass-window body { background: transparent; }
 html.fx-lite *, html.fx-lite *::before, html.fx-lite *::after { backdrop-filter: none !important; }
 html.fx-lite .bg-layer, html.fx-lite .marquee span, html.fx-lite .aq-pool, html.fx-lite .aq-pool i, html.fx-lite .aq-bub b, html.fx-lite .froth b { animation: none !important; }
 html.fx-lite .grain { display: none !important; }
+
+/* ==========================================================================
+   Full screen (the key beside the mini player, F11 or F; App.toggleFull)
+   The window takes the whole screen and the album art fills it, shown as it is: no title bar, no library,
+   no title block, dock or corner keys, no shade over the art. Moving the pointer brings up a control panel
+   at the bottom centre (.fs-ui); the seekbar and the transport move into it. Lyrics take the right half of
+   the screen beside the art: the right-hand panel at half the width. Always the wide layout (App._layout).
+   ========================================================================== */
+.fs-panel { display: none; }
+.app.full.wide { --tb: 0px; --cpad: 0px; --rw-open: 50vw; }
+.app.full .titlebar { display: none; }
+.app.wide.full :is(#library, #eq) { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.3s ease, visibility 0s linear 0.3s; }
+.app.wide.full #player { left: 0; }
+.app.wide.full #player > :is(.pl-info, .pl-nav, .pl-corner, .pl-header) { display: none; }
+.app.wide.full #aaWrap .aa-scrim { opacity: 0; }
+/* the pointer goes too while the controls are away */
+.app.full:not(.fs-ui) :is(#aaWrap, #aaWrap *) { cursor: none; }
+/* lyrics: a half of the screen, so larger lines */
+.app.full .side .ly-line { font-size: clamp(23px, 2.1vw, 40px); }
+
+.app.full .fs-panel {
+  display: flex; flex-direction: column; position: absolute; z-index: 6; left: 0; right: var(--rw); bottom: 22px; margin: 0 auto;
+  width: min(760px, calc(100% - var(--rw) - 32px)); padding: 10px 8px 4px; border-radius: 26px;
+  opacity: 0; visibility: hidden; translate: 0 18px; pointer-events: none;
+  transition: opacity 0.3s ease, translate 0.45s var(--ease), visibility 0s linear 0.3s, right 0.55s var(--ease), width 0.55s var(--ease);
+}
+.app.full.fs-ui .fs-panel {
+  opacity: 1; visibility: visible; translate: none; pointer-events: auto;
+  transition: opacity 0.25s ease, translate 0.45s var(--ease), visibility 0s linear 0s, right 0.55s var(--ease), width 0.55s var(--ease);
+}
+/* dark glass, so the controls read over any cover; the panel itself neither lifts nor presses */
+.fs-panel.lg, .btn-ios .fs-panel.lg { --lg-bg: linear-gradient(180deg, rgba(18, 18, 20, 0.72), rgba(6, 6, 8, 0.8)); }
+.fs-panel.lg:hover, .btn-ios .fs-panel.lg:hover { background: var(--lg-bg); filter: none; }
+.fs-panel.lg:active { transform: none; }
+.fs-head { display: flex; align-items: center; gap: 6px; padding: 0 6px 2px 18px; }
+.fs-text { flex: 1; min-width: 0; }
+.fs-title { font-size: 15px; font-weight: 800; letter-spacing: -0.2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fs-artist { font-size: 12.5px; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
+.fs-head .icon-btn.on, .btn-ios .fs-head .icon-btn.on {
+  --lg-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.15)); color: #fff;
+}
+/* the seekbar and the transport, a size down */
+.fs-panel .seek { padding-top: 2px; }
+.fs-panel .wave { height: 40px; }
+.fs-panel .controls { padding: 2px 16px 6px; gap: 14px; }
+.fs-panel .play-wrap { width: 74px; height: 74px; }
+.fs-panel .ctl-play.lg { width: 58px; height: 58px; }
+.fs-panel .ctl-play .pp { width: 28px; height: 28px; }
+.fs-panel .ctl-md.lg { width: 46px; height: 46px; }
+.fs-panel .ctl-md .ico { width: 24px; height: 24px; }
+.fs-panel .ctl-sm.lg { width: 40px; height: 40px; }
+.fs-panel .ctl-sm .ico { width: 20px; height: 20px; }

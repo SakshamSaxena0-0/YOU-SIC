@@ -18,7 +18,7 @@ export class PlayerView {
     this.bgFlip = 0;
     this.ambient = new Ambient([[$('#library'), 'l'], [$('#eq'), 'l'], [$('#side'), 'r']], $('#aaWrap'), $('#aaTrack'));
     // full screen: the cover fits the screen, lit around by its own edges
-    this.fsLight = new FullLight($('#fsLight'), () => app.full && app.root.classList.contains('fs-fit'));
+    this.fsLight = new FullLight($('#fsLight'), () => app.full);
     this.lastPrev = null; this.lastNext = null;
     this.cards = {
       prev: $('[data-slot=prev]'), cur: $('[data-slot=cur]'), next: $('[data-slot=next]'),

@@ -1467,21 +1467,25 @@ html.fx-lite .grain { display: none !important; }
 .app.wide.full #player > :is(.pl-info, .pl-nav, .pl-corner, .pl-header) { display: none; }
 .app.wide.full #aaWrap .aa-scrim { opacity: 0; }
 /* the cover is never cut off. By default it is stretched over the whole screen (or the half beside the
-   lyrics), so the screen is all cover; the panel's key (.fs-fit, App.setFullFit) shows it whole at its own
-   shape instead, centred, the room it leaves lit by its own edges (.fs-light, fullLight.js). The
-   column-edge light (ambient.js) isn't needed in either */
+   lyrics), so the screen is all cover; Whole cover (.fs-fit, App.setFullFit) shows it at its own shape
+   instead: its box is the largest of that shape that fits (--fs-ar, fullLight.js), centred, and the room
+   it leaves is lit by its own edges (.fs-light, fullLight.js). The column-edge light (ambient.js) isn't
+   needed in either */
 .app.wide.full #aaWrap .aa-img { background-size: 100% 100%; background-position: center; background-repeat: no-repeat; }
-.app.wide.full.fs-fit #aaWrap .aa-img { background-size: contain; background-color: transparent; }
+.app.wide.full.fs-fit #aaWrap .aa-img {
+  inset: 0; margin: auto; width: min(100%, 100cqh * var(--fs-ar, 1)); height: min(100%, 100cqw / var(--fs-ar, 1)); background-color: transparent;
+}
 .app.wide.full #aaWrap > .amb-edge { display: none; }
 .fs-light { display: none; }
-.app.wide.full.fs-fit #aaWrap > .fs-light {
-  display: block; position: absolute; overflow: hidden; pointer-events: none; transition: opacity 0.4s ease;
+.app.wide.full #aaWrap > .fs-light {
+  display: block; position: absolute; overflow: hidden; pointer-events: none; opacity: 0; transition: opacity 0.5s ease;
   inset: calc(-1 * var(--bt, 0px)) calc(-1 * var(--br, 0px)) calc(-1 * var(--bb, 0px)) calc(-1 * var(--bl, 0px));
 }
+.app.wide.full.fs-fit #aaWrap > .fs-light { opacity: 1; }
 .fs-light canvas { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 0.9s ease; }
 .fs-light canvas.show { opacity: 1; }
 /* tap the cover for the song's details: its light dims with it */
-.app.wide.full #aaWrap.info-on > .fs-light { opacity: 0.42; }
+.app.wide.full.fs-fit #aaWrap.info-on > .fs-light { opacity: 0.42; }
 /* the pointer goes too while the controls are away */
 .app.full:not(.fs-ui) :is(#aaWrap, #aaWrap *) { cursor: none; }
 /* lyrics: a half of the screen, so larger lines */
@@ -1522,3 +1526,40 @@ html.fx-lite .grain { display: none !important; }
 .fs-panel .ctl-md .ico { width: 24px; height: 24px; }
 .fs-panel .ctl-sm.lg { width: 40px; height: 40px; }
 .fs-panel .ctl-sm .ico { width: 20px; height: 20px; }
+
+/* Going in and out of full screen (html.vt-full) and between Fill screen and Whole cover (html.vt-fit) are
+   view transitions (App._viewMorph). The cover (fs-art; fs-img for the switch) moves and resizes from where
+   it was to where it goes, its shade (fs-scrim) with it; the library, the side panel, the title, the dock, the corner keys and the title
+   bar fade where they stand, above it; the seekbar and the transport glide between the player and the
+   control panel, above that; the rest of the page cross-fades below. The names are set only while one runs. */
+html.vt-full #aaTrack { view-transition-name: fs-art; }
+html.vt-full #aaWrap > .aa-scrim { view-transition-name: fs-scrim; }
+html.vt-fit #aaTrack .aa-card[data-slot='cur'] .aa-img { view-transition-name: fs-img; }
+html.vt-full #library { view-transition-name: fs-lib; }
+html.vt-full #eq { view-transition-name: fs-eq; }
+html:is(.vt-full, .vt-fit) #side { view-transition-name: fs-side; }
+html.vt-full .titlebar { view-transition-name: fs-bar; }
+html.vt-full #player > .pl-info { view-transition-name: fs-title; }
+html.vt-full #player > .pl-corner-l { view-transition-name: fs-cl; }
+html.vt-full #player > .pl-corner-r { view-transition-name: fs-cr; }
+html.vt-full #plNav { view-transition-name: fs-dock; }
+html:is(.vt-full, .vt-fit) #fsPanel { view-transition-name: fs-panel; }
+html.vt-full :is(#player, #fsPanel) > .seek { view-transition-name: fs-seek; }
+html.vt-full :is(#player, #fsPanel) > .controls { view-transition-name: fs-ctl; }
+html:is(.vt-full, .vt-fit)::view-transition-group(*) { z-index: 3; animation-duration: 0.62s; animation-timing-function: var(--ease); }
+html:is(.vt-full, .vt-fit)::view-transition-group(root) { z-index: 0; }
+html:is(.vt-full, .vt-fit)::view-transition-group(fs-art), html.vt-fit::view-transition-group(fs-img) { z-index: 1; }
+html.vt-full::view-transition-group(fs-scrim) { z-index: 2; }
+html.vt-full::view-transition-group(fs-seek), html.vt-full::view-transition-group(fs-ctl) { z-index: 4; }
+html:is(.vt-full, .vt-fit)::view-transition-old(*), html:is(.vt-full, .vt-fit)::view-transition-new(*) { animation-duration: 0.36s; }
+html:is(.vt-full, .vt-fit)::view-transition-old(root), html:is(.vt-full, .vt-fit)::view-transition-new(root) { animation-duration: 0.45s; }
+/* the cover: each picture covers the moving box (no stretching on the way); the switch's two pictures are
+   the same cover stretched to the box, so only the box is seen to move */
+html.vt-full::view-transition-old(fs-art), html.vt-full::view-transition-new(fs-art) { width: 100%; height: 100%; object-fit: cover; animation-duration: 0.45s; }
+/* its shade is a gradient: it simply stretches with the cover */
+html.vt-full::view-transition-old(fs-scrim), html.vt-full::view-transition-new(fs-scrim) { width: 100%; height: 100%; object-fit: fill; }
+/* the side panel is half the screen wide in full screen: it slides and fades at its own size, never scaled */
+html:is(.vt-full, .vt-fit)::view-transition-old(fs-side), html:is(.vt-full, .vt-fit)::view-transition-new(fs-side) {
+  width: 100%; height: 100%; object-fit: none; object-position: left top;
+}
+html.vt-fit::view-transition-old(fs-img), html.vt-fit::view-transition-new(fs-img) { width: 100%; height: 100%; object-fit: fill; }

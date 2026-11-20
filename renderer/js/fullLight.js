@@ -2,7 +2,9 @@
 // above and below it) is lit by the cover's own edges, stretched out towards the screen's edges and fading
 // into the ground there, so the cover sits in its own light rather than between black bars. The light is a
 // tiny canvas the browser stretches over the screen: soft, with no blur filter. It is drawn once per song
-// and again when the space changes size (after it settles), and only while full screen is on.
+// and again when the space changes size (after it settles), whenever full screen is on (Fill screen keeps it
+// out of sight, ready to fade in). The cover's shape goes to #aaWrap as --fs-ar (width over height), which
+// sizes the cover's box for Whole cover.
 const LONG = 64; // the canvas's longer side, in pixels
 // how much of the ground lies over the light: a little at the cover's edge, nearly all at the screen's
 const FADE = [[0, 0.35], [0.3, 0.62], [0.65, 0.86], [1, 0.98]];
@@ -26,7 +28,13 @@ export class FullLight {
     // out of full screen the old light would only flash up on the way back in: drop it now
     if (!this.isOn()) { this.host.replaceChildren(); this.key = ''; }
     const seq = ++this.seq;
-    const done = (im) => { if (seq !== this.seq) return; this.img = im; this.draw(true); };
+    const done = (im) => {
+      if (seq !== this.seq) return;
+      this.img = im;
+      const ar = im && im.naturalWidth && im.naturalHeight ? im.naturalWidth / im.naturalHeight : 1;
+      this.host.parentElement.style.setProperty('--fs-ar', ar.toFixed(4));
+      this.draw(true);
+    };
     if (!url) return done(null);
     const im = new Image();
     im.onload = () => done(im);

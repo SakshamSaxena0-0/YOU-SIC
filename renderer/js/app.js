@@ -83,11 +83,17 @@ class App {
     this._fsFitUi();
     // full screen needs the window's help (preload.js); the Android build has none
     if (!pa.setFullScreen) $('#plFull').style.display = $('#fullBtn').style.display = 'none';
-    pa.onFullScreen?.((on) => this._setFull(on));
+    pa.onFullScreen?.((on) => this._onWinFull(on));
     this.player.addEventListener('track', () => this._fsText());
     this._bindFull();
     this._layout();
     new ResizeObserver(() => { this._layout(); this._navInk(); if (!this.narrow) this._sideInk(); }).observe(document.body);
+    // while the window itself is being resized the columns follow it at once rather than gliding after it
+    addEventListener('resize', () => {
+      this.root.classList.add('no-anim');
+      clearTimeout(this._rzT);
+      this._rzT = setTimeout(() => this._animateAgain(), 160);
+    });
     document.fonts.ready.then(() => { if (!this.narrow) this._sideInk(); });
     this._bindPremium();
     // liquid glass refraction for every .lg element, now and as screens build new ones
@@ -168,14 +174,62 @@ class App {
   get full() { return this.root.classList.contains('full'); }
 
   toggleFull(force) {
-    const on = force ?? !this.full;
-    this._setFull(on);
+    const on = force ?? !(this._fullWant ?? this.full);
+    this._fullWant = on;
     pa.setFullScreen?.(on);
+    this._fullFollow(on);
   }
 
-  // the page's side of it; also called when the window goes in or out of full screen by itself (F11)
+  // the window went in or out of full screen: after toggleFull asked, or by itself (F11)
+  _onWinFull(on) {
+    this._fullWant = on;
+    this._fullFollow(on);
+  }
+
+  // The page changes once the window has its new size, so the move from one layout to the other plays out
+  // whole instead of being cut short by the resize. A window whose size doesn't change (it already was the
+  // screen's size, or it can't go full screen) goes ahead after a moment.
+  _fullFollow(on) {
+    const stop = () => { clearTimeout(this._fullT); removeEventListener('resize', this._fullR); };
+    stop();
+    // (toggleFull and the window's own word both get here: the move starts once)
+    const go = () => {
+      stop();
+      if (this._fullWant !== on || on === (this._fullTo ?? this.full)) return;
+      this._fullTo = on;
+      this._viewMorph('vt-full', () => { this._fullTo = undefined; this._setFull(on); });
+    };
+    const screenSized = () => innerWidth >= screen.width - 2 && innerHeight >= screen.height - 2;
+    if (screenSized() === on) return go();
+    this._fullR = () => { if (screenSized() === on) requestAnimationFrame(go); };
+    addEventListener('resize', this._fullR);
+    this._fullT = setTimeout(go, 450);
+  }
+
+  // A change shown as a view transition (css: html.vt-full, html.vt-fit): the cover moves and resizes from
+  // where it was to where it goes while the rest cross-fades, and the panels stay above the cover the whole
+  // way. The browser does the moving (no script per frame). Reduce animations, or no support, just switches.
+  _viewMorph(cls, change) {
+    const html = document.documentElement;
+    if (!document.startViewTransition || this.store.settings.reduceMotion || document.hidden) return change();
+    if (this._vt) { this._vt.skipTransition(); html.classList.remove(this._vtCls); }
+    html.classList.add(cls);
+    const vt = document.startViewTransition(change);
+    this._vt = vt;
+    this._vtCls = cls;
+    vt.finished.finally(() => {
+      if (this._vt !== vt) return;
+      html.classList.remove(cls);
+      this._vt = null;
+    });
+  }
+
+  // the page's side of it
   _setFull(on) {
     if (on === this.full) return;
+    // the layout switches at once (the view transition does the moving); animations come back after
+    this.root.classList.add('no-anim');
+    this._animateAgain();
     closeMenu();
     $('#volPop').classList.remove('open');
     if (on) {
@@ -201,17 +255,23 @@ class App {
   // how the cover shows in full screen (the panel's Fill screen / Whole cover choice, or Settings; remembered):
   // stretched over the whole screen, so the screen is all cover and none of it is cut off (the default), or
   // whole at its own shape (.fs-fit), the room beside it lit by its own edges (fullLight.js)
+  // In full screen the change is shown: the cover narrows to its own shape (or widens to the screen's) and its
+  // light fades in beside it (or out).
   setFullFit(mode) {
     this.store.settings.fullFit = mode === 'fit' ? 'fit' : 'fill';
     this.store.saveSettings();
-    this._fsFitUi();
-    this.playerView.fsLight.draw();
+    const fit = this.store.settings.fullFit === 'fit';
+    $$('#fsPanel [data-fit]').forEach((b) => b.classList.toggle('on', (b.dataset.fit === 'fit') === fit));
+    if (this.full && fit !== this.root.classList.contains('fs-fit')) this._viewMorph('vt-fit', () => this._fsFitUi());
+    else this._fsFitUi();
   }
 
   _fsFitUi() {
     const fit = this.store.settings.fullFit === 'fit';
     this.root.classList.toggle('fs-fit', fit);
     $$('#fsPanel [data-fit]').forEach((b) => b.classList.toggle('on', (b.dataset.fit === 'fit') === fit));
+    // the light is drawn for the room as it is now (nothing to do if it already was)
+    if (fit && this.full) this.playerView.fsLight.draw();
   }
 
   _fsText() {
@@ -270,7 +330,14 @@ class App {
     this.root.dataset.screen = this.screen;
     $$('.nav-btn[data-act=library]').forEach((b) => b.classList.toggle('on', this.screen === 'library' && !this.narrow));
     $$('.nav-btn[data-act=eq]').forEach((b) => b.classList.toggle('on', this.screen === 'eq'));
-    if (animate) requestAnimationFrame(() => this.root.classList.remove('no-anim'));
+    this._animateAgain();
+  }
+
+  // A change made without animating (a layout switch) must not leave the animations off for what follows:
+  // they come back once that change has been drawn. Reduce animations keeps them off.
+  _animateAgain() {
+    if (this.store.settings.reduceMotion) return;
+    requestAnimationFrame(() => requestAnimationFrame(() => { if (!this.store.settings.reduceMotion) this.root.classList.remove('no-anim'); }));
   }
 
   show(screen) {

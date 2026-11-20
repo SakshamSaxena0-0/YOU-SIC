@@ -121,16 +121,15 @@ export class Ambient {
     im.src = url;
   }
 
-  // the layout changed size (PlayerView._bleed): redraw the light in place, once things settle
+  // the layout changed size (PlayerView._bleed): once things settle, the light for the new layout
+  // cross-fades over the old one (as on a new song), so it never jumps when a panel opens or closes
   refit() {
     clearTimeout(this._refit);
     this._refit = setTimeout(() => {
       if (!this.img) return;
       const g = this._geom();
       if (g.key === this.key || !g.w) return;
-      this.key = g.key;
-      const cols = { l: column(this.img, 'l', g), r: column(this.img, 'r', g) };
-      for (const p of this.pieces) if (p.cur && cols[p.side]) paint(p.cur, cols[p.side], p.side, p.kind, g);
+      this._show(this.seq, this.img);
     }, 150);
   }
 

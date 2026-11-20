@@ -11,6 +11,7 @@ import { LyricsView } from './lyricsView.js';
 import { toast, menuAt, openSheet, closeSheet, chooser, closeMenu } from './ui.js';
 import { liquidAll, watchLiquid, refreshLiquid } from './liquidGlass.js';
 import { MiniLink } from './miniLink.js';
+import { Spotlight } from './spotlight.js';
 
 // A soft spring (damping 0.92, 0.7 s): it sets off quickly and settles without a bounce. Used for the moves of
 // the view transitions (App._vtMoves).
@@ -534,11 +535,16 @@ class App {
     // cursor-following spotlight on cards, rows and glass buttons
     addEventListener('pointermove', (e) => {
       const el = e.target.closest && e.target.closest('.tile, .row, .gcell, .lg');
-      if (!el) return;
+      // (the library's buttons in the Brutal mood have the spotlight below instead: restyling a button on
+      // every move is what that avoids)
+      if (!el || this.brutal && el.classList.contains('tile') && el.closest('#library')) return;
       const r = el.getBoundingClientRect();
       el.style.setProperty('--mx', `${e.clientX - r.left}px`);
       el.style.setProperty('--my', `${e.clientY - r.top}px`);
     }, { passive: true });
+    // Brutal mood: a dot-matrix light round the pointer on the library's buttons, their rims catching it
+    // (js/spotlight.js, css/spotlight.css)
+    this.spotlight = new Spotlight($('#library'), { scope: '.lib-page', card: '.tile', reach: 130, enabled: () => this.brutal });
   }
 
   _applyGlassWindow() {

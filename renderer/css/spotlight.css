@@ -1,0 +1,77 @@
+/* ==========================================================================
+   Library spotlight (Liquid Glass, Brutal mood: html.glass-brutal; js/spotlight.js)
+   The library's buttons as matte monochrome cards (pure greys, no warm tint), and a light that follows
+   the cursor: a fine orthogonal dot matrix and a soft white glow just round the pointer, clipped to each
+   card, and the rims of the cards near it catching the light, so a card beside the pointer lights the
+   edge that faces it. All of the light is one small element per card (span.spot-light: the lit rim, the
+   glow and the dots, masked to a circle round the pointer), under the card's names and icon. spotlight.js
+   makes it and gives it .on and the pointer's position in the card (--mouse-x, --mouse-y) while the card
+   is within reach. A move restyles and repaints only the lights of the cards near the pointer, never the
+   cards. No loop, no blur, no animation while the pointer moves.
+   ========================================================================== */
+/* registered: typed lengths, not inherited (the light has nothing inside it) */
+@property --mouse-x { syntax: '<length>'; inherits: false; initial-value: -999px; }
+@property --mouse-y { syntax: '<length>'; inherits: false; initial-value: -999px; }
+
+html.glass-brutal {
+  --sp-card: rgb(30 30 30 / 0.9);          /* the card: #1E1E1E, nearly opaque so nothing tints it */
+  --sp-badge: #2a2a2a;                     /* the icon's square */
+  --sp-ink: #eaeaea;                       /* names */
+  --sp-count: #888;                        /* counts */
+  --sp-r: 12px;
+  --sp-dot: rgb(255 255 255 / 0.72);       /* the dot matrix: 1.5px dots on a 4px grid */
+  --sp-pitch: 4px;
+  --sp-light-r: 110px;                     /* how far round the pointer the light reaches (spotlight.js reach is 130) */
+  --sp-glow-r: 150px;                      /* the white glow under the dots */
+  --sp-glow: 0.12;
+  --sp-rim-w: 2px;
+  /* the rim at rest: the mood's brushed-steel ring in neutral greys, under a dark veil so the light shows */
+  --sp-rim: linear-gradient(rgb(18 18 18 / 0.45) 0 0), var(--br-gloss), conic-gradient(#b3b3b3, #848484 6%, #d9d9d9 12.5%, #767676 19%, #949494 25%, #c5c5c5 32%, #ededed 37.5%,
+    #bcbcbc 43%, #797979 50%, #6b6b6b 57%, #cfcfcf 62.5%, #727272 69%, #999 75%, #cacaca 82%, #efefef 87.5%, #d1d1d1 94%, #b3b3b3);
+}
+
+/* ---------- the card ---------- */
+html.glass-brutal .app #library.library .lib-page .tile.lg {
+  --lg-bg: linear-gradient(180deg, rgb(255 255 255 / 0.05), rgb(255 255 255 / 0.012) 55%, rgb(255 255 255 / 0.03)),
+    linear-gradient(var(--sp-card), var(--sp-card));
+  background: var(--lg-bg); /* the spotlight is the pointer light here: no second glow on hover */
+  border-radius: var(--sp-r);
+  filter: none; /* nor a brightening */
+}
+/* the rim at rest, under what is on the card (it never overlaps it), so the light can lie over it */
+html.glass-brutal .app #library.library .lib-page .tile.lg::before { z-index: -1; padding: var(--sp-rim-w); background: var(--sp-rim); }
+
+/* the light: the rim lit white, a soft glow and the dot matrix, all shown only round the pointer. It is the
+   card's own span.spot-light (made by spotlight.js), over the rim and under the names and the icon. */
+html.glass-brutal .app #library.library .lib-page .tile.lg::after { content: none; } /* the general hover glow */
+html.glass-brutal #library .spot-light {
+  position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none;
+  border: var(--sp-rim-w) solid #fff;
+  background:
+    radial-gradient(circle at 1.5px 1.5px, var(--sp-dot) 0.75px, transparent 1.2px) 0 0 / var(--sp-pitch) var(--sp-pitch) padding-box,
+    radial-gradient(circle var(--sp-glow-r) at var(--mouse-x) var(--mouse-y), rgb(255 255 255 / var(--sp-glow)),
+      rgb(255 255 255 / calc(var(--sp-glow) * 0.45)) 32%, transparent 70%) border-box padding-box;
+  mask-image: radial-gradient(circle var(--sp-light-r) at var(--mouse-x) var(--mouse-y), #000, rgb(0 0 0 / 0.7) 25%, rgb(0 0 0 / 0.25) 55%, transparent);
+  opacity: 0;
+}
+html.glass-brutal #library .spot-light.on { opacity: 1; }
+/* while lit, a layer of its own: redrawing the light then redraws nothing round it (the rims, the shadows) */
+html.glass-brutal #library .spot-light:is(.on, .fade) { will-change: transform; }
+/* a card coming into reach or leaving it needs no fade (the light is already nothing at the edge of its
+   reach); when the pointer leaves the library, the lights fade out */
+html.glass-brutal #library .spot-light.fade { transition: opacity 0.4s ease-out; }
+/* a song filled with its cover: the cover is never touched, so only the rims light, over it */
+html.glass-brutal .app #library.library .lib-page .tile.lg.has-art::before { z-index: 3; }
+html.glass-brutal #library .tile.has-art > .spot-light { z-index: 4; background: none; }
+/* other moods draw no light */
+html:not(.glass-brutal) .spot-light { display: none; }
+
+/* ---------- what is on it ---------- */
+html.glass-brutal .app #library.library .lib-page .tile-ico:not(.has-art) {
+  border-radius: 9px;
+  color: #fff;
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.09), rgb(255 255 255 / 0) 55%), var(--sp-badge);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.16), inset 0 0 0 1px rgb(255 255 255 / 0.07), 0 6px 14px -8px rgb(0 0 0 / 0.7);
+}
+html.glass-brutal .app #library.library .lib-page .tile:not(.has-art, .playing) .tile-title { color: var(--sp-ink); }
+html.glass-brutal .app #library.library .lib-page .tile:not(.has-art) .tile-count { color: var(--sp-count); }

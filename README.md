@@ -18,7 +18,7 @@ On first start the app scans your Windows *Music* folder. Add more folders from 
 | Player | Blurred, slowly drifting album-art background; accent color extracted from the cover; 3D album-art carousel |
 | Gestures | Album art: swipe ←/→ to change track, swipe ↓ (or click) for the track's category, swipe ↑ for lyrics. Mini-player: click to open the player, drag ←/→ to change track, long-press to open the playing category. Library: swipe → from the left edge (or Alt+drag, mouse Back, Backspace) for the parent category. Visualization: swipe ←/→ to change presets |
 | Seekbar | Real waveform, decoded from the file and morphed in, with a drag bubble; mouse wheel seeks |
-| Library | Folders, Folders Hierarchy, All Songs, Albums, Artists, Album Artists, Genres, Years, Composers, Playlists, Queue, Recently Added/Played, Most Played, Top Rated; search; sort options; list or grid view (the list menu, ⋮ beside search: *View > List view / Grid view*, remembered per kind of view; grid view shows a list's folders, artists... and songs as tiles like the library's own); Ctrl+wheel zoom; virtualized lists and grids |
+| Library | Folders, Folders Hierarchy, All Songs, Albums, Artists, Album Artists, Genres, Years, Composers, Playlists, Queue, Recently Added/Played, Most Played, Top Rated; search; sort options; list or grid view (the list menu, ⋮ beside search: *View > List view / Grid view*, remembered per kind of view; grid view shows a list's folders, artists... and songs as tiles like the library's own); Ctrl+wheel zoom; virtualized lists and grids; in the Brutal mood, a dot-matrix spotlight follows the mouse over the tiles and lights the rims near it |
 | Playback | Gapless (next track preloaded) or crossfade (1–12 s); shuffle; repeat off/category/song; Play Next / Queue; resumes the last session |
 | Equalizer | 10-band graphic EQ with a live frequency-response curve, 21 presets plus your own; Preamp, Bass, Treble, Balance and Tempo knobs; Limiter; Reverb tab with 7 knobs and 8 presets |
 | Visualization | MilkDrop presets (butterchurn) in the right-hand panel (over the album art in narrow windows) or fullscreen; shuffle / locked / sequential preset modes |
@@ -59,6 +59,7 @@ preload.js       IPC bridge
 renderer/
   index.html     app shell
   css/app.css    theme, layout, animations
+  css/spotlight.css, js/spotlight.js   the library tiles' cursor spotlight (Brutal mood)
   js/audio.js    Web Audio engine (2 decks, EQ / tone / balance / reverb / limiter)
   js/player.js   queue, shuffle/repeat, gapless & crossfade
   js/*View.js    player, library, equalizer, visualization, lyrics screens

@@ -7,7 +7,30 @@
 // the controls, app.css .aa-scrim), so it comes from the part of the cover you see. Each piece is a tiny
 // canvas the browser stretches over its area: soft light without a blur filter. Drawn once per song and
 // again when the layout changes size; the old light cross-fades to the new one (brutal.css .amb).
+//
+// All of it is drawn from a small copy of the cover (shrink), on canvases kept in memory rather than on the
+// graphics card (ctx): the light's colours are read back and toned pixel by pixel (tone), and reading back
+// a canvas on the card makes the page wait for the card, which mid-animation (a view transition, a swipe)
+// is a visible stall of tens of milliseconds. In memory, a whole redraw costs well under a millisecond.
 const W = 32, H = 48;
+const SMALL = 256; // the cover's copy: this wide (its height in proportion)
+const ctx = (c) => c.getContext('2d', { willReadFrequently: true });
+
+// The cover as a small bitmap, decoded and scaled in the background where the browser can (from the
+// file's bytes); else from the picture itself. Null when there is no picture.
+async function shrink(url) {
+  const opts = { resizeWidth: SMALL, resizeQuality: 'medium' };
+  try {
+    const r = await fetch(url);
+    if (r.ok) return await createImageBitmap(await r.blob(), opts);
+  } catch {}
+  const im = new Image();
+  im.src = url;
+  try { await im.decode(); } catch { return null; }
+  try { return await createImageBitmap(im, opts); } catch { return im; }
+}
+// a picture's own size (a bitmap's or an image's)
+const dims = (img) => [img.naturalWidth || img.width || 0, img.naturalHeight || img.height || 0];
 const FLOOR = 0.22; // the light left where the scrim is darkest, behind the controls
 // the light on the panes (and the wash under the window) is kept deep, so their text keeps its contrast
 // over any cover: saturation up, luminance (0-255) capped
@@ -39,7 +62,7 @@ function light(y, g) {
 
 // the cover's visible edge on one side, averaged down to one column of H colours (a little brighter)
 function column(img, side, g) {
-  const iw = img.naturalWidth, ih = img.naturalHeight;
+  const [iw, ih] = dims(img);
   if (!iw || !ih || !g.w || !g.h) return null;
   // the cover fills its box (background-size: cover, background-position: 50% 38%, app.css .aa-img)
   const s = Math.max(g.w / iw, g.h / ih);
@@ -48,7 +71,7 @@ function column(img, side, g) {
   const sx = side === 'l' ? -ox / s : (g.w - ox) / s - band;
   const col = document.createElement('canvas');
   col.width = 1; col.height = H;
-  const cg = col.getContext('2d');
+  const cg = ctx(col);
   cg.imageSmoothingQuality = 'high';
   cg.filter = 'saturate(1.35) brightness(1.15)';
   cg.drawImage(img, Math.max(0, sx), Math.max(0, -oy / s), band, Math.min(ih, g.h / s), 0, 0, 1, H);
@@ -75,7 +98,7 @@ function tone(x, w, h, sat, maxY) {
 function paint(c, col, side, kind, g) {
   const w = kind === 'panel' ? W : 2;
   c.width = w; c.height = H;
-  const x = c.getContext('2d');
+  const x = ctx(c);
   x.drawImage(col, 0, 0, 1, H, 0, 0, w, H);
   if (kind === 'panel') tone(x, w, H, PANE_SAT, PANE_MAXY);
   x.globalCompositeOperation = 'destination-in';
@@ -103,16 +126,16 @@ function paint(c, col, side, kind, g) {
 // room round it, then cut to size, so the blur doesn't darken its edges.
 function bleed(c, img) {
   const w = 72, h = 42, pad = 12;
-  const iw = img.naturalWidth, ih = img.naturalHeight;
+  const [iw, ih] = dims(img);
   if (!iw || !ih) return false;
   const big = document.createElement('canvas');
   big.width = w + 2 * pad; big.height = h + 2 * pad;
-  const b = big.getContext('2d');
+  const b = ctx(big);
   const s = Math.max(big.width / iw, big.height / ih);
   b.filter = 'blur(4px)';
   b.drawImage(img, (big.width - iw * s) / 2, (big.height - ih * s) * 0.38, iw * s, ih * s);
   c.width = w; c.height = h;
-  const x = c.getContext('2d');
+  const x = ctx(c);
   x.drawImage(big, pad, pad, w, h, 0, 0, w, h);
   tone(x, w, h, PANE_SAT, WASH_MAXY);
   return true;
@@ -158,10 +181,7 @@ export class Ambient {
     this.url = url;
     const seq = ++this.seq;
     if (!url) return this._show(seq, null);
-    const im = new Image();
-    im.onload = () => this._show(seq, im);
-    im.onerror = () => this._show(seq, null);
-    im.src = url;
+    shrink(url).then((im) => this._show(seq, im), () => this._show(seq, null));
   }
 
   // the layout changed size (PlayerView._bleed): once things settle, the light for the new layout
@@ -184,6 +204,7 @@ export class Ambient {
     const g = this._geom();
     this.key = g.key;
     const cols = im ? { l: column(im, 'l', g), r: column(im, 'r', g) } : {};
+    const made = [];
     for (const p of this.pieces) {
       for (const old of p.box.querySelectorAll('canvas.show')) {
         old.classList.remove('show');
@@ -199,8 +220,10 @@ export class Ambient {
       }
       p.box.append(c);
       p.cur = c;
-      void c.offsetWidth; // start from transparent, so it fades in
-      c.classList.add('show');
+      made.push(c);
     }
+    // they start from transparent (one style pass for all of them), so they fade in
+    if (made.length) getComputedStyle(made[0]).opacity;
+    for (const c of made) c.classList.add('show');
   }
 }

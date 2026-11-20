@@ -92,7 +92,7 @@ class App {
     this._fsFitUi();
     // full screen needs the window's help (preload.js); the Android build has none
     if (!pa.setFullScreen) $('#plFull').style.display = $('#fullBtn').style.display = 'none';
-    pa.onFullScreen?.((on) => this._onWinFull(on));
+    pa.onFullScreen?.((on, size) => this._onWinFull(on, size));
     this.player.addEventListener('track', () => this._fsText());
     this._bindFull();
     this._layout();
@@ -242,36 +242,54 @@ class App {
   toggleFull(force) {
     const on = force ?? !(this._fullWant ?? this.full);
     this._fullWant = on;
-    pa.setFullScreen?.(on);
-    this._fullFollow(on);
+    if (!pa.setFullScreen) return this._fullGo(on);
+    this._fullWait(on);
+    pa.setFullScreen(on);
   }
 
-  // the window went in or out of full screen: after toggleFull asked, or by itself (F11)
-  _onWinFull(on) {
+  // the window went in or out of full screen (after toggleFull asked, or by itself: F11), with its new size
+  // (main.js fullSay): { w, h, resized }
+  _onWinFull(on, size) {
     this._fullWant = on;
-    this._fullFollow(on);
+    this._fullWait(on, size || { resized: false });
   }
 
-  // The page changes once the window has its new size, so the move from one layout to the other plays out
-  // whole instead of being cut short by the resize. A window whose size doesn't change (it already was the
-  // screen's size, or it can't go full screen) goes ahead after a moment.
-  _fullFollow(on) {
-    const stop = () => { clearTimeout(this._fullT); removeEventListener('resize', this._fullR); };
-    stop();
-    // (toggleFull and the window's own word both get here: the move starts once)
-    const go = () => {
-      stop();
-      if (this._fullWant !== on || on === (this._fullTo ?? this.full)) return;
-      this._fullTo = on;
-      // which way it goes (css: html.vt-out, the light beside the cover fades out on the way out)
-      document.documentElement.classList.toggle('vt-out', !on);
-      this._viewMorph('vt-full', () => { this._fullTo = undefined; this._setFull(on); });
-    };
-    const screenSized = () => innerWidth >= screen.width - 2 && innerHeight >= screen.height - 2;
-    if (screenSized() === on) return go();
-    this._fullR = () => { if (screenSized() === on) requestAnimationFrame(go); };
-    addEventListener('resize', this._fullR);
-    this._fullT = setTimeout(go, 450);
+  // The page changes once the window has its new size, so the move from one layout to the other plays on a
+  // window that keeps its size: a resize under a view transition cuts it short (the page jumps to its new
+  // layout) or has it capture everything again (a stall at its start). A maximized window over an
+  // auto-hiding taskbar is 2px short of the screen, so its size can't tell whether it is in full screen: the
+  // window says when its change is made, and whether its size changed; that new size reaches the page as
+  // a resize. (No word from the window within half a second, and the move goes ahead anyway.)
+  _fullWait(on, said) {
+    let p = this._fullP;
+    if (!p || p.on !== on) {
+      if (p) clearTimeout(p.t);
+      p = this._fullP = { on, w: innerWidth, h: innerHeight, said: null };
+      p.t = setTimeout(() => this._fullGo(on, p), 500);
+      if (!this._fullR) addEventListener('resize', (this._fullR = () => this._fullP && this._fullCheck(this._fullP)));
+    }
+    if (said) p.said = said;
+    this._fullCheck(p);
+  }
+
+  _fullCheck(p) {
+    const s = p.said;
+    if (!s) return;
+    // its new size has reached the page (or the page already was that size)
+    const near = (a, b) => Math.abs(a - b) <= 1;
+    const there = !s.resized || innerWidth !== p.w || innerHeight !== p.h || (near(innerWidth, s.w) && near(innerHeight, s.h));
+    // (on the next frame: the page has laid itself out at the new size by then, so the move captures that)
+    if (there) requestAnimationFrame(() => this._fullGo(p.on, p));
+  }
+
+  _fullGo(on, p) {
+    if (p) { if (p !== this._fullP) return; clearTimeout(p.t); this._fullP = null; }
+    // (asked twice the same way, the move starts once)
+    if (this._fullWant !== on || on === (this._fullTo ?? this.full)) return;
+    this._fullTo = on;
+    // which way it goes (css: html.vt-out, the light beside the cover fades out on the way out)
+    document.documentElement.classList.toggle('vt-out', !on);
+    this._viewMorph('vt-full', () => { this._fullTo = undefined; this._setFull(on); });
   }
 
   // A change shown as a view transition (css: html.vt-full): the cover moves and resizes from

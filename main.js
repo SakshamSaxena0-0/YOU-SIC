@@ -416,6 +416,28 @@ function setWallpaperMode(on) {
 // Acrylic window material needs Windows 11 22H2 (build 22621) or newer.
 const GLASS_SUPPORTED = process.platform === 'win32' && Number((require('os').release().split('.')[2]) || 0) >= 22621;
 
+// Full screen. The page changes its layout (a view transition) once the window has its new size: a window
+// resized under a view transition cuts it short. So the page hears of the change once it is made, with the
+// window's new size (in the page's pixels) and whether that size changed. On Windows the change is made
+// within setFullScreen (a maximized window over an auto-hiding taskbar only grows by 2px), so this is at
+// once; a window already in the state asked for answers at once too.
+let fullFrom = null;
+function setFull(on) {
+  if (!win || win.isDestroyed()) return;
+  if (win.isFullScreen() === on) return fullSay();
+  fullFrom = win.getContentSize();
+  win.setFullScreen(on);
+}
+function fullSay() {
+  setImmediate(() => {
+    if (!win || win.isDestroyed()) return;
+    const [w, h] = win.getContentSize();
+    const resized = !!fullFrom && (fullFrom[0] !== w || fullFrom[1] !== h);
+    fullFrom = null;
+    win.webContents.send('win:full', win.isFullScreen(), { w, h, resized });
+  });
+}
+
 async function createWindow() {
   const b = await readJson('window.json', {});
   const settings = await readJson('settings.json', {});
@@ -445,13 +467,13 @@ async function createWindow() {
   const sendState = () => win.webContents.send('win:state', { maximized: win.isMaximized() });
   win.on('maximize', sendState);
   win.on('unmaximize', sendState);
-  // full screen: the page follows the window (App._setFull), whichever way it came in or out; F11 toggles it
-  win.on('enter-full-screen', () => win.webContents.send('win:full', true));
-  win.on('leave-full-screen', () => win.webContents.send('win:full', false));
+  // full screen: the page follows the window (App._onWinFull), whichever way it came in or out; F11 toggles it
+  win.on('enter-full-screen', fullSay);
+  win.on('leave-full-screen', fullSay);
   win.webContents.on('before-input-event', (e, input) => {
     if (input.type === 'keyDown' && input.key === 'F11' && !input.control && !input.alt && !input.meta) {
       e.preventDefault();
-      win.setFullScreen(!win.isFullScreen());
+      setFull(!win.isFullScreen());
     }
   });
   for (const ev of ['move', 'resize', 'maximize', 'unmaximize', 'restore']) win.on(ev, () => wall.on && sendGeom());
@@ -582,7 +604,7 @@ function setupIpc() {
     }
   });
   ipcMain.on('win:max', () => (win.isMaximized() ? win.unmaximize() : win.maximize()));
-  ipcMain.on('win:full', (_e, on) => { if (win && !win.isDestroyed() && win.isFullScreen() !== !!on) win.setFullScreen(!!on); });
+  ipcMain.on('win:full', (_e, on) => setFull(!!on));
   ipcMain.handle('win:glass', (_e, on) => {
     on = !!on && GLASS_SUPPORTED;
     try {

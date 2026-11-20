@@ -4,6 +4,7 @@ import { extractColors } from './palette.js';
 import { Waveform } from './waveform.js';
 import { THEME_COLORS, GLASS_BRUTAL } from './store.js';
 import { Ambient } from './ambient.js';
+import { FullLight } from './fullLight.js';
 
 const PLACEHOLDER = 'placeholder';
 
@@ -16,6 +17,8 @@ export class PlayerView {
     this.showRemain = true;
     this.bgFlip = 0;
     this.ambient = new Ambient([[$('#library'), 'l'], [$('#eq'), 'l'], [$('#side'), 'r']], $('#aaWrap'), $('#aaTrack'));
+    // full screen: the cover fits the screen, lit around by its own edges
+    this.fsLight = new FullLight($('#fsLight'), () => app.full);
     this.lastPrev = null; this.lastNext = null;
     this.cards = {
       prev: $('[data-slot=prev]'), cur: $('[data-slot=cur]'), next: $('[data-slot=next]'),
@@ -379,6 +382,7 @@ export class PlayerView {
     const root = document.documentElement;
     // the Brutal mood and Metal keep their palettes but let the cover's own colours glow into the panels beside it
     this.ambient.set(this.app.seamless ? url : '');
+    this.fsLight.set(url);
     let accent = hexToRgb(s.accent), dark = [16, 16, 20];
     // solid themes (and Liquid Glass's Brutal mood) run on a fixed palette, whatever the cover looks like
     const fixed = THEME_COLORS[s.theme] || (this.app.brutal ? GLASS_BRUTAL : null);

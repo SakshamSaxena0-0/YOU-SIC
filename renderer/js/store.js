@@ -20,6 +20,7 @@ export const DEFAULT_SETTINGS = {
   glassMood: 'brutal', // Liquid Glass only: brutal (black and white, hard light, heavy type) | clear (clear glass tinted by the album)
   refraction: true,
   fullFit: 'fill', // full screen: fill (the cover stretched over the whole screen) | fit (the whole cover at its own shape, lit by its edges)
+  navMin: false, // wide layout: the left-hand pane folded down to its rail (the ☰ key)
   windowBg: 'wallpaper', // wallpaper | acrylic | solid
   buttonStyle: 'ios', // ios (clear glass) | bubble | aqua (liquid-filled)
   liquid: 'aqua', // aqua | lime | accent

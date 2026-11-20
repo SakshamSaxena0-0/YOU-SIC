@@ -17,6 +17,8 @@ import { Spotlight } from './spotlight.js';
 // the view transitions (App._vtMoves).
 const SPRING = 'linear(0, 0.0194, 0.0683, 0.1355, 0.2127, 0.2938, 0.3747, 0.4524, 0.5252, 0.5919, 0.6522, 0.7058, 0.7529, 0.794, 0.8294, 0.8596, 0.8853, 0.907, 0.925, 0.9401, 0.9525, 0.9626, 0.9709, 0.9776, 0.9829, 0.9872, 0.9905, 0.9932, 0.9952, 0.9968, 0.9979, 0.9988, 0.9994, 0.9999, 1.0002, 1.0004, 1.0005, 1.0006, 1.0006, 1.0006, 1)';
 const SPRING_MS = 700;
+// wide windows narrower than this fold the left-hand pane down to its rail by themselves (Snap layouts)
+const NAV_AUTO = 1200;
 
 class App {
   constructor() {
@@ -81,7 +83,8 @@ class App {
     pa.onProgress((m) => this._scanProgress(m));
 
     $$('#side .eq-tab').forEach((t) => (t.onclick = () => this.showSide(t.dataset.side)));
-    $('#sideClose').onclick = () => this.showSide(null);
+    $('#sideClose').onclick = () => this._paneMorph(() => this.showSide(null), 'vt-fold-r');
+    this._bindRail();
     $('#plAdmire').onclick = () => this.toggleArt();
     $('#plFull').onclick = $('#fullBtn').onclick = () => this.toggleFull(true);
     $('#fsExit').onclick = () => this.toggleFull(false);
@@ -141,6 +144,63 @@ class App {
       if (!wide) this.toggleArt(false);
       this._applyScreen(false);
     }
+    if (wide) {
+      // crossing NAV_AUTO forgets a choice made with ☰ below it, and the pane follows the window again
+      const small = innerWidth < NAV_AUTO;
+      if (small !== this._navSmall) { this._navSmall = small; this._navOverride = undefined; }
+      const min = this._navOverride ?? (!!this.store.settings.navMin || small);
+      if (min !== this.navMin) this._navSet(min);
+    }
+  }
+
+  // ---------- the left-hand pane (wide): a NavigationView that folds down to its rail ----------
+  _bindRail() {
+    $('#railToggle').onclick = () => this.toggleNav();
+    $$('#rail [data-rail]').forEach((b) => (b.onclick = () => this.show(b.dataset.rail)));
+  }
+
+  get navMin() { return this.root.classList.contains('nav-min'); }
+
+  // fold the pane (true) or open it (false); `also` runs in the same change (show() opening it on a view).
+  // Chosen where the window is wide enough to have room for it, it is remembered.
+  toggleNav(force, also) {
+    const min = force ?? !this.navMin;
+    if (min === this.navMin) return also?.();
+    if (innerWidth >= NAV_AUTO) {
+      this._navOverride = undefined;
+      if (this.store.settings.navMin !== min) { this.store.settings.navMin = min; this.store.saveSettings(); }
+    } else this._navOverride = min;
+    this._paneMorph(() => { this._navSet(min); also?.(); }, min ? 'vt-fold-l' : 'vt-open-l');
+  }
+
+  _navSet(min) {
+    this.root.classList.toggle('nav-min', min);
+    const t = $('#railToggle');
+    t.setAttribute('aria-expanded', String(!min));
+    t.title = min ? 'Expand the panel' : 'Collapse the panel';
+  }
+
+  // A pane folding or opening (either side) is a view transition, like full screen: the pieces glide to
+  // their new places on the graphics card instead of the columns being laid out again on every frame.
+  // dir names the pane and the way it goes (vt-fold-l, vt-open-l, vt-fold-r, vt-open-r: css/fluent.css).
+  _paneMorph(change, dir) {
+    if (this.narrow || this.full) return change();
+    const html = document.documentElement;
+    const done = () => { html.classList.remove(dir); this._animateAgain(); };
+    this.root.classList.add('no-anim');
+    html.classList.add(dir);
+    this._viewMorph('vt-pane', change);
+    if (this._vt && this._vtCls === 'vt-pane') this._vt.finished.finally(done); else done();
+  }
+
+  // the dock's lyrics and visualization keys: a morph only when the right-hand panel comes or goes
+  _sideAct(act) {
+    const run = act === 'vis' ? () => this.toggleVis() : () => this.toggleLyrics();
+    if (this.narrow || this.full) return run();
+    const on = this.root.classList.contains('side-on');
+    const closes = act === 'vis' ? this.visOpen && !this._lyricsUnderVis : this.lyrics.open && !this.visOpen;
+    if (on && !closes) return run();
+    this._paneMorph(run, on ? 'vt-fold-r' : 'vt-open-r');
   }
 
   // where lyrics and the visualization show: the right-hand panel when wide, over the cover when narrow
@@ -164,8 +224,8 @@ class App {
     this._syncSide();
   }
 
-  // Admire art (wide layout): show only the album art, with nothing over it (css: .art-only). The fullscreen
-  // key in the player's bottom-right corner turns it on; A, Esc and a tap on the cover bring the controls back.
+  // Admire art (wide layout): show only the album art, with nothing over it (css: .art-only). The picture
+  // key in the title bar turns it on; A, Esc and a tap on the cover bring the controls back.
   toggleArt(force) {
     const on = !this.narrow && (force ?? !this.root.classList.contains('art-only'));
     if (on && this.playerView.flipped) this.playerView.flipArt(false);
@@ -230,7 +290,16 @@ class App {
       if (this._vt !== vt) return;
       html.classList.remove(cls);
       this._vt = null;
+      this._vtDrop();
     });
+  }
+
+  // The moves below are the page's own animations on the transition's pieces, held at their end (fill), so
+  // they outlive it: the next transition's piece of the same name would take their end as its own (and
+  // stay where it was). They go when their transition does.
+  _vtDrop() {
+    for (const a of this._vtAnims || []) a.cancel();
+    this._vtAnims = [];
   }
 
   // The browser moves a box whose size changes by animating its width and height, which the page has to
@@ -240,6 +309,7 @@ class App {
   // inside stretch to the box, so the scale gives back each one's own shape at its own end.)
   _vtMoves() {
     const html = document.documentElement, moves = [];
+    this._vtDrop();
     for (const a of document.getAnimations()) {
       const pe = a.effect?.pseudoElement || '';
       if (!pe.startsWith('::view-transition-group(') || pe === '::view-transition-group(root)') continue;
@@ -254,10 +324,10 @@ class App {
       if (!w || !h) continue;
       const m0 = new DOMMatrixReadOnly(from.transform && from.transform !== 'none' ? from.transform : undefined);
       const m1 = new DOMMatrixReadOnly(cs.transform && cs.transform !== 'none' ? cs.transform : undefined);
-      html.animate([
+      this._vtAnims.push(html.animate([
         { transform: `translate(${m0.e}px, ${m0.f}px) scale(${parseFloat(from.width) / w}, ${parseFloat(from.height) / h})` },
         { transform: `translate(${m1.e}px, ${m1.f}px)` },
-      ], { pseudoElement: pe, duration: SPRING_MS, easing: SPRING, fill: 'both' });
+      ], { pseudoElement: pe, duration: SPRING_MS, easing: SPRING, fill: 'both' }));
     }
   }
 
@@ -389,6 +459,7 @@ class App {
     this.root.dataset.screen = this.screen;
     $$('.nav-btn[data-act=library]').forEach((b) => b.classList.toggle('on', this.screen === 'library' && !this.narrow));
     $$('.nav-btn[data-act=eq]').forEach((b) => b.classList.toggle('on', this.screen === 'eq'));
+    $$('#rail [data-rail]').forEach((b) => b.classList.toggle('on', !this.narrow && b.dataset.rail === (this.screen === 'eq' ? 'eq' : 'library')));
     this._animateAgain();
   }
 
@@ -404,6 +475,8 @@ class App {
     // the library and the equalizer are out of sight in full screen: going to them leaves it
     if (screen !== 'player' && this.full) this.toggleFull(false);
     if (this.root.classList.contains('wide') && screen === 'player') screen = 'library';
+    // the pane folded down to its rail opens to show the view asked for
+    if (!this.narrow && this.navMin) return this.toggleNav(false, () => { this.screen = screen; this._applyScreen(false); });
     this.screen = screen;
     this._applyScreen(true);
   }
@@ -441,8 +514,8 @@ class App {
       ({
         library: () => (this.narrow ? this.openLibrary(this.player.source?.node && this.library.stack.length <= 1 ? this.player.source.node : null) : this.show('library')),
         eq: () => this.openEq(),
-        vis: () => this.toggleVis(),
-        lyrics: () => this.toggleLyrics(),
+        vis: () => this._sideAct('vis'),
+        lyrics: () => this._sideAct('lyrics'),
         sleep: () => this.sleepTimer(),
         settings: () => this.settings(),
         playerMenu: () => this.playerMenu(b),
@@ -499,6 +572,7 @@ class App {
       const p = this.player, en = this.engine;
       const k = e.key;
       if (k === ' ' ) { e.preventDefault(); p.toggle(); }
+      else if (k === ',' && e.ctrlKey) { e.preventDefault(); this.settings(); }
       else if (k === 'ArrowRight' && e.ctrlKey) p.next();
       else if (k === 'ArrowLeft' && e.ctrlKey) p.prev();
       else if (k === 'ArrowRight' && this.visOpen) this.vis.step(1);

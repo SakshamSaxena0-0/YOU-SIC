@@ -24,6 +24,9 @@ const ROOT = [
   { type: 'mostPlayed', title: 'Most Played', icon: 'trending_up' },
   { type: 'topRated', title: 'Top Rated', icon: 'star' },
 ];
+// Wide windows show the root as a navigation list (css/fluent.css .nav-list): the most used first, the rest
+// under "More". Narrow windows (and phones) keep the tiles above.
+const NAV_MAIN = ['allSongs', 'albums', 'artists', 'playlists', 'queue', 'topRated', 'folders', 'genres', 'years', 'recentlyPlayed'];
 
 export class LibraryView {
   constructor(app) {
@@ -184,6 +187,7 @@ export class LibraryView {
       : p.content.items ? `${p.content.items.length} items` : '';
     $('#libSub').textContent = sub;
     $('#libBack').classList.toggle('dim', this.stack.length <= 1);
+    $('#library').classList.toggle('at-root', this.stack.length <= 1);
     $('#libShuffle').style.visibility = this._tracksOf(p).length ? '' : 'hidden';
     $('#libPlay').style.visibility = this._tracksOf(p).length ? '' : 'hidden';
     const t = $('.lib-titles');
@@ -222,7 +226,15 @@ export class LibraryView {
   _buildRoot(page) {
     const { el, content } = page;
     const empty = !this.store.tracks.length;
-    el.innerHTML = `<div class="scroller"><div class="root-grid">${content.items.map((it, i) => `
+    const at = new Map(content.items.map((it, i) => [it.type, i]));
+    const row = (i) => {
+      const it = content.items[i];
+      return `<button class="nav-row${it.type === this.navSel ? ' on' : ''}" data-i="${i}"><span class="nav-ico">${icon(it.icon)}</span><span class="nav-label">${esc(it.title)}</span><span class="nav-count">${it.count ?? ''}</span></button>`;
+    };
+    const more = content.items.map((it, i) => i).filter((i) => !NAV_MAIN.includes(content.items[i].type));
+    const nav = `<div class="nav-list" role="list">${NAV_MAIN.filter((t) => at.has(t)).map((t) => row(at.get(t))).join('')}
+      <div class="nav-sep">More</div>${more.map(row).join('')}</div>`;
+    el.innerHTML = `<div class="scroller">${nav}<div class="root-grid root-tiles">${content.items.map((it, i) => `
       <button class="tile lg" data-lg="static" data-i="${i}" style="--d:${i * 22}ms">
         <span class="tile-ico">${icon(it.icon)}</span>
         <span class="tile-title">${esc(it.title)}</span>
@@ -234,8 +246,13 @@ export class LibraryView {
     </div>`;
     page.scroller = el.firstElementChild;
     el.onclick = (e) => {
-      const b = e.target.closest('.tile');
-      if (b) this.push(content.items[+b.dataset.i].node);
+      const b = e.target.closest('.tile, .nav-row');
+      if (b) {
+        // the row stays marked as the view you chose, for when you come back to the list
+        this.navSel = content.items[+b.dataset.i].type;
+        el.querySelectorAll('.nav-row').forEach((r) => r.classList.toggle('on', r === b));
+        this.push(content.items[+b.dataset.i].node);
+      }
       if (e.target.closest('#emptyAdd, #rootAdd')) this.app.addFolder();
       if (e.target.closest('#rootRescan')) this.app.rescan(true);
     };

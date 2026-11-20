@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="css/brutal.css">
   <link rel="stylesheet" href="css/seamless.css">
   <link rel="stylesheet" href="css/spotlight.css">
+  <link rel="stylesheet" href="css/fluent.css">
 </head>
 <body>
   <div id="wall" class="wall" aria-hidden="true"></div>
@@ -18,6 +19,16 @@
         <span class="tb-logo"></span>
         <span class="tb-title">YouSic</span>
       </div>
+      <!-- wide layout: the player's own window tools, beside the window's buttons (they used to sit in the
+           cover's bottom corners) -->
+      <div class="tb-tools">
+        <button class="tb-btn tb-tool" data-act="playerMenu" data-icon="more_vert" title="Song menu"></button>
+        <button class="tb-btn tb-tool" id="plMini" data-icon="mini_player" title="Mini player"></button>
+        <!-- Full screen: the window takes the whole screen and the album art fills it (App.toggleFull) -->
+        <button class="tb-btn tb-tool" id="plFull" data-icon="fullscreen" title="Full screen (F)"></button>
+        <!-- Admire art: hide the title block, the controls and the dock so the album art shows on its own -->
+        <button class="tb-btn tb-tool" id="plAdmire" data-icon="image" title="Admire art (A)" aria-pressed="false"></button>
+      </div>
       <div class="tb-buttons">
         <button class="tb-btn" data-win="min" title="Minimize"><svg viewBox="0 0 12 12"><path d="M1 6h10" /></svg></button>
         <button class="tb-btn" data-win="max" title="Maximize"><svg viewBox="0 0 12 12"><rect x="1.5" y="1.5" width="9" height="9" rx="1" /></svg></button>
@@ -26,6 +37,14 @@
     </header>
 
     <div class="stage" id="stage">
+      <!-- wide layout: the navigation rail (a NavigationView's compact strip): the toggle that folds the
+           left-hand pane away, the pane's two views, and Settings at the foot (App._bindRail) -->
+      <nav class="rail" id="rail" aria-label="Navigation">
+        <button class="rail-btn" id="railToggle" data-icon="menu" title="Collapse the panel" aria-expanded="true"></button>
+        <button class="rail-btn" data-rail="library" data-icon="library" title="Library (Ctrl+L)"></button>
+        <button class="rail-btn" data-rail="eq" data-icon="equalizer" title="Equalizer (E)"></button>
+        <button class="rail-btn rail-set" data-act="settings" title="Settings (Ctrl+,)"><span data-icon="settings"></span><span class="rail-label">Settings</span></button>
+      </nav>
       <!-- ============ PLAYER SCREEN ============ -->
       <section class="screen player" id="player">
         <div class="bg" id="bg"><div class="bg-layer"></div><div class="bg-layer"></div><div class="bg-shade"></div></div>
@@ -107,33 +126,22 @@
             <!-- the mini player: a small window that stays on top (renderer/mini.html); full screen beside it -->
             <span class="mini-pair">
               <button class="mini-btn" id="miniBtn" title="Mini player"><span data-icon="mini_player"></span><span class="pl-cat-label">Mini player</span></button>
-              <button class="mini-btn mini-full" id="fullBtn" title="Full screen (F11)"><span data-icon="fullscreen"></span></button>
+              <button class="mini-btn mini-full" id="fullBtn" title="Full screen (F)"><span data-icon="fullscreen"></span></button>
             </span>
           </div>
         </div>
 
         <nav class="pl-nav lg" data-lg-blur="10" id="plNav">
           <div class="nav-ink" id="navInk"></div>
-          <button class="nav-btn" data-act="library" data-icon="library" data-label="LIB" title="Library"></button>
+          <button class="nav-btn" data-act="library" data-icon="library" data-label="LIB" title="Library (Ctrl+L)"></button>
           <button class="nav-btn" data-act="eq" data-icon="equalizer" data-label="EQ" title="Equalizer (E)"></button>
           <button class="nav-btn" data-act="vis" data-icon="graphic_eq" data-label="WAVE" title="Visualization (V)"></button>
           <button class="nav-btn" data-act="lyrics" data-icon="lyrics" data-label="LYRICS" title="Lyrics (Y)"></button>
           <button class="nav-btn" data-act="sleep" data-icon="timer" data-label="TIMER" title="Sleep timer"></button>
-          <button class="nav-btn" data-act="settings" data-icon="settings" data-label="SET" title="Settings"></button>
+          <button class="nav-btn" data-act="settings" data-icon="settings" data-label="SET" title="Settings (Ctrl+,)"></button>
         </nav>
 
-        <!-- wide layout: no header over the cover (css: .app.wide); its keys sit in the bottom corners beside
-             the dock. They carry the header's class, so each theme draws them as it draws the header's keys -->
-        <div class="pl-header pl-corner pl-corner-l">
-          <button class="icon-btn lg" data-act="playerMenu" title="Menu" data-icon="more_vert"></button>
-        </div>
-        <div class="pl-header pl-corner pl-corner-r">
-          <button class="icon-btn lg" id="plMini" data-icon="mini_player" title="Mini player"></button>
-          <!-- Full screen: the window takes the whole screen and the album art fills it (App.toggleFull) -->
-          <button class="icon-btn lg" id="plFull" data-icon="fullscreen" title="Full screen (F11)"></button>
-          <!-- Admire art: hide the title block, the controls and the dock so the album art shows on its own -->
-          <button class="icon-btn lg" id="plAdmire" data-icon="image" title="Admire art (A)" aria-pressed="false"></button>
-        </div>
+        <!-- wide layout: no header over the cover (css: .app.wide); its keys are in the title bar (.tb-tools) -->
 
         <!-- full screen: the controls, at the bottom centre while the pointer moves. The seekbar and the
              transport move in here while full screen is on, and back out after (App._setFull) -->

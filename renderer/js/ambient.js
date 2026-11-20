@@ -77,10 +77,30 @@ function paint(c, col, side, kind, g) {
   x.fillRect(0, 0, w, H);
 }
 
+// the whole cover, blurred into a soft wash: the ground of the whole window in the wide layout (under the
+// title bar, the panes and the cover's own column), so the cover's colours run through everything. Tiny
+// and blurred once per song; the browser stretches it (no blur filter on screen). Drawn on a canvas with
+// room round it, then cut to size, so the blur doesn't darken its edges.
+function bleed(c, img) {
+  const w = 72, h = 42, pad = 12;
+  const iw = img.naturalWidth, ih = img.naturalHeight;
+  if (!iw || !ih) return false;
+  const big = document.createElement('canvas');
+  big.width = w + 2 * pad; big.height = h + 2 * pad;
+  const b = big.getContext('2d');
+  const s = Math.max(big.width / iw, big.height / ih);
+  b.filter = 'blur(4px) saturate(1.25) brightness(0.8)';
+  b.drawImage(img, (big.width - iw * s) / 2, (big.height - ih * s) * 0.38, iw * s, ih * s);
+  c.width = w; c.height = h;
+  c.getContext('2d').drawImage(big, pad, pad, w, h, 0, 0, w, h);
+  return true;
+}
+
 export class Ambient {
   // panels: [[element, 'l' | 'r']]: 'l' sits left of the cover, 'r' right of it. wrap and track: the
   // cover's box (#aaWrap) and the cover itself (#aaTrack), whose edges get a piece each, under the cover.
-  constructor(panels, wrap, track) {
+  // stage: the window's ground (wide layout), which gets the whole cover blurred (bleed)
+  constructor(panels, wrap, track, stage) {
     this.track = track; this.wrap = wrap;
     const piece = (host, side, kind, cls) => {
       const box = document.createElement('div');
@@ -91,6 +111,7 @@ export class Ambient {
     };
     this.pieces = panels.filter(([el]) => el).map(([el, side]) => piece(el, side, 'panel', `amb-${side}`));
     if (wrap && track) this.pieces.push(piece(wrap, 'l', 'edge', 'amb-edge amb-el'), piece(wrap, 'r', 'edge', 'amb-edge amb-er'));
+    if (stage) this.pieces.push(piece(stage, 'f', 'full', 'amb-full'));
     this.url = null;
     this.img = null;
     this.seq = 0;
@@ -128,7 +149,7 @@ export class Ambient {
     this._refit = setTimeout(() => {
       if (!this.img) return;
       // not during a view transition: it would have to be captured again on every frame of it
-      if (document.documentElement.classList.contains('vt-full')) return this.refit();
+      if (/vt-(full|pane)/.test(document.documentElement.className)) return this.refit();
       const g = this._geom();
       if (g.key === this.key || !g.w) return;
       this._show(this.seq, this.img);
@@ -147,10 +168,13 @@ export class Ambient {
         setTimeout(() => old.remove(), 1000);
       }
       p.cur = null;
-      const col = cols[p.side];
-      if (!col) continue;
       const c = document.createElement('canvas');
-      paint(c, col, p.side, p.kind, g);
+      if (p.kind === 'full') { if (!im || !bleed(c, im)) continue; }
+      else {
+        const col = cols[p.side];
+        if (!col) continue;
+        paint(c, col, p.side, p.kind, g);
+      }
       p.box.append(c);
       p.cur = c;
       void c.offsetWidth; // start from transparent, so it fades in

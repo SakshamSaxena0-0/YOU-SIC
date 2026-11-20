@@ -189,11 +189,15 @@ export class Waveform {
     const dark = (k) => `rgb(${Math.round(r * (1 - k))},${Math.round(gg * (1 - k))},${Math.round(b * (1 - k))})`;
     // batch bars into four paths: played/unplayed x top/reflection
     const pT = new Path2D(), pB = new Path2D(), uT = new Path2D(), uB = new Path2D();
+    // the bar under the pointer is drawn on its own, lit (with the time over it: .seek-bubble)
+    const hi = this.hover >= 0 && !this.dragging ? Math.min(BARS - 1, Math.floor(this.hover * BARS)) : -1;
+    let hiBar = null;
     for (let i = 0; i < BARS; i++) {
       const x = i * step + (step - bw) / 2;
       const v = this.cur[i];
       const top = Math.max(1.5, v * (mid - 4));
       const bot = Math.max(1, v * (h - mid - 3) * 0.6);
+      if (i === hi) { hiBar = [x, top, bot]; continue; }
       const played = (i + 0.5) / BARS <= prog;
       (played ? pT : uT).roundRect(x, mid - top, bw, top, rad);
       (played ? pB : uB).roundRect(x, mid + 2, bw, bot, rad);
@@ -222,10 +226,21 @@ export class Waveform {
     g.fillStyle = pg;
     g.fill(pB);
     g.globalAlpha = 1;
-    // hover guide
+    // hover: the guide, and the bar under it lit white
     if (this.hover >= 0 && !this.dragging) {
       g.fillStyle = 'rgba(255,255,255,0.35)';
       g.fillRect(this.hover * w - 0.5, 4, 1, h - 8);
+    }
+    if (hiBar) {
+      const [x, top, bot] = hiBar;
+      g.save();
+      g.shadowColor = 'rgba(255,255,255,0.7)';
+      g.shadowBlur = 8;
+      g.fillStyle = '#fff';
+      g.beginPath(); g.roundRect(x - 0.5, mid - top - 1, bw + 1, top + 1, rad); g.fill();
+      g.restore();
+      g.fillStyle = 'rgba(255,255,255,0.4)';
+      g.beginPath(); g.roundRect(x, mid + 2, bw, bot, rad); g.fill();
     }
     // playhead: hairline + glowing knob
     const lg = g.createLinearGradient(0, 0, 0, h);

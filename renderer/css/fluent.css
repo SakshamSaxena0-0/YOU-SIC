@@ -1,0 +1,139 @@
+/* ==========================================================================
+   Desktop layout (wide windows; Windows 11 Fluent): the left-hand pane as a NavigationView (a rail with
+   ☰, the pane's views and Settings, and a panel that folds away), the library's root as a navigation
+   list, the player's window tools in the title bar, quieter lyrics, and pointer affordances. In the Brutal
+   mood the panes float as acrylic cards over the cover's colours, which run under the whole window.
+   Narrow windows (and phones) keep their own layout: none of this applies to them.
+   ========================================================================== */
+
+/* ---------- title bar: the player's tools beside the window's buttons ---------- */
+.tb-tools { display: none; }
+.app.wide:not(.full) .tb-tools { display: flex; -webkit-app-region: no-drag; margin-right: 4px; }
+.tb-tool { width: 40px; }
+.tb-tool .ico { width: 16px; height: 16px; stroke: none; fill: currentColor; }
+.tb-tool[aria-pressed='true'] { color: #fff; background: rgb(255 255 255 / 0.06); }
+.tb-btn:active { background: rgb(255 255 255 / 0.04); color: rgb(255 255 255 / 0.7); }
+.tb-close:active { background: rgb(196 43 28 / 0.9); color: #fff; }
+
+/* ---------- the rail ---------- */
+.rail { display: none; }
+.app.wide .rail {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  position: absolute; left: 0; top: var(--tb); bottom: 0; width: var(--rail); z-index: 5; padding: 4px 0 10px;
+}
+.app.full .rail { display: none; }
+/* the Clear mood's columns carry their own glass; the rail gets a ground of its own there, so its glyphs
+   read over any wallpaper (in the Brutal mood it lies on the cover's colours, like the panes) */
+html:not(.glass-brutal) .app.wide .rail { background: linear-gradient(180deg, rgb(14 14 20 / 0.42), rgb(8 8 12 / 0.5)); }
+.rail-btn {
+  position: relative; flex: none; width: 40px; height: 36px; border-radius: 6px; display: grid; place-items: center;
+  color: rgb(255 255 255 / 0.8); transition: background 0.15s ease, color 0.15s ease;
+}
+.rail-btn .ico { width: 20px; height: 20px; }
+.rail-btn:hover { background: rgb(255 255 255 / 0.06); color: #fff; }
+.rail-btn:active { background: rgb(255 255 255 / 0.04); color: rgb(255 255 255 / 0.7); }
+.rail-btn.on { background: rgb(255 255 255 / 0.08); color: #fff; }
+/* the selected mark: a short bar in the cover's own colour (--album: playerView._applyColors) */
+:is(.rail-btn, .nav-row).on::before {
+  content: ''; position: absolute; left: 0; top: 50%; width: 3px; height: 16px; margin-top: -8px; border-radius: 2px;
+  background: var(--album, var(--accent));
+}
+#railToggle { margin-bottom: 10px; }
+/* Settings at the foot: its name shows while the panel is open, the row reaching into it */
+.rail-set { margin-top: auto; display: flex; align-items: center; justify-content: flex-start; gap: 14px; padding: 0 10px; overflow: hidden; white-space: nowrap; }
+.rail-set > [data-icon] { display: grid; flex: none; }
+.rail-label { font-size: 14px; font-weight: 500; }
+.app.wide:not(.nav-min) .rail-set { align-self: flex-start; margin-left: 6px; width: calc(var(--navw) - 18px); }
+.app.wide.nav-min .rail-label { display: none; }
+:is(.rail-btn, .nav-row, .tb-btn):focus-visible { outline: 2px solid #fff; outline-offset: -2px; }
+
+/* the panel folded away: only the rail is left, and the player takes the room */
+.app.wide.nav-min :is(#library, #eq) { visibility: hidden; opacity: 0; pointer-events: none; transform: translateX(-24px); }
+/* room at the panel's foot for the Settings row */
+.app.wide #library .lib-pages { margin-bottom: 56px; }
+.app.wide #eq { padding-bottom: 56px; }
+
+/* ---------- the library's root: a navigation list ---------- */
+.nav-list { display: none; }
+.app.wide .nav-list { display: flex; flex-direction: column; gap: 2px; padding: 2px 8px 16px; }
+.app.wide :is(.root-tiles, #library .folder-strip) { display: none; }
+.nav-row {
+  position: relative; display: flex; align-items: center; gap: 14px; height: 40px; padding: 0 12px; border-radius: 6px; flex: none;
+  color: rgb(255 255 255 / 0.92); font-size: 14.5px; font-weight: 500; text-align: left;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.nav-row:hover { background: rgb(255 255 255 / 0.06); }
+.nav-row:active { background: rgb(255 255 255 / 0.04); color: rgb(255 255 255 / 0.72); }
+.nav-row.on { background: rgb(255 255 255 / 0.08); }
+.nav-ico { flex: none; display: grid; place-items: center; width: 20px; height: 20px; color: rgb(255 255 255 / 0.86); }
+.nav-ico .ico { width: 20px; height: 20px; }
+.nav-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nav-count { flex: none; font-size: 12px; color: rgb(255 255 255 / 0.45); font-variant-numeric: tabular-nums; }
+.nav-sep { font-size: 12px; font-weight: 600; color: rgb(255 255 255 / 0.45); padding: 14px 12px 6px; }
+/* the root's header: just its name (as written) and search */
+.app.wide #library.at-root :is(#libBack, #libShuffle, #libPlay, #libMenu, .lib-sub) { display: none; }
+.app.wide #library.at-root .lib-header { padding-left: 18px; }
+html .app.wide #library.at-root .lib-title { text-transform: none; font-size: 22px; font-weight: 700; letter-spacing: -0.2px; }
+
+/* ---------- the player ---------- */
+/* the dock and the transport: a touch of light under the pointer */
+.app.wide .nav-btn:hover { transform: scale(1.1); filter: drop-shadow(0 0 7px rgb(255 255 255 / 0.35)); }
+.app.wide .nav-btn:active { transform: scale(0.92); }
+.app.wide .controls .ctl.lg:hover { filter: brightness(1.1) drop-shadow(0 0 10px rgb(255 255 255 / 0.22)); }
+
+/* lyrics beside the cover: the line being sung white and semi-bold, the rest at 45%; any line can be
+   clicked to go to it (lyricsView.js) and brightens under the pointer */
+html .app.wide:not(.full) .side .ly-line {
+  font-size: 19px; font-weight: 500; letter-spacing: 0; line-height: 1.38; padding: 6px 10px; border-radius: 6px;
+  color: rgb(255 255 255 / 0.45); filter: none; text-shadow: none; transform: none;
+  transition: color 0.3s ease, background 0.15s ease;
+}
+html .app.wide:not(.full) .side .ly-line:hover { color: rgb(255 255 255 / 0.82); background: rgb(255 255 255 / 0.05); }
+html .app.wide:not(.full) .side .ly-line.active { color: #fff; font-weight: 600; }
+
+/* ---------- Brutal: the cover's colours under the whole window, the panes floating over them ---------- */
+/* the whole cover, blurred (ambient.js bleed), over the mood's dark ground */
+html.seamless .app.wide .amb-full { z-index: 0; background: var(--br-coal); }
+html.seamless.glass-window .app.wide .amb-full { background: var(--br-panel); }
+.amb-full canvas.show { opacity: 0.45; }
+/* the panes' own edge light (seamless.css) would wash over their cards: the whole-window colours replace it */
+html.seamless .app.wide:not(.full) :is(.amb-l, .amb-r) { display: none; }
+html.seamless .app.wide.full .amb-full { display: none; }
+html.glass-brutal .app.wide:not(.full) :is(#player > .bg, #library, #eq) { background: none; }
+html.glass-brutal .app.wide:not(.full) :is(.lib-header, .side-header) { background: none; box-shadow: none; }
+/* the panes: acrylic cards (a low dark tint, a hairline rim), with the colours showing through */
+html.glass-brutal .app.wide:not(.full) :is(#library, #eq, #side)::before {
+  content: ''; position: absolute; z-index: -1; pointer-events: none; border-radius: 12px;
+  inset: calc(var(--tb) - 4px) 0 8px 2px;
+  background: rgb(18 18 18 / 0.55);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.08), inset 0 1px 0 rgb(255 255 255 / 0.05), 0 12px 40px -14px rgb(0 0 0 / 0.55);
+}
+html.glass-brutal .app.wide:not(.full) #side::before { inset: calc(var(--tb) - 4px) 8px 8px 0; }
+
+/* ---------- a pane folding or opening (App._paneMorph): a view transition, like full screen ---------- */
+html.vt-pane #aaTrack { view-transition-name: fs-art; }
+html.vt-pane #aaWrap > .aa-scrim { view-transition-name: fs-scrim; }
+html.vt-pane .app.wide:not([data-screen='eq']) #library { view-transition-name: fs-lib; }
+html.vt-pane .app.wide[data-screen='eq'] #eq { view-transition-name: fs-eq; }
+html.vt-pane .app.wide #side { view-transition-name: fs-side; }
+html.vt-pane #player > .pl-info { view-transition-name: fs-title; }
+html.vt-pane #plNav { view-transition-name: fs-dock; }
+html.vt-pane #player > .seek { view-transition-name: fs-seek; }
+html.vt-pane #player > .controls { view-transition-name: fs-ctl; }
+html.vt-pane::view-transition-group(*) { z-index: 4; transform-origin: 0 0; animation-duration: 0.55s; animation-timing-function: var(--ease); }
+html.vt-pane::view-transition-group(root) { z-index: 0; }
+html.vt-pane::view-transition-group(fs-art) { z-index: 1; }
+html.vt-pane::view-transition-group(fs-scrim) { z-index: 2; }
+html.vt-pane::view-transition-old(*), html.vt-pane::view-transition-new(*) { animation-duration: 0.3s; width: 100%; height: 100%; object-fit: fill; }
+html.vt-pane::view-transition-old(root) { display: none; }
+html.vt-pane::view-transition-new(root) { animation: none; }
+html.vt-pane :is(.aa-scrim, .amb canvas) { transition: none !important; }
+/* the pane itself slides out towards its own edge, or in from it */
+html.vt-pane.vt-fold-l::view-transition-old(fs-lib), html.vt-pane.vt-fold-l::view-transition-old(fs-eq) { animation: vt-out-l 0.36s var(--ease) both; }
+html.vt-pane.vt-open-l::view-transition-new(fs-lib), html.vt-pane.vt-open-l::view-transition-new(fs-eq) { animation: vt-in-l 0.5s var(--ease) both; }
+html.vt-pane.vt-fold-r::view-transition-old(fs-side) { animation: vt-out-r 0.36s var(--ease) both; }
+html.vt-pane.vt-open-r::view-transition-new(fs-side) { animation: vt-in-r 0.5s var(--ease) both; }
+@keyframes vt-out-l { to { transform: translateX(-28%); opacity: 0; } }
+@keyframes vt-in-l { from { transform: translateX(-28%); opacity: 0; } }
+@keyframes vt-out-r { to { transform: translateX(28%); opacity: 0; } }
+@keyframes vt-in-r { from { transform: translateX(28%); opacity: 0; } }

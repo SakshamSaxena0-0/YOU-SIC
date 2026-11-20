@@ -14,16 +14,16 @@ On first start the app scans your Windows *Music* folder. Add more folders from 
 
 | Area | What it does |
 | --- | --- |
-| Window layout | Wide windows (980 px and up) have three columns: the library (or the equalizer) on the left, the player in the middle (the album art fills the whole column, edge to edge, with the title and controls over its lower part on a dark fade; tap it for the song info). *Admire art* (the picture button beside the player's library button, or A) hides the header and the controls to show only the art; A, Esc or a tap on the cover brings them back, and lyrics or the visualization on the right. The right-hand panel switches with its Lyrics / Visualizer tabs, the dock buttons or Y / V, and hides with its arrow button (the player then takes the room; LYRICS or WAVE brings it back). Narrow windows show one screen at a time. |
+| Window layout | Wide windows (980 px and up) have three columns: the library (or the equalizer) on the left, in a Windows 11-style navigation pane (a rail with ☰, Library, Equalizer and Settings; ☰ folds the panel down to the rail, and it folds by itself below 1200 px; the library's root is a list of rows with counts), the player in the middle (the album art fills the whole column, edge to edge, with the title and controls over its lower part on a dark fade; tap it for the song info). *Admire art* (the picture button in the title bar, or A) hides the header and the controls to show only the art; A, Esc or a tap on the cover brings them back, and lyrics or the visualization on the right. The right-hand panel switches with its Lyrics / Visualizer tabs, the dock buttons or Y / V, and hides with its arrow button (the player then takes the room; LYRICS or WAVE brings it back). Narrow windows show one screen at a time. |
 | Player | Blurred, slowly drifting album-art background; accent color extracted from the cover; 3D album-art carousel |
 | Gestures | Album art: swipe ←/→ to change track, swipe ↓ (or click) for the track's category, swipe ↑ for lyrics. Mini-player: click to open the player, drag ←/→ to change track, long-press to open the playing category. Library: swipe → from the left edge (or Alt+drag, mouse Back, Backspace) for the parent category. Visualization: swipe ←/→ to change presets |
-| Seekbar | Real waveform, decoded from the file and morphed in, with a drag bubble; mouse wheel seeks |
+| Seekbar | Real waveform, decoded from the file and morphed in; the time under the pointer and its bar lit on hover, a bubble while dragging; mouse wheel seeks |
 | Library | Folders, Folders Hierarchy, All Songs, Albums, Artists, Album Artists, Genres, Years, Composers, Playlists, Queue, Recently Added/Played, Most Played, Top Rated; search; sort options; list or grid view (the list menu, ⋮ beside search: *View > List view / Grid view*, remembered per kind of view; grid view shows a list's folders, artists... and songs as tiles like the library's own); Ctrl+wheel zoom; virtualized lists and grids; in the Brutal mood, a dot-matrix spotlight follows the mouse over the tiles and lights the rims near it |
 | Playback | Gapless (next track preloaded) or crossfade (1–12 s); shuffle; repeat off/category/song; Play Next / Queue; resumes the last session |
 | Equalizer | 10-band graphic EQ with a live frequency-response curve, 21 presets plus your own; Preamp, Bass, Treble, Balance and Tempo knobs; Limiter; Reverb tab with 7 knobs and 8 presets |
 | Visualization | MilkDrop presets (butterchurn) in the right-hand panel (over the album art in narrow windows) or fullscreen; shuffle / locked / sequential preset modes |
 | Lyrics | Synced `.lrc` files next to the song, plus embedded (synced or plain) lyrics tags; click a line to seek |
-| Windows | Custom title bar, media keys and the Windows media flyout (SMTC), taskbar thumbnail prev/play/next buttons, sleep timer with fade-out, star ratings, track info |
+| Windows | Custom title bar (with the song menu, mini player, full screen and admire art beside the window buttons), Ctrl+, opens Settings, media keys and the Windows media flyout (SMTC), taskbar thumbnail prev/play/next buttons, sleep timer with fade-out, star ratings, track info |
 
 Supported formats: MP3, FLAC, M4A/AAC, OGG/Opus, WAV, WebM.
 
@@ -60,6 +60,7 @@ renderer/
   index.html     app shell
   css/app.css    theme, layout, animations
   css/spotlight.css, js/spotlight.js   the library tiles' cursor spotlight (Brutal mood)
+  css/fluent.css   the desktop layout: navigation rail and list, title bar tools, floating panes, pane morphs
   js/audio.js    Web Audio engine (2 decks, EQ / tone / balance / reverb / limiter)
   js/player.js   queue, shuffle/repeat, gapless & crossfade
   js/*View.js    player, library, equalizer, visualization, lyrics screens

@@ -103,7 +103,7 @@ input { font: inherit; color: inherit; }
 .tb-btn { width: 46px; height: var(--tb); display: grid; place-items: center; color: var(--dim); transition: background 0.15s, color 0.15s; }
 .tb-btn svg { width: 10px; height: 10px; stroke: currentColor; stroke-width: 1.1; fill: none; }
 .tb-btn:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
-.tb-close:hover { background: #e81123; }
+.tb-close:hover { background: #c42b1c; color: #fff; } /* Windows 11's close red */
 
 /* ---------- screens & layout ---------- */
 .stage { position: absolute; inset: 0; overflow: hidden; }
@@ -120,19 +120,24 @@ input { font: inherit; color: inherit; }
    top and the controls below. Right: lyrics or the visualization (#side), which can be hidden; the
    player then takes its room. The player's own backdrop runs under the right-hand panel too. */
 .app.wide {
-  --lw: clamp(320px, 27vw, 460px);
+  --lw: clamp(280px, 23vw, 410px);
+  /* the left-hand pane is a rail (☰, the views, Settings: css/fluent.css) and the panel beside it, which
+     folds away (.nav-min) */
+  --rail: 52px;
+  --navw: calc(var(--rail) + var(--lw));
   --rw-open: clamp(280px, 25vw, 440px);
   --rw: 0px;
   /* the middle column's content stops growing at this width, so the controls don't spread out */
   --cmax: 780px;
-  --cpad: max(0px, (100vw - var(--lw) - var(--rw) - var(--cmax)) / 2);
+  --cpad: max(0px, (100vw - var(--navw) - var(--rw) - var(--cmax)) / 2);
 }
+.app.wide.nav-min { --navw: var(--rail); }
 .app.wide.side-on { --rw: var(--rw-open); }
 .app.wide #player {
-  left: var(--lw); right: 0; z-index: 1; padding: 0 calc(var(--rw) + var(--cpad)) 0 var(--cpad);
+  left: var(--navw); right: 0; z-index: 1; padding: 0 calc(var(--rw) + var(--cpad)) 0 var(--cpad);
   transition: padding 0.55s var(--ease), transform 0.55s var(--ease), opacity 0.45s ease;
 }
-.app.wide #library, .app.wide #eq { left: 0; right: auto; width: var(--lw); z-index: 2; box-shadow: 1px 0 0 rgba(255, 255, 255, 0.05), 20px 0 60px -20px rgba(0, 0, 0, 0.7); }
+.app.wide #library, .app.wide #eq { left: var(--rail); right: auto; width: var(--lw); z-index: 2; box-shadow: 1px 0 0 rgba(255, 255, 255, 0.05), 20px 0 60px -20px rgba(0, 0, 0, 0.7); }
 .app.wide #eq { transform: translateX(-100%); opacity: 0; }
 .app.wide[data-screen='eq'] #eq { transform: none; opacity: 1; }
 .app.wide[data-screen='eq'] #library { transform: translateX(-12%); opacity: 0; pointer-events: none; }
@@ -215,10 +220,9 @@ input { font: inherit; color: inherit; }
 .app.wide #player > .pl-corner-l { left: 16px; }
 .app.wide #player > .pl-corner-r { right: calc(var(--rw) + 16px); }
 .app.wide #player.corners-up > .pl-corner { position-anchor: --pl-title; top: auto; bottom: calc(anchor(top) + 8px); }
-/* room for the corner keys: three on the right (mini player, full screen, admire art) */
-.app.wide #player:not(.corners-up) > .pl-nav { margin-left: max(18px, 160px - var(--cpad)); margin-right: max(18px, 160px - var(--cpad)); }
+/* (the corner keys moved to the title bar: css/fluent.css .tb-tools) */
 
-/* Admire art (the fullscreen key in the bottom-right corner, or A): the title block, seekbar, controls,
+/* Admire art (the picture key in the title bar, or A): the title block, seekbar, controls,
    dock and corner keys fade away with the fades over the cover, so nothing covers it. A, Esc and a tap on
    the cover bring them back. Wide layout only. */
 .app.wide #player > :is(.pl-header, .pl-info, .seek, .controls, .pl-nav) { transition: opacity 0.35s ease, translate 0.45s var(--ease), visibility 0s linear 0s; }

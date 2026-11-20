@@ -16,7 +16,7 @@ export class PlayerView {
     this.metaMode = 0;
     this.showRemain = true;
     this.bgFlip = 0;
-    this.ambient = new Ambient([[$('#library'), 'l'], [$('#eq'), 'l'], [$('#side'), 'r']], $('#aaWrap'), $('#aaTrack'));
+    this.ambient = new Ambient([[$('#library'), 'l'], [$('#eq'), 'l'], [$('#side'), 'r']], $('#aaWrap'), $('#aaTrack'), $('#stage'));
     // full screen: the cover fits the screen, lit around by its own edges
     this.fsLight = new FullLight($('#fsLight'), () => app.full);
     this.lastPrev = null; this.lastNext = null;
@@ -386,11 +386,11 @@ export class PlayerView {
     let accent = hexToRgb(s.accent), dark = [16, 16, 20];
     // solid themes (and Liquid Glass's Brutal mood) run on a fixed palette, whatever the cover looks like
     const fixed = THEME_COLORS[s.theme] || (this.app.brutal ? GLASS_BRUTAL : null);
+    // the cover's own accent, whatever the palette: the selected marks in the navigation (css/fluent.css)
+    const cover = url ? await extractColors(url) : null;
+    root.style.setProperty('--album', cover?.accent ? `rgb(${cover.accent.join(',')})` : 'var(--accent)');
     if (fixed) { accent = fixed.accent; dark = fixed.dark; url = ''; }
-    if (s.dynamicAccent && url) {
-      const c = await extractColors(url);
-      if (c) { if (c.accent) accent = c.accent; dark = c.dark; }
-    }
+    if (s.dynamicAccent && url && cover) { if (cover.accent) accent = cover.accent; dark = cover.dark; }
     root.style.setProperty('--accent', `rgb(${accent.join(',')})`);
     root.style.setProperty('--accent-rgb', accent.join(','));
     root.style.setProperty('--tint', `rgb(${dark.join(',')})`);

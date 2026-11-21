@@ -5,7 +5,7 @@ dist-next/
 *.log
 swap-build.ps1
 android/build/
-android/yousic.keystore
+android/*.keystore
 android/keystore.properties
 dist-android/
 android-native/build/

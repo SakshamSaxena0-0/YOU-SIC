@@ -50,6 +50,7 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "shortcutName": "YouSic",
+      "guid": "dc939b87-67b0-5f4a-aebc-f61bdc47e5a8",
       "artifactName": "${productName}-Setup.exe"
     },
     "fileAssociations": [],

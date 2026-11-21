@@ -2,11 +2,25 @@
 
 A music player for Windows (Electron).
 
-## Run
+<p align="center">
+  <a href="https://github.com/SakshamSaxena0-0/YOU-SIC/releases/latest/download/YouSic-Setup.exe"><img src="docs/download.svg" width="360" alt="Download YouSic for Windows"></a>
+  <br>
+  <sub>Latest version · <a href="https://github.com/SakshamSaxena0-0/YOU-SIC/releases">all releases</a></sub>
+</p>
 
-- **Packaged app:** `dist\win-unpacked\YouSic.exe` (build it first: `npm install`, then `npm run dist`)
-- **From source:** `npm install`, then `npm start`
-- **Rebuild the exe:** `npm run dist` (folder build) or `npm run installer` (NSIS setup .exe)
+## Install
+
+1. Download **`YouSic-Setup.exe`** with the button above (Windows 10 or 11, 64-bit).
+2. Run it. The app isn't code-signed, so Windows may show *Windows protected your PC*: choose *More info*, then
+   *Run anyway*.
+3. Pick a folder (or keep the default). The installer adds Start menu and desktop shortcuts, and YouSic can be
+   removed from *Settings → Apps* like any other app.
+
+## Build from source
+
+- **Run:** `npm install`, then `npm start`
+- **Build the exe:** `npm run dist` (folder build: `dist\win-unpacked\YouSic.exe`) or `npm run installer`
+  (`dist\YouSic-Setup.exe`)
 
 On first start the app scans your Windows *Music* folder. Add more folders from Library → *Add folder*, or from Settings.
 

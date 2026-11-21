@@ -4,8 +4,8 @@ A music player for Windows (Electron).
 
 ## Run
 
-- **Packaged app:** `dist\win-unpacked\YouSic.exe` (or the `YouSic.lnk` shortcut in this folder)
-- **From source:** `npm start`
+- **Packaged app:** `dist\win-unpacked\YouSic.exe` (build it first: `npm install`, then `npm run dist`)
+- **From source:** `npm install`, then `npm start`
 - **Rebuild the exe:** `npm run dist` (folder build) or `npm run installer` (NSIS setup .exe)
 
 On first start the app scans your Windows *Music* folder. Add more folders from Library → *Add folder*, or from Settings.
@@ -67,3 +67,7 @@ renderer/
 ```
 
 User data (library cache, covers, settings, playlists, stats) lives in `%APPDATA%\YouSic`.
+
+## License
+
+MIT, see [LICENSE](LICENSE).

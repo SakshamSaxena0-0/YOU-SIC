@@ -44,6 +44,8 @@ html[data-drop='up'] .mini-box { top: calc(var(--m) + var(--ph) + var(--gap)); }
   transition: opacity 0.18s ease, transform 0.25s var(--spring), background-color 0.15s; cursor: pointer;
 }
 .mini-full .ico { width: 16px; height: 16px; }
+/* the other corner: close the mini player and leave the music playing */
+.mini-x { right: auto; left: 5px; }
 .mini-art:hover .mini-full { opacity: 1; transform: none; }
 .mini-full:hover { background: rgba(0, 0, 0, 0.8); }
 .mini.dragging .mini-full { opacity: 0; }

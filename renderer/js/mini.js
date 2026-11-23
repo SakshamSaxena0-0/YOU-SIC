@@ -238,6 +238,8 @@ function full() {
   setTimeout(() => pa.miniClose(), 150);
 }
 $('#full').onclick = full;
+// close only the mini player: the music keeps playing and the full player stays minimised in the taskbar
+$('#closeMini').onclick = () => { mini.classList.add('bye'); setTimeout(() => pa.miniClose(true), 150); };
 art.addEventListener('dblclick', full);
 $('#btnPlay').onclick = () => cmd('toggle');
 $('#btnPrev').onclick = () => cmd('prev');

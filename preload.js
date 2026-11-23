@@ -29,7 +29,7 @@ contextBridge.exposeInMainWorld('pa', {
   onGeom: (cb) => ipcRenderer.on('win:geom', (_e, g) => cb(g)),
   // mini player: the main window's side
   miniOpen: (state) => ipcRenderer.send('mini:open', state),
-  miniClose: () => ipcRenderer.send('mini:close'),
+  miniClose: (keepMinimized) => ipcRenderer.send('mini:close', !!keepMinimized),
   miniState: (part) => ipcRenderer.send('mini:state', part),
   onMiniClosed: (cb) => ipcRenderer.on('mini:closed', () => cb()),
   // mini player: its own window's side

@@ -498,7 +498,7 @@ function thumbIcon(dataUrl) { return nativeImage.createFromDataURL(dataUrl); }
 // screen), and clicks there go through to whatever is below (setIgnoreMouseEvents).
 const MINI = { w: 460, h: 120, gap: 8, panel: 120, m: 24 };
 const MINI_W = MINI.w + 2 * MINI.m, MINI_H = 2 * MINI.m + MINI.h + MINI.gap + MINI.panel;
-let mini = null, miniState = {}, miniDrop = 'down', miniDrag = null, miniShownAt = 0;
+let mini = null, miniKeepMin = false, miniState = {}, miniDrop = 'down', miniDrag = null, miniShownAt = 0;
 
 // the box's top left on screen <-> the window's
 const miniWinPos = (box, drop) => ({ x: box.x - MINI.m, y: box.y - MINI.m - (drop === 'up' ? MINI.panel + MINI.gap : 0) });
@@ -537,13 +537,15 @@ async function openMini() {
     mini = null;
     if (!win || win.isDestroyed()) return;
     win.webContents.send('mini:closed');
+    if (miniKeepMin) { miniKeepMin = false; return; } // closed with its X: the full player stays in the taskbar
     if (win.isMinimized()) win.restore();
     win.focus();
   });
 }
 
-function closeMini() {
+function closeMini(keepMinimized) {
   if (!mini) return;
+  miniKeepMin = !!keepMinimized;
   try { writeJson('mini.json', miniBox()); } catch {}
   mini.close();
 }
@@ -583,7 +585,7 @@ function setupIpc() {
   ipcMain.on('win:min', () => win.minimize());
   // mini player
   ipcMain.on('mini:open', (_e, state) => { miniState = state || {}; openMini(); });
-  ipcMain.on('mini:close', () => closeMini());
+  ipcMain.on('mini:close', (_e, keepMinimized) => closeMini(keepMinimized));
   ipcMain.on('mini:state', (_e, part) => {
     Object.assign(miniState, part);
     if (mini && !mini.isDestroyed()) mini.webContents.send('mini:state', part);

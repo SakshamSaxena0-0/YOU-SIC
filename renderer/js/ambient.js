@@ -205,21 +205,25 @@ export class Ambient {
     shrink(url).then((im) => this._show(seq, im), () => this._show(seq, null));
   }
 
-  // the layout changed size (PlayerView._bleed): once things settle, the light for the new layout
-  // cross-fades over the old one (as on a new song), so it never jumps when a panel opens or closes
+  // the layout changed size (PlayerView._bleed): the light is painted again for the new layout at once,
+  // in place (no fade), so it fits the cover from the first frame when a panel opens or closes
   refit() {
-    clearTimeout(this._refit);
-    this._refit = setTimeout(() => {
-      if (!this.img) return;
-      // not during a view transition: it would have to be captured again on every frame of it
-      if (/vt-(full|pane)/.test(document.documentElement.className)) return this.refit();
-      const g = this._geom();
-      if (g.key === this.key || !g.w) return;
-      this._show(this.seq, this.img);
-    }, 150);
+    if (!this.img) return;
+    // not during a view transition: it would have to be captured again on every frame of it. Its pieces jump
+    // to their new places at its end, so there the new light cross-fades in (over the old) instead
+    if (/vt-(full|pane)/.test(document.documentElement.className)) {
+      this._afterVt = true;
+      clearTimeout(this._refit); this._refit = setTimeout(() => this.refit(), 150); return;
+    }
+    const g = this._geom();
+    if (g.key === this.key || !g.w) return;
+    const fade = this._afterVt; this._afterVt = false;
+    this._show(this.seq, this.img, !fade);
   }
 
-  _show(seq, im) {
+  // inPlace: the same song in a new layout, painted over the canvases on show. Otherwise (a new song) the
+  // new light fades in on top of the old, which stays whole underneath until it has, so nothing dims
+  _show(seq, im, inPlace = false) {
     if (seq !== this.seq) return;
     this.img = im;
     const g = this._geom();
@@ -227,18 +231,19 @@ export class Ambient {
     const cols = im ? { l: column(im, 'l', g), r: column(im, 'r', g) } : {};
     const made = [];
     for (const p of this.pieces) {
-      for (const old of p.box.querySelectorAll('canvas.show')) {
-        old.classList.remove('show');
-        setTimeout(() => old.remove(), 1000);
+      const prev = p.cur;
+      const reuse = inPlace && prev?.isConnected;
+      const c = reuse ? prev : document.createElement('canvas');
+      let ok = false;
+      if (p.kind === 'full') ok = !!im && bleed(c, im);
+      else if (cols[p.side]) { paint(c, cols[p.side], p.side, p.kind, g); ok = true; }
+      if (reuse) { if (!ok) { c.classList.remove('show'); p.cur = null; } continue; }
+      if (prev) {
+        if (!ok) prev.classList.remove('show');
+        setTimeout(() => prev.remove(), 1000);
       }
       p.cur = null;
-      const c = document.createElement('canvas');
-      if (p.kind === 'full') { if (!im || !bleed(c, im)) continue; }
-      else {
-        const col = cols[p.side];
-        if (!col) continue;
-        paint(c, col, p.side, p.kind, g);
-      }
+      if (!ok) continue;
       p.box.append(c);
       p.cur = c;
       made.push(c);

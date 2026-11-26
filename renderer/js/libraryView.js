@@ -472,7 +472,7 @@ export class LibraryView {
         const t = tracks[i];
         const el = document.createElement('div');
         el.className = 'row track' + (i % 2 ? ' alt' : '') + (cur && cur.id === t.id ? ' playing' : ''); // .alt: every other row (DOM order is not list order)
-        el.style.transform = `translateY(${i * ROW_H}px)`;
+        el.style.translate = `0 ${i * ROW_H}px`; // translate, not transform: the hover scale would multiply a transform offset
         el.dataset.i = i;
         const right = this._trackRight(page, t);
         const num = page.node.type === 'album' && t.track ? `<span class="t-num">${t.track}</span>` : '';

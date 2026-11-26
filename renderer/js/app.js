@@ -673,6 +673,8 @@ class App {
   _navInk() {
     const ink = $('#navInk');
     const on = $('#plNav .nav-btn.on');
+    // the pill sits under one button; another one that is on (the lyrics toggle) is drawn without it
+    $$('#plNav .nav-btn').forEach((b) => b.classList.toggle('ink', b === on));
     if (!on) { ink.style.opacity = '0'; return; }
     ink.style.opacity = '1';
     ink.style.width = `${on.offsetWidth}px`;

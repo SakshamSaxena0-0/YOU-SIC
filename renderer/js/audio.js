@@ -63,7 +63,7 @@ export class AudioEngine extends EventTarget {
     this.visTap.connect(this.analyser);
     this.volume.connect(this.master).connect(ctx.destination);
 
-    this.opts = { eq: true, tone: true, limiter: true, reverb: false };
+    this.opts = { eq: true, tone: true, limiter: false, reverb: false };
     this.tempo = 1;
     this.decks = [this._deck(0), this._deck(1)];
     this.cur = 0;

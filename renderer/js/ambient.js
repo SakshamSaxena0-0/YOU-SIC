@@ -75,7 +75,28 @@ function column(img, side, g) {
   cg.imageSmoothingQuality = 'high';
   cg.filter = 'saturate(1.35) brightness(1.15)';
   cg.drawImage(img, Math.max(0, sx), Math.max(0, -oy / s), band, Math.min(ih, g.h / s), 0, 0, 1, H);
+  soften(cg);
   return col;
+}
+
+// Stretched down a tall pane, each of the column's H colours is a band ~20 px high, and a cover with stripes
+// or hard lines at its edge turns into hard stripes across the pane: run the colours together (two passes
+// of a 5-row average, the ends held), so the light changes gradually down the window.
+function soften(cg) {
+  let d;
+  try { d = cg.getImageData(0, 0, 1, H); } catch { return; }
+  const p = d.data;
+  for (let pass = 0; pass < 2; pass++) {
+    const src = p.slice();
+    for (let y = 0; y < H; y++) {
+      for (let j = 0; j < 4; j++) {
+        let sum = 0;
+        for (let k = -2; k <= 2; k++) sum += src[Math.min(H - 1, Math.max(0, y + k)) * 4 + j];
+        p[y * 4 + j] = sum / 5;
+      }
+    }
+  }
+  cg.putImageData(d, 0, 0);
 }
 
 // Light that falls on a pane has to stay colour, never a pale wash over its text: every pixel keeps its

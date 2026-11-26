@@ -19,7 +19,7 @@ html.glass-brutal {
   --sp-ink: #eaeaea;                       /* names */
   --sp-count: #888;                        /* counts */
   --sp-r: 12px;
-  --sp-dot: rgb(255 255 255 / 0.72);       /* the dot matrix: 1.5px dots on a 4px grid */
+  --sp-dot: rgb(255 255 255 / 0.4);        /* the dot matrix: 1.5px dots on a 4px grid (soft: it lies under the names and paths) */
   --sp-pitch: 4px;
   --sp-light-r: 110px;                     /* how far round the pointer the light reaches (spotlight.js reach is 130) */
   --sp-glow-r: 150px;                      /* the white glow under the dots */

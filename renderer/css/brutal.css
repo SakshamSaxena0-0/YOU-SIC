@@ -52,11 +52,14 @@ html.glass-brutal .app.wide :is(.lib-header, .side-header) {
 }
 html.glass-brutal .app.wide .side-header { --br-dir: 270deg; }
 
-/* ---------- type: heavy uppercase titles, raw mono labels ---------- */
-html.glass-brutal :is(#plTitle, .lib-title, .ah-title, .sheet-title) { text-transform: uppercase; font-weight: 800; letter-spacing: -0.02em; }
+/* ---------- type: heavy titles, raw mono labels ---------- */
+/* names (songs, albums, folders) keep their own case; only the app's own labels are set in capitals */
+html.glass-brutal :is(#plTitle, .lib-title, .ah-title, .sheet-title) { font-weight: 800; letter-spacing: -0.02em; }
+html.glass-brutal .sheet-title { text-transform: uppercase; }
 html.glass-brutal #plTitle { line-height: 1.08; }
 html.glass-brutal .pl-artist { color: var(--br-bone); font-weight: 700; }
-html.glass-brutal :is(.tile-title, .pl-cat-label, .eq-tab, .set-sec, .tb-title) { font-family: var(--mono); text-transform: uppercase; }
+html.glass-brutal :is(.tile-title, .pl-cat-label, .eq-tab, .set-sec, .tb-title) { font-family: var(--mono); }
+html.glass-brutal :is(.pl-cat-label, .eq-tab, .set-sec, .tb-title) { text-transform: uppercase; }
 html.glass-brutal .tile-title { font-size: 12px; font-weight: 700; letter-spacing: 0.04em; line-height: 1.25; }
 html.glass-brutal .eq-tab { font-size: 11.5px; font-weight: 700; letter-spacing: 0.08em; }
 html.glass-brutal .pl-cat-label { letter-spacing: 0.24em; }
@@ -65,6 +68,9 @@ html.glass-brutal .tile-count { color: var(--dim); }
 html.glass-brutal .ly-line { color: rgba(236, 236, 232, 0.2); filter: none; }
 html.glass-brutal .ly-line:hover { color: rgba(236, 236, 232, 0.5); }
 html.glass-brutal .ly-line.active { color: var(--br-bone); text-shadow: none; }
+/* full screen: the lyrics lie over the cover's own colours, where a 20% line can't be read */
+html.glass-brutal .app.full .side .ly-line:not(.active) { color: rgba(236, 236, 232, 0.4); }
+html.glass-brutal .app.full .side .ly-line:not(.active):hover { color: rgba(236, 236, 232, 0.65); }
 
 /* ---------- shapes: squarer slabs ---------- */
 html.glass-brutal :is(.tile, .tile.lg) { border-radius: var(--br-r); }
@@ -120,6 +126,8 @@ html.glass-brutal.btn-ios .ctl-sm.on::after { background: var(--br-ink); box-sha
 html.glass-brutal.btn-ios .ctl-sm.on .ico, html.glass-brutal.btn-ios .chip.on .ico { filter: none; }
 html.glass-brutal :is(.nav-ink, .eq-tab-ink) { background: var(--br-solid); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.35), 0 8px 20px -8px var(--br-shade); }
 html.glass-brutal .nav-btn.on { color: var(--br-ink); filter: none; }
+/* a toggle that is on without the pill under it (the lyrics panel open on another page): white, not ink on the dark dock */
+html.glass-brutal .nav-btn.on:not(.ink) { color: #fff; }
 html.glass-brutal .eq-tab.active { color: var(--br-ink); }
 html.glass-brutal .switch:checked { background: var(--br-solid); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.35); }
 html.glass-brutal .switch:checked::after { background: var(--br-ink); }

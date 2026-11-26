@@ -90,9 +90,18 @@ export class FullLight {
       fade(0, by, 0, 0, 0, 0, cw, by);
       fade(0, by + bh, 0, ch, 0, by + bh, cw, rh);
     }
-    this.host.append(c);
-    void c.offsetWidth; // start from transparent, so it fades in
-    c.classList.add('show');
+    // stretched out, each row (or column) of the edge became a hard stripe: soften the tiny canvas once,
+    // over the ground colour so its own borders don't darken
+    const out = document.createElement('canvas');
+    out.width = cw; out.height = ch;
+    const o = out.getContext('2d');
+    o.fillStyle = `rgb(${ground})`;
+    o.fillRect(0, 0, cw, ch);
+    o.filter = 'blur(1.6px)';
+    o.drawImage(c, 0, 0);
+    this.host.append(out);
+    void out.offsetWidth; // start from transparent, so it fades in
+    out.classList.add('show');
   }
 
   // the player's ground colour ("r,g,b"), which the light fades into

@@ -34,7 +34,7 @@ export const DEFAULT_SETTINGS = {
   sorts: {},
   views: {}, // library: 'grid' or 'list' per kind of view (the list menu's View); unset = the view's own default
   eq: {
-    enabled: true, tone: true, limiter: true, reverb: false,
+    enabled: true, tone: true, limiter: false, reverb: false,
     bands: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], preamp: 0, bass: 0, treble: 0, balance: 0, tempo: 1,
     preset: 'Flat', userPresets: [],
     rev: { mix: 0.3, size: 0.5, damp: 0.5, filter: 0.1, fade: 0.5, predelay: 0.2, predelayMix: 0.1 }, revPreset: 'Hall',
@@ -98,6 +98,8 @@ export class Store extends EventTarget {
     // Liquid Glass is the only theme now: whoever was on another one is moved to it
     if (!THEMES.includes(this.settings.theme)) this.settings.theme = 'glass';
     if ((s.v || 0) < 2) Object.assign(this.settings, { v: 2, buttonStyle: 'ios', windowBg: 'wallpaper' });
+    // v3: the limiter starts off so the music plays as it is in the file (it can be turned back on)
+    if ((s.v || 0) < 3) { this.settings.v = 3; this.settings.eq.limiter = false; }
     // settings of the themes that are gone
     delete this.settings.metalCover;
     delete this.settings.metalMode;

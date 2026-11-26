@@ -1456,6 +1456,10 @@ html.glass-window, html.glass-window body { background: transparent; }
 html.fx-lite *, html.fx-lite *::before, html.fx-lite *::after { backdrop-filter: none !important; }
 html.fx-lite .bg-layer, html.fx-lite .marquee span, html.fx-lite .aq-pool, html.fx-lite .aq-pool i, html.fx-lite .aq-bub b, html.fx-lite .froth b { animation: none !important; }
 html.fx-lite .grain { display: none !important; }
+/* without the blur a see-through panel shows the player sharp under its text: panels over other content go solid */
+html.fx-lite :is(.sheet, .ctxmenu, .toast, .vol-pop, .fs-panel) { background: linear-gradient(180deg, rgb(36, 36, 44), rgb(20, 20, 26)) !important; }
+html.fx-lite .scrim.open { background: rgba(0, 0, 0, 0.72); }
+html.fx-lite .app:not(.wide) :is(.library, .eq) { background: rgb(14, 14, 18) !important; }
 
 /* ==========================================================================
    Full screen (the key beside the mini player, F11 or F; App.toggleFull)

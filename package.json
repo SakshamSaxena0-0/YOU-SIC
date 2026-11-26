@@ -1,7 +1,7 @@
 {
   "name": "yousic",
   "productName": "YouSic",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A music player for Windows",
   "main": "main.js",
   "scripts": {
